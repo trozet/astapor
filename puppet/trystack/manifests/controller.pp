@@ -1,4 +1,3 @@
-
 # TODO
 # refine iptable rules, their probably giving access to the public
 #
@@ -134,8 +133,9 @@ class trystack::controller(){
 
     class {'memcached':}
 
-    class {'apache':}
-    class {'apache::mod::wsgi':}
+# Double definition - This seems to have appeared with Puppet 3.x
+#   class {'apache':}
+#   class {'apache::mod::wsgi':}
     file { '/etc/httpd/conf.d/openstack-dashboard.conf':}
 
     firewall { '001 controller incoming':
