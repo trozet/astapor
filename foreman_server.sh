@@ -75,6 +75,10 @@ pushd foreman-installer/
 scl enable ruby193 "puppet apply --verbose -e 'include puppet, puppet::server, passenger, foreman_proxy, foreman' --modulepath=./"
 popd
 
+########### FIX PASSENGER ################# 
+cp broker-ruby /usr/share/foreman
+chmod 777 /usr/share/foreman/broker-ruby
+cp ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
 
 ############ SETUP MYSQL ###################
 yum -y install foreman-mysql* mysql-server 
