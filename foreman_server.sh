@@ -77,7 +77,20 @@ popd
 
 
 ############ SETUP MYSQL ###################
+yum -y install foreman-mysql* mysql-server 
+chkconfig mysqld on
+service mysqld start
 
+MYSQL_ADMIN_PASSWD='mysql'
+/usr/bin/mysqladmin -u root password "${MYSQL_ADMIN_PASSWD}"
+/usr/bin/mysqladmin -u root -h $(hostname) password "${MYSQL_ADMIN_PASSWD}"
+
+MYSQL_PUPPET_PASSWD='puppet'
+echo "create database puppet; GRANT ALL PRIVILEGES ON puppet.* TO puppet@localhost IDENTIFIED BY '$MYSQL_PUPPET_PASSWD'; commit;" | mysql -u root -p
+
+cp database.yml /usr/share/foreman/config/
+
+sudo -u foreman scl enable ruby193 "cd /usr/share/foreman; RAILS_ENV=production rake db:migrate"
 ###########################################
 
 # turn on certificate autosigning
@@ -90,9 +103,7 @@ scl enable ruby193 "ruby foreman-setup.rb proxy"
 # install puppet modules
 mkdir -p /etc/puppet/modules/production
 cp -r puppet/* /etc/puppet/modules/production/
-pushd /usr/share/foreman
-RAILS_ENV=production rake puppet:import:puppet_classes[batch]
-popd
+sudo -u foreman scl enable ruby193 "cd /usr/share/foreman; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
 scl enable ruby193 "ruby foreman-setup.rb globals"
 scl enable ruby193 "ruby foreman-setup.rb hostgroups"
@@ -104,13 +115,12 @@ cat >/tmp/foreman_client.sh <<EOF
 
 # start with a subscribed RHEL7 box
 rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-rpm -Uvh https://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
 yum-config-manager --enable rhel-6-server-optional-rpms
 yum clean all
 
 # install dependent packages
 yum install -y http://yum.theforeman.org/releases/latest/el6/x86_64/rubygems-1.8.10-1.el6.noarch.rpm
-yum install -y augeas puppet git policycoreutils-python
+yum install -y augeas ruby193-puppet 
 
 # Set PuppetServer
 augtool -s set /files/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
