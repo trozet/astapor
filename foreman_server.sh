@@ -5,7 +5,7 @@
 if [ "x$PUPPETMASTER" = "x" ]; then
   # Set PuppetServer
   #export PUPPETMASTER=puppet.example.com
-  export PUPPETMASTER=$(hostname)
+  export PUPPETMASTER=$(hostname --fqdn)
 fi
 
 if [ "x$FOREMAN_INSTALLER_DIR" = "x" ]; then
