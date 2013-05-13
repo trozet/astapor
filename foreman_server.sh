@@ -22,7 +22,11 @@ if [ ! -f foreman_server.sh ]; then
   exit 1
 fi
 
-# TODO exit if not >= RHEL 6.4 (check /etc/redhat-release)
+if [ ! -f /etc/redhat-release ] || \
+    cat /etc/redhat-release | grep -v -q -P 'release 6.[456789]'; then
+  echo "This installer is only supported on RHEL 6.4 or greater."
+  exit 1
+fi
 
 # start with a subscribed RHEL6 box.  hint:
 #    subscription-manager register
