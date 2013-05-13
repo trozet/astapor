@@ -92,6 +92,7 @@ popd
 cp config/broker-ruby /usr/share/foreman
 chmod 777 /usr/share/foreman/broker-ruby
 cp config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
+rm /etc/httpd/conf.d/passenger.conf
 
 ############ SETUP MYSQL ###################
 yum -y install foreman-mysql* mysql-server
