@@ -17,7 +17,10 @@ if [ ! -d $FOREMAN_INSTALLER_DIR ]; then
   exit 1
 fi
 
-# TODO exit if not in same dir as forem_server.sh, foreman-params.json
+if [ ! -f foreman_server.sh ]; then
+  echo "You must be in the same dir as foreman_server.sh when executing it"
+  exit 1
+fi
 
 # TODO exit if not >= RHEL 6.4 (check /etc/redhat-release)
 
