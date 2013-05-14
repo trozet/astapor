@@ -8,6 +8,15 @@ if [ "x$PUPPETMASTER" = "x" ]; then
   export PUPPETMASTER=$(hostname)
 fi
 
+if [ "x$FOREMAN_INSTALLER_DIR" = "x" ]; then
+  FOREMAN_INSTALLER_DIR=$HOME/foreman-installer
+fi
+
+if [ ! -d $FOREMAN_INSTALLER_DIR ]; then
+  echo "$FOREMAN_INSTALLER_DIR does not exist.  exiting"
+  exit 1
+fi
+
 # TODO exit if not in same dir as forem_server.sh, foreman-params.json
 
 # TODO exit if not >= RHEL 6.4 (check /etc/redhat-release)
@@ -68,21 +77,17 @@ augtool -s set /files/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
 # Puppet Plugins
 augtool -s set /files/etc/puppet/puppet.conf/main/pluginsync true
 
-workdir=/root
-pushd $workdir
-
-# install formean
-pushd foreman-installer/
+pushd $FOREMAN_INSTALLER_DIR
 scl enable ruby193 "puppet apply --verbose -e 'include puppet, puppet::server, passenger, foreman_proxy, foreman' --modulepath=./"
 popd
 
-########### FIX PASSENGER ################# 
+########### FIX PASSENGER #################
 cp broker-ruby /usr/share/foreman
 chmod 777 /usr/share/foreman/broker-ruby
 cp ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
 
 ############ SETUP MYSQL ###################
-yum -y install foreman-mysql* mysql-server 
+yum -y install foreman-mysql* mysql-server
 chkconfig mysqld on
 service mysqld start
 
@@ -125,7 +130,7 @@ yum clean all
 
 # install dependent packages
 yum install -y http://yum.theforeman.org/releases/latest/el6/x86_64/rubygems-1.8.10-1.el6.noarch.rpm
-yum install -y augeas ruby193-puppet 
+yum install -y augeas ruby193-puppet
 
 # Set PuppetServer
 augtool -s set /files/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
