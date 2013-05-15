@@ -57,7 +57,7 @@ function install_pkgs {
 install_pkgs "yum-utils yum-rhn-plugin"
 
 rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-cp foreman-nightlies.repo /etc/yum.repos.d/
+cp config/foreman-nightlies.repo /etc/yum.repos.d/
 yum-config-manager --enable rhel-6-server-optional-rpms
 yum clean all
 
@@ -81,10 +81,10 @@ pushd $FOREMAN_INSTALLER_DIR
 scl enable ruby193 "puppet apply --verbose -e 'include puppet, puppet::server, passenger, foreman_proxy, foreman' --modulepath=./"
 popd
 
-########### FIX PASSENGER #################
-cp broker-ruby /usr/share/foreman
+########### FIX PASSENGER ################# 
+cp config/broker-ruby /usr/share/foreman
 chmod 777 /usr/share/foreman/broker-ruby
-cp ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
+cp config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
 
 ############ SETUP MYSQL ###################
 yum -y install foreman-mysql* mysql-server
@@ -98,7 +98,7 @@ MYSQL_ADMIN_PASSWD='mysql'
 MYSQL_PUPPET_PASSWD='puppet'
 echo "create database puppet; GRANT ALL PRIVILEGES ON puppet.* TO puppet@localhost IDENTIFIED BY '$MYSQL_PUPPET_PASSWD'; commit;" | mysql -u root -p
 
-cp database.yml /usr/share/foreman/config/
+cp config/database.yml /usr/share/foreman/config/
 
 sudo -u foreman scl enable ruby193 "cd /usr/share/foreman; RAILS_ENV=production rake db:migrate"
 ###########################################
@@ -106,19 +106,20 @@ sudo -u foreman scl enable ruby193 "cd /usr/share/foreman; RAILS_ENV=production 
 # turn on certificate autosigning
 echo '*' >> /etc/puppet/autosign.conf
 
-# Configure defaults, host groups, proxy, etc
-sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
-scl enable ruby193 "ruby foreman-setup.rb proxy"
-
 # install puppet modules
 mkdir -p /etc/puppet/modules/production
 cp -r puppet/* /etc/puppet/modules/production/
 sudo -u foreman scl enable ruby193 "cd /usr/share/foreman; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
+# Configure defaults, host groups, proxy, etc
+pushd bin/
+sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
+scl enable ruby193 "ruby foreman-setup.rb proxy"
+
 scl enable ruby193 "ruby foreman-setup.rb globals"
 scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 scl enable ruby193 "ruby foreman-setup.rb settings"
-
+popd
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
 cat >/tmp/foreman_client.sh <<EOF
