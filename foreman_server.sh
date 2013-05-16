@@ -113,9 +113,18 @@ sudo -u foreman scl enable ruby193 "cd /usr/share/foreman; RAILS_ENV=production 
 
 # Configure defaults, host groups, proxy, etc
 pushd bin/
-sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
-scl enable ruby193 "ruby foreman-setup.rb proxy"
 
+sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
+
+export PASSWD_COUNT=$(cat foreman-params.json | grep changeme | wc -l)
+
+for i in $(seq $PASSWD_COUNT)
+do
+  export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
+  sed -i "s/changeme/$PASSWD" foreman-params.json
+done
+
+scl enable ruby193 "ruby foreman-setup.rb proxy"
 scl enable ruby193 "ruby foreman-setup.rb globals"
 scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 scl enable ruby193 "ruby foreman-setup.rb settings"

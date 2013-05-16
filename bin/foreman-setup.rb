@@ -13,6 +13,7 @@ require 'rubygems'
 require 'json'
 require 'logger'
 require 'rest-client'
+require 'securerandom'
 
 # Default
 @params_file_name = 'foreman-params.json'
@@ -88,6 +89,10 @@ def create_puppetos(puppetos)
   end
 end
 
+def gen_password
+  puts SecureRandom.hex
+end
+
 def update(cmd, data)
   response = @client[cmd].put(data)
 rescue RestClient::UnprocessableEntity => e
@@ -159,6 +164,8 @@ begin
       create_hostgroups(@params['hostgroups'])
     when 'settings'
       update_settings(@params['settings'])
+    when 'password'
+      gen_password
     else
       usage
     end
