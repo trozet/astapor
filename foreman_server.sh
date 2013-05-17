@@ -5,7 +5,7 @@
 if [ "x$PUPPETMASTER" = "x" ]; then
   # Set PuppetServer
   #export PUPPETMASTER=puppet.example.com
-  export PUPPETMASTER=$(hostname)
+  export PUPPETMASTER=$(hostname --fqdn)
 fi
 
 if [ "x$FOREMAN_INSTALLER_DIR" = "x" ]; then
@@ -17,9 +17,16 @@ if [ ! -d $FOREMAN_INSTALLER_DIR ]; then
   exit 1
 fi
 
-# TODO exit if not in same dir as forem_server.sh, foreman-params.json
+if [ ! -f foreman_server.sh ]; then
+  echo "You must be in the same dir as foreman_server.sh when executing it"
+  exit 1
+fi
 
-# TODO exit if not >= RHEL 6.4 (check /etc/redhat-release)
+if [ ! -f /etc/redhat-release ] || \
+    cat /etc/redhat-release | grep -v -q -P 'release 6.[456789]'; then
+  echo "This installer is only supported on RHEL 6.4 or greater."
+  exit 1
+fi
 
 # start with a subscribed RHEL6 box.  hint:
 #    subscription-manager register
@@ -85,6 +92,7 @@ popd
 cp config/broker-ruby /usr/share/foreman
 chmod 777 /usr/share/foreman/broker-ruby
 cp config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
+rm /etc/httpd/conf.d/passenger.conf
 
 ############ SETUP MYSQL ###################
 yum -y install foreman-mysql* mysql-server
