@@ -8,8 +8,16 @@ if [ "x$PUPPETMASTER" = "x" ]; then
   export PUPPETMASTER=$(hostname --fqdn)
 fi
 
+if [ "x$SCL_RUBY_HOME" = "x" ]; then
+  SCL_RUBY_HOME=/opt/rh/ruby193/root
+fi
+
 if [ "x$FOREMAN_INSTALLER_DIR" = "x" ]; then
-  FOREMAN_INSTALLER_DIR=$HOME/foreman-installer
+  FOREMAN_INSTALLER_DIR=$SCL_RUBY_HOME/usr/share/foreman-installer
+fi
+
+if [ "x$FOREMAN_DIR" = "x" ]; then
+  FOREMAN_DIR=$SCL_RUBY_HOME/usr/share/foreman
 fi
 
 if [ ! -d $FOREMAN_INSTALLER_DIR ]; then
@@ -32,45 +40,6 @@ fi
 #    subscription-manager register
 #    subscription-manager subscribe --auto
 
-function install_pkgs {
-  depends=$1
-  install_list=""
-  for dep in $depends; do
-    if ! `rpm -q --quiet --nodigest $dep`; then
-      install_list="$install_list $dep"
-    fi
-  done
-
-  # Install the needed packages
-  if [ "x$install_list" != "x" ]; then
-    sudo yum install -y $install_list
-  fi
-
-  # Verify the dependencies did install
-  fail_list=""
-  for dep in $depends; do
-    if ! `rpm -q --quiet --nodigest $dep`; then
-      fail_list="$fail_list $dep"
-    fi
-  done
-
-  # If anything failed verification, we tell the user and exit
-  if [ "x$fail_list" != "x" ]; then
-      echo "ABORTING:  FAILED TO INSTALL $fail_list"
-      exit 1
-  fi
-}
-
-install_pkgs "yum-utils yum-rhn-plugin"
-
-rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-cp config/foreman-nightlies.repo /etc/yum.repos.d/
-yum-config-manager --enable rhel-6-server-optional-rpms
-yum clean all
-
-# install dependent packages
-install_pkgs "augeas ruby193-puppet git policycoreutils-python"
-
 # enable ip forwarding
 sudo sysctl -w net.ipv4.ip_forward=1
 sudo sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
@@ -89,13 +58,12 @@ scl enable ruby193 "puppet apply --verbose -e 'include puppet, puppet::server, p
 popd
 
 ########### FIX PASSENGER ################# 
-cp config/broker-ruby /usr/share/foreman
-chmod 777 /usr/share/foreman/broker-ruby
+cp config/broker-ruby $FOREMAN_DIR
+chmod 777 $FOREMAN_DIR/broker-ruby
 cp config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
 rm /etc/httpd/conf.d/passenger.conf
 
 ############ SETUP MYSQL ###################
-yum -y install foreman-mysql* mysql-server
 chkconfig mysqld on
 service mysqld start
 
@@ -106,9 +74,9 @@ MYSQL_ADMIN_PASSWD='mysql'
 MYSQL_PUPPET_PASSWD='puppet'
 echo "create database puppet; GRANT ALL PRIVILEGES ON puppet.* TO puppet@localhost IDENTIFIED BY '$MYSQL_PUPPET_PASSWD'; commit;" | mysql -u root -p
 
-cp config/database.yml /usr/share/foreman/config/
+cp config/database.yml $FOREMAN_DIR/config/
 
-sudo -u foreman scl enable ruby193 "cd /usr/share/foreman; RAILS_ENV=production rake db:migrate"
+sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake db:migrate"
 ###########################################
 
 # turn on certificate autosigning
@@ -117,7 +85,7 @@ echo '*' >> /etc/puppet/autosign.conf
 # install puppet modules
 mkdir -p /etc/puppet/modules/production
 cp -r puppet/* /etc/puppet/modules/production/
-sudo -u foreman scl enable ruby193 "cd /usr/share/foreman; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
+sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
 # Configure defaults, host groups, proxy, etc
 pushd bin/
@@ -140,13 +108,7 @@ popd
 # TODO don't hit yum unless packages are not installed
 cat >/tmp/foreman_client.sh <<EOF
 
-# start with a subscribed RHEL7 box
-rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-yum-config-manager --enable rhel-6-server-optional-rpms
-yum clean all
-
-# install dependent packages
-yum install -y http://yum.theforeman.org/releases/latest/el6/x86_64/rubygems-1.8.10-1.el6.noarch.rpm
+# start with a subscribed RHEL6 box
 yum install -y augeas ruby193-puppet
 
 # Set PuppetServer
