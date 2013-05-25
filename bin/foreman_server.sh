@@ -60,6 +60,7 @@ include passenger
 class { 'foreman':
   db_type => 'mysql',
   custom_repo => true,
+  app_root => '/opt/rh/ruby193/root/usr/share/foreman'
 }
 #
 # Check foreman_proxy/manifests/{init,params}.pp for other options
@@ -78,37 +79,23 @@ scl enable ruby193 "puppet apply --verbose installer.pp --modulepath=. "
 popd
 
 ########### FIX PASSENGER ################# 
-cp config/broker-ruby $FOREMAN_DIR
+cp ../config/broker-ruby $FOREMAN_DIR
 chmod 777 $FOREMAN_DIR/broker-ruby
-cp config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
+cp ../config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
 rm /etc/httpd/conf.d/passenger.conf
 
-############ SETUP MYSQL ###################
-chkconfig mysqld on
-service mysqld start
-
-MYSQL_ADMIN_PASSWD='mysql'
-/usr/bin/mysqladmin -u root password "${MYSQL_ADMIN_PASSWD}"
-/usr/bin/mysqladmin -u root -h $(hostname) password "${MYSQL_ADMIN_PASSWD}"
-
-MYSQL_PUPPET_PASSWD='puppet'
-echo "create database puppet; GRANT ALL PRIVILEGES ON puppet.* TO puppet@localhost IDENTIFIED BY '$MYSQL_PUPPET_PASSWD'; commit;" | mysql -u root -p
-
-cp config/database.yml $FOREMAN_DIR/config/
-
-sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake db:migrate"
-###########################################
+### TODO fix foreman db migrate
+cp ../config/dbmigrate $FOREMAN_DIR/extras/
 
 # turn on certificate autosigning
 echo '*' >> /etc/puppet/autosign.conf
 
 # install puppet modules
 mkdir -p /etc/puppet/modules/production
-cp -r puppet/* /etc/puppet/modules/production/
+cp -r ../puppet/* /etc/puppet/modules/production/
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
 # Configure defaults, host groups, proxy, etc
-pushd bin/
 
 sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
 
@@ -123,7 +110,6 @@ done
 scl enable ruby193 "ruby foreman-setup.rb proxy"
 scl enable ruby193 "ruby foreman-setup.rb globals"
 scl enable ruby193 "ruby foreman-setup.rb hostgroups"
-popd
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
 cat >/tmp/foreman_client.sh <<EOF
