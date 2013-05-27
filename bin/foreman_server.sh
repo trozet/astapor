@@ -56,6 +56,7 @@ augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync
 pushd $FOREMAN_INSTALLER_DIR
 cat > installer.pp << EOM
 include puppet
+include puppet::server
 include passenger
 class { 'foreman':
   db_type => 'mysql',
