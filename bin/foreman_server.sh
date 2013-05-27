@@ -119,17 +119,17 @@ cat >/tmp/foreman_client.sh <<EOF
 yum install -y augeas ruby193-puppet
 
 # Set PuppetServer
-augtool -s set /files/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
+augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
 
 # Puppet Plugins
-augtool -s set /files/etc/puppet/puppet.conf/main/pluginsync true
+augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
 
 # check in to foreman
-puppet agent --test
+scl enable ruby193 "puppet agent --test"
 sleep 1
-puppet agent --test
+scl enable ruby193 "puppet agent --test"
 
-/etc/init.d/puppet start
+/etc/init.d/ruby193-puppet start
 EOF
 
 echo "Foreman is installed and almost ready for setting up your OpenStack"
