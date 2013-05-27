@@ -48,10 +48,10 @@ sudo sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/sysctl.co
 # TODO: selinux policy
 setenforce 0
 
-augtool -s set /files/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
+augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
 
 # Puppet Plugins
-augtool -s set /files/etc/puppet/puppet.conf/main/pluginsync true
+augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
 
 pushd $FOREMAN_INSTALLER_DIR
 cat > installer.pp << EOM
