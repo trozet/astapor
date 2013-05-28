@@ -89,12 +89,15 @@ rm /etc/httpd/conf.d/passenger.conf
 cp ../config/dbmigrate $FOREMAN_DIR/extras/
 
 # turn on certificate autosigning
-echo '*' >> /etc/puppet/autosign.conf
+echo '*' >> $SCL_RUBY_HOME/etc/puppet/autosign.conf
 
 # install puppet modules
-mkdir -p /etc/puppet/modules/production
-cp -r ../puppet/* /etc/puppet/modules/production/
+mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
+cp -r ../puppet/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
+
+# reset permissions
+sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake permissions:reset"
 
 # Configure defaults, host groups, proxy, etc
 
@@ -105,7 +108,7 @@ export PASSWD_COUNT=$(cat foreman-params.json | grep changeme | wc -l)
 for i in $(seq $PASSWD_COUNT)
 do
   export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
-  sed -i "s/changeme/$PASSWD" foreman-params.json
+  sed -i "s/CHANGEME/$PASSWD" foreman-params.json
 done
 
 scl enable ruby193 "ruby foreman-setup.rb proxy"
