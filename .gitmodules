@@ -1,0 +1,12 @@
+[submodule "installer_puppet/puppet-puppet"]
+	path = installer_puppet/puppet-puppet
+	url = git://github.com/cwolferh/puppet-puppet.git
+[submodule "installer_puppet/puppet-foreman"]
+	path = installer_puppet/puppet-foreman
+	url = git://github.com/cwolferh/puppet-foreman.git
+[submodule "installer_puppet/puppet-foreman_proxy"]
+	path = installer_puppet/puppet-foreman_proxy
+	url = git://github.com/cwolferh/puppet-foreman_proxy.git
+[submodule "installer_puppet/puppet-passenger"]
+	path = installer_puppet/puppet-passenger
+	url = git://github.com/cwolferh/puppet-passenger.git
