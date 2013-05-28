@@ -4,7 +4,7 @@
 %global homedir /usr/share/openstack-foreman-installer
 
 Name:	%{?scl_prefix}openstack-foreman-installer	
-Version:	0.0.4
+Version:	0.0.5
 Release:	1%{?dist}
 Summary:	Installer & Configuration tool for OpenStack
 
@@ -60,6 +60,16 @@ install -m 0644 config/ruby193-passenger.conf %{buildroot}%{homedir}/config
 %{homedir}/config/ruby193-passenger.conf
 
 %changelog
+* Tue May 28 2013 Jordan OMara <jomara@redhat.com> 0.0.5-1
+- Merge remote-tracking branch 'origin/master' (jomara@redhat.com)
+- bump submodule rev (cwolfe@redhat.com)
+- Merge remote-tracking branch 'origin/master' (jomara@redhat.com)
+- scl foreman-installer updates (cwolfe@redhat.com)
+- Fixing some paths for SCL (jomara@redhat.com)
+- SCL related stuff for generated client script (jistr@redhat.com)
+- Include puppet::server in installer.pp (jistr@redhat.com)
+- SCL paths for Puppet server configuration (jistr@redhat.com)
+
 * Fri May 24 2013 Jordan OMara <jomara@redhat.com> 0.0.4-1
 - Some fixes for 193 foreman (jomara@redhat.com)
 - work in progress-- "puppet apply" tweaks.  note, no puppet::server
