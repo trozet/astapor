@@ -8,29 +8,6 @@
       "name": "proxy1",
       "host": "https://foreman_hostname:8443"
     },
-    "globals": {
-      "admin_email":            "EDIT ME: EG admin@example.org",
-      "admin_password":         "CHANGEME",
-      "controller_node_public": "EDIT ME: EG 10.100.0.2",
-      "fixed_network_range":    "EDIT ME: EG 10.100.10.0/24",
-      "floating_network_range": "EDIT ME: EG 8.21.28.128/25",
-      "pacemaker_pub_floating_ip":    "EDIT ME: EG 10.100.10.0/24",
-      "pacemaker_priv_floating_ip": "EDIT ME: EG 8.21.28.128/25",
-      "glance_db_password":     "CHANGEME",
-      "glance_user_password":   "CHANGEME",
-      "horizon_secret_key":     "secret",
-      "keystone_admin_token":   "secret",
-      "keystone_db_password":   "CHANGEME",
-      "keystone_password":      "CHANGEME",
-      "mysql_root_password":    "CHANGEME",
-      "nova_db_password":       "CHANGEME",
-      "nova_user_password":     "CHANGEME",
-      "cinder_db_password":     "CHANGEME",
-      "cinder_user_password":   "CHANGEME",
-      "private_interface":      "EDIT ME: em1",
-      "public_interface":       "EDIT ME: em2",
-      "verbose":                "true"
-    },
     "hostgroups": {
 	"OpenStack Controller": {
 	    "environment": "production",

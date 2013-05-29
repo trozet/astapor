@@ -95,6 +95,17 @@ cp ../config/dbmigrate $FOREMAN_DIR/extras/
 # turn on certificate autosigning
 echo '*' >> $SCL_RUBY_HOME/etc/puppet/autosign.conf
 
+# Configure class defaults
+# This is not ideal, but will work until the API v2 is ready
+
+PASSWD_COUNT=$(cat ../puppet/trystack/manifests/params.pp | grep CHANGEME | wc -l)
+
+for i in $(seq $PASSWD_COUNT)
+do
+  export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
+  sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" ../puppet/trystack/manifests/params.pp
+done
+
 # install puppet modules
 mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
 cp -r ../puppet/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
@@ -107,16 +118,7 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 
 sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
 
-export PASSWD_COUNT=$(cat foreman-params.json | grep changeme | wc -l)
-
-for i in $(seq $PASSWD_COUNT)
-do
-  export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
-  sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" foreman-params.json
-done
-
 scl enable ruby193 "ruby foreman-setup.rb proxy"
-scl enable ruby193 "ruby foreman-setup.rb globals"
 scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
@@ -143,8 +145,12 @@ scl enable ruby193 "puppet agent --test"
 EOF
 
 echo "Foreman is installed and almost ready for setting up your OpenStack"
-echo "First, you need to input a few parameters into foreman."
-echo "Visit https://$(hostname)/common_parameters"
+echo "First, you need to alter a few parameters in Foreman."
+echo "Visit:"
+echo "https://$(hostname)/puppetclasses/trystack::compute/edit"
+echo "https://$(hostname)/puppetclasses/trystack::controller/edit"
+echo "Go to the Smart Class Parameters tab and work though each of the parameters"
+echo "in the left-hand column"
 echo ""
 echo "Then copy /tmp/foreman_client.sh to your openstack client nodes"
 echo "Run that script and visit the HOSTS tab in foreman. Pick CONTROLLER"
