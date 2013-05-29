@@ -108,7 +108,7 @@ export PASSWD_COUNT=$(cat foreman-params.json | grep changeme | wc -l)
 for i in $(seq $PASSWD_COUNT)
 do
   export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
-  sed -i "s/CHANGEME/$PASSWD" foreman-params.json
+  sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" foreman-params.json
 done
 
 scl enable ruby193 "ruby foreman-setup.rb proxy"
