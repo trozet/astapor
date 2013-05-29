@@ -3,23 +3,23 @@
 # refine iptable rules, their probably giving access to the public
 #
 
-class trystack::controller(
-  $admin_email                = 'EDIT ME: EG admin@example.org',
-  $admin_password             = 'CHANGEME-admin',
-  $cinder_db_password         = 'CHANGEME-cinder',
-  $cinder_user_password       = 'CHANGEME-cinder-user',
-  $glance_db_password         = 'CHANGEME-glance',
-  $glance_user_password       = 'CHANGEME-glance-user',
-  $horizon_secret_key         = 'secret-horizon',
-  $keystone_admin_token       = 'secret-keystone',
-  $keystone_db_password       = 'CHANGEME-keystone',
-  $mysql_root_password        = 'CHANGEME-mysql',
-  $nova_db_password           = 'CHANGEME-nova',
-  $nova_user_password         = 'CHANGEME-nova-user',
-  $pacemaker_priv_floating_ip = 'EDIT ME PRIV: EG 8.21.28.128/25',
-  $pacemaker_pub_floating_ip  = 'EDIT ME PUBL: EG 10.100.10.0/24',
-  $verbose                    = 'true'
-){
+class trystack::controller (
+  $admin_email                = $trystack::params::admin_email,
+  $admin_password             = $trystack::params::admin_password,
+  $cinder_db_password         = $trystack::params::cinder_db_password,
+  $cinder_user_password       = $trystack::params::cinder_user_password,
+  $glance_db_password         = $trystack::params::glance_db_password,
+  $glance_user_password       = $trystack::params::glance_user_password,
+  $horizon_secret_key         = $trystack::params::horizon_secret_key,
+  $keystone_admin_token       = $trystack::params::keystone_admin_token,
+  $keystone_db_password       = $trystack::params::keystone_db_password,
+  $mysql_root_password        = $trystack::params::mysql_root_password,
+  $nova_db_password           = $trystack::params::nova_db_password,
+  $nova_user_password         = $trystack::params::nova_user_password,
+  $pacemaker_priv_floating_ip = $trystack::params::pacemaker_priv_floating_ip,
+  $pacemaker_pub_floating_ip  = $trystack::params::pacemaker_pub_floating_ip,
+  $verbose                    = $trystack::params::verbose
+) inherits trystack::params {
 
     #pacemaker::corosync { 'trystack': }
 

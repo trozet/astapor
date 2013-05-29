@@ -1,15 +1,16 @@
 
 # Common trystack configurations
-class trystack::compute(
-  $nova_db_password           = "CHANGEME-nova",
-  $pacemaker_priv_floating_ip = "EDIT ME PRIV: EG 8.21.28.128/25",
-  $verbose                    = "true",
-  $nova_user_password         = "CHANGEME-nova-user",
-  $private_interface          = "EDIT ME: em1",
-  $public_interface           = "EDIT ME: em2",
-  $fixed_network_range        = "EDIT ME: EG 10.100.10.0/24",
-  $floating_network_range     = "EDIT ME: EG 8.21.28.128/25"
-){
+class trystack::compute (
+  $fixed_network_range        = $trystack::params::fixed_network_range,
+  $floating_network_range     = $trystack::params::floating_network_range,
+  $nova_db_password           = $trystack::params::nova_db_password,
+  $nova_user_password         = $trystack::params::nova_user_password,
+  $pacemaker_priv_floating_ip = $trystack::params::pacemaker_priv_floating_ip,
+  $private_interface          = $trystack::params::private_interface,
+  $public_interface           = $trystack::params::public_interface,
+  $verbose                    = $trystack::params::verbose,
+) inherits trystack::params {
+
     # Configure Nova
     nova_config{
         'auto_assign_floating_ip':  value => 'True';
