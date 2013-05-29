@@ -1,10 +1,12 @@
 class trystack::params {
-  $admin_email                = 'EDIT ME: EG admin@example.org'
+  $verbose                    = 'true'
+
+  # Passwords are currently changed to decent strings by sed
+  # during the setup process. This will move to the Foreman API v2
+  # at some point.
   $admin_password             = 'CHANGEME'
   $cinder_db_password         = 'CHANGEME'
   $cinder_user_password       = 'CHANGEME'
-  $fixed_network_range        = 'EDIT ME: EG 10.100.10.0/24'
-  $floating_network_range     = 'EDIT ME: EG 8.21.28.128/25'
   $glance_db_password         = 'CHANGEME'
   $glance_user_password       = 'CHANGEME'
   $horizon_secret_key         = 'CHANGEME'
@@ -13,9 +15,15 @@ class trystack::params {
   $mysql_root_password        = 'CHANGEME'
   $nova_db_password           = 'CHANGEME'
   $nova_user_password         = 'CHANGEME'
-  $pacemaker_priv_floating_ip = 'EDIT ME PRIV: EG 8.21.28.128/25'
-  $pacemaker_pub_floating_ip  = 'EDIT ME PUBL: EG 10.100.10.0/24'
-  $private_interface          = 'EDIT ME: em1'
-  $public_interface           = 'EDIT ME: em2'
-  $verbose                    = 'true'
+
+  # Networking
+  $private_interface          = 'eth1'
+  $public_interface           = 'eth0'
+  $fixed_network_range        = inline_template("<%= scope.lookupvar('::network_${private_interface}') + '/' + scope.lookupvar('::netmask_${private_interface}') %>")
+  $floating_network_range     = inline_template("<%= scope.lookupvar('::network_${public_interface}') + '/' + scope.lookupvar('::netmask_${public_interface}') %>")
+  $pacemaker_priv_floating_ip = inline_template("<%= scope.lookupvar('::ipaddress_${private_interface}') %>")
+  $pacemaker_pub_floating_ip  = inline_template("<%= scope.lookupvar('::ipaddress_${public_interface}') %>")
+
+  # Logs
+  $admin_email                = "admin@${::domain}"
 }
