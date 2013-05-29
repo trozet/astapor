@@ -116,7 +116,6 @@ do
 done
 
 scl enable ruby193 "ruby foreman-setup.rb proxy"
-scl enable ruby193 "ruby foreman-setup.rb globals"
 scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
@@ -143,8 +142,12 @@ scl enable ruby193 "puppet agent --test"
 EOF
 
 echo "Foreman is installed and almost ready for setting up your OpenStack"
-echo "First, you need to input a few parameters into foreman."
-echo "Visit https://$(hostname)/common_parameters"
+echo "First, you need to alter a few parameters in Foreman."
+echo "Visit:"
+echo "https://$(hostname)/puppetclasses/trystack::compute/edit"
+echo "https://$(hostname)/puppetclasses/trystack::controller/edit"
+echo "Go to the Smart Class Parameters tab and work though each of the parameters"
+echo "in the left-hand column"
 echo ""
 echo "Then copy /tmp/foreman_client.sh to your openstack client nodes"
 echo "Run that script and visit the HOSTS tab in foreman. Pick CONTROLLER"

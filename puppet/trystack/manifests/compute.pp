@@ -1,17 +1,26 @@
 
 # Common trystack configurations
-class trystack::compute(){
+class trystack::compute(
+  $nova_db_password           = "CHANGEME-nova",
+  $pacemaker_priv_floating_ip = "EDIT ME PRIV: EG 8.21.28.128/25",
+  $verbose                    = "true",
+  $nova_user_password         = "CHANGEME-nova-user",
+  $private_interface          = "EDIT ME: em1",
+  $public_interface           = "EDIT ME: em2",
+  $fixed_network_range        = "EDIT ME: EG 10.100.10.0/24",
+  $floating_network_range     = "EDIT ME: EG 8.21.28.128/25"
+){
     # Configure Nova
     nova_config{
-        'auto_assign_floating_ip': value => 'True';
-        #"network_host": value => "${pacemaker_priv_floating_ip}";
-        "network_host": value => "$::ipaddress";
+        'auto_assign_floating_ip':  value => 'True';
+        #"network_host":            value => ${pacemaker_priv_floating_ip;
+        "network_host":             value => "$::ipaddress";
         "libvirt_inject_partition": value => "-1";
-        #"metadata_host": value => "$pacemaker_priv_floating_ip";
-        "metadata_host": value => "$::ipaddress";
-        "qpid_hostname": value => "$pacemaker_priv_floating_ip";
-        "rpc_backend": value => "nova.rpc.impl_qpid";
-        "multi_host": value => "True";
+        #"metadata_host":           value => "$pacemaker_priv_floating_ip";
+        "metadata_host":            value => "$::ipaddress";
+        "qpid_hostname":            value => "$pacemaker_priv_floating_ip";
+        "rpc_backend":              value => "nova.rpc.impl_qpid";
+        "multi_host":               value => "True";
     }
 
     class { 'nova':
@@ -22,6 +31,7 @@ class trystack::compute(){
     }
 
     # uncomment if on a vm
+    # GSutclif: Maybe wrap this in a Facter['is-virtual'] test ?
     #file { "/usr/bin/qemu-system-x86_64":
     #    ensure => link,
     #    target => "/usr/libexec/qemu-kvm",
@@ -65,6 +75,5 @@ class trystack::compute(){
         dport    => '5900-5999',
         action   => 'accept',
     }
-
 
 }
