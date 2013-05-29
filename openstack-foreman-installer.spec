@@ -4,7 +4,7 @@
 %global homedir /usr/share/openstack-foreman-installer
 
 Name:	%{?scl_prefix}openstack-foreman-installer	
-Version:	0.0.5
+Version:	0.0.6
 Release:	1%{?dist}
 Summary:	Installer & Configuration tool for OpenStack
 
@@ -60,6 +60,21 @@ install -m 0644 config/ruby193-passenger.conf %{buildroot}%{homedir}/config
 %{homedir}/config/ruby193-passenger.conf
 
 %changelog
+* Wed May 29 2013 Jordan OMara <jomara@redhat.com> 0.0.6-1
+- Merge pull request #25 from GregSutcliffe/master (jsomara@gmail.com)
+- Attempt to guess defaults for _all_ the params (gsutclif@redhat.com)
+- Move trystack params to an common class, and use sed magic to put appropriate
+  passwords in. (gsutclif@redhat.com)
+- Parameterize trystack classes, remove old globals from JSON, style cleanup
+  (gsutclif@redhat.com)
+- updated locations of foreman installer puppet modules (cwolfe@redhat.com)
+- foreman-installer submodules (cwolfe@redhat.com)
+- Fix augtool as puppet.conf is in a non-standard location (dcleal@redhat.com)
+- Adding db migrate script (jomara@redhat.com)
+- Merge pull request #24 from domcleal/changeme (jsomara@gmail.com)
+- Set each password differently to the last (dcleal@redhat.com)
+- Fix broker-ruby location (dcleal@redhat.com)
+
 * Tue May 28 2013 Jordan OMara <jomara@redhat.com> 0.0.5-1
 - Merge remote-tracking branch 'origin/master' (jomara@redhat.com)
 - bump submodule rev (cwolfe@redhat.com)
