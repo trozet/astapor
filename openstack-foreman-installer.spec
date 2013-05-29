@@ -4,7 +4,7 @@
 %global homedir /usr/share/openstack-foreman-installer
 
 Name:	%{?scl_prefix}openstack-foreman-installer	
-Version:	0.0.7
+Version:	0.0.8
 Release:	1%{?dist}
 Summary:	Installer & Configuration tool for OpenStack
 
@@ -60,6 +60,9 @@ install -m 0644 config/ruby193-passenger.conf %{buildroot}%{homedir}/config
 %{homedir}/config/ruby193-passenger.conf
 
 %changelog
+* Wed May 29 2013 Jordan OMara <jomara@redhat.com> 0.0.8-1
+- tweaking foreman server (jomara@redhat.com)
+
 * Wed May 29 2013 Jordan OMara <jomara@redhat.com> 0.0.7-1
 - overriding custom repos (jomara@redhat.com)
 - Adding the non custom puppet scripts (jomara@redhat.com)
