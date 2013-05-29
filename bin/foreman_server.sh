@@ -57,6 +57,14 @@ set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
 save
 EOF
 
+# fix db migrate script for scl
+cp ../config/dbmigrate $FOREMAN_DIR/extras/
+# fix broken passenger config file for scl
+cp ../config/broker-ruby $FOREMAN_DIR
+chmod 777 $FOREMAN_DIR/broker-ruby
+cp ../config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
+rm /etc/httpd/conf.d/passenger.conf
+
 pushd $FOREMAN_INSTALLER_DIR
 cat > installer.pp << EOM
 include puppet
@@ -83,17 +91,10 @@ EOM
 scl enable ruby193 "puppet apply --verbose installer.pp --modulepath=. "
 popd
 
-########### FIX PASSENGER ################# 
-cp ../config/broker-ruby $FOREMAN_DIR
-chmod 777 $FOREMAN_DIR/broker-ruby
-cp ../config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
-rm /etc/httpd/conf.d/passenger.conf
-
-### TODO fix foreman db migrate
-cp ../config/dbmigrate $FOREMAN_DIR/extras/
-
 # turn on certificate autosigning
 echo '*' >> $SCL_RUBY_HOME/etc/puppet/autosign.conf
+
+scl enable ruby193 "ruby foreman-setup.rb proxy"
 
 # Configure class defaults
 # This is not ideal, but will work until the API v2 is ready
@@ -118,7 +119,6 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 
 sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
 
-scl enable ruby193 "ruby foreman-setup.rb proxy"
 scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
