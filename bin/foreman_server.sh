@@ -13,7 +13,7 @@ if [ "x$SCL_RUBY_HOME" = "x" ]; then
 fi
 
 if [ "x$FOREMAN_INSTALLER_DIR" = "x" ]; then
-  FOREMAN_INSTALLER_DIR=$SCL_RUBY_HOME/usr/share/foreman-installer
+  FOREMAN_INSTALLER_DIR=/usr/share/openstack-foreman-installer/installer_puppet
 fi
 
 if [ "x$FOREMAN_DIR" = "x" ]; then

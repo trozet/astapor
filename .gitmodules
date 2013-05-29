@@ -1,12 +1,42 @@
-[submodule "installer_puppet/puppet-puppet"]
-	path = installer_puppet/puppet-puppet
-	url = git://github.com/cwolferh/puppet-puppet.git
-[submodule "installer_puppet/puppet-foreman"]
-	path = installer_puppet/puppet-foreman
-	url = git://github.com/cwolferh/puppet-foreman.git
-[submodule "installer_puppet/puppet-foreman_proxy"]
-	path = installer_puppet/puppet-foreman_proxy
-	url = git://github.com/cwolferh/puppet-foreman_proxy.git
-[submodule "installer_puppet/puppet-passenger"]
-	path = installer_puppet/puppet-passenger
-	url = git://github.com/cwolferh/puppet-passenger.git
+[submodule "installer_puppet/tftp"]
+	path = installer_puppet/tftp
+	url = git://github.com/theforeman/puppet-tftp.git
+[submodule "installer_puppet/apache"]
+	path = installer_puppet/apache
+	url = git://github.com/theforeman/puppet-apache.git
+[submodule "installer_puppet/xinetd"]
+	path = installer_puppet/xinetd
+	url = git://github.com/puppetlabs/puppetlabs-xinetd.git
+[submodule "installer_puppet/git"]
+	path = installer_puppet/git
+	url = git://github.com/theforeman/puppet-git.git
+[submodule "installer_puppet/dhcp"]
+	path = installer_puppet/dhcp
+	url = git://github.com/theforeman/puppet-dhcp
+[submodule "installer_puppet/dns"]
+	path = installer_puppet/dns
+	url = git://github.com/theforeman/puppet-dns
+[submodule "installer_puppet/concat_native"]
+	path = installer_puppet/concat_native
+	url = git://github.com/theforeman/puppet-concat.git
+[submodule "installer_puppet/mysql"]
+	path = installer_puppet/mysql
+	url = git://github.com/puppetlabs/puppetlabs-mysql.git
+[submodule "installer_puppet/stdlib"]
+	path = installer_puppet/stdlib
+	url = git://github.com/puppetlabs/puppetlabs-stdlib.git
+[submodule "installer_puppet/concat"]
+	path = installer_puppet/concat
+	url = git://github.com/ripienaar/puppet-concat.git
+[submodule "installer_puppet/puppet"]
+	path = installer_puppet/puppet
+	url = git://github.com/cwolferh/puppet-puppet
+[submodule "installer_puppet/foreman"]
+	path = installer_puppet/foreman
+	url = git://github.com/cwolferh/puppet-foreman
+[submodule "installer_puppet/foreman_proxy"]
+	path = installer_puppet/foreman_proxy
+	url = git://github.com/cwolferh/puppet-foreman_proxy
+[submodule "installer_puppet/passenger"]
+	path = installer_puppet/passenger
+	url = git://github.com/cwolferh/puppet-passenger
