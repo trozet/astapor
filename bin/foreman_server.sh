@@ -61,9 +61,7 @@ EOF
 cp ../config/dbmigrate $FOREMAN_DIR/extras/
 # fix broken passenger config file for scl
 cp ../config/broker-ruby $FOREMAN_DIR
-chmod 777 $FOREMAN_DIR/broker-ruby
-cp ../config/ruby193-passenger.conf /etc/httpd/conf.d/ruby193-passenger.conf
-rm /etc/httpd/conf.d/passenger.conf
+chmod 775 $FOREMAN_DIR/broker-ruby
 
 pushd $FOREMAN_INSTALLER_DIR
 cat > installer.pp << EOM
@@ -95,16 +93,17 @@ popd
 echo '*' >> $SCL_RUBY_HOME/etc/puppet/autosign.conf
 
 scl enable ruby193 "ruby foreman-setup.rb proxy"
+scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 
 # Configure class defaults
 # This is not ideal, but will work until the API v2 is ready
 
-PASSWD_COUNT=$(cat ../puppet/trystack/manifests/params.pp | grep CHANGEME | wc -l)
+PASSWD_COUNT=$(cat ../puppet/modules/trystack/manifests/params.pp | grep CHANGEME | wc -l)
 
 for i in $(seq $PASSWD_COUNT)
 do
   export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
-  sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" ../puppet/trystack/manifests/params.pp
+  sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" ../puppet/modules/trystack/manifests/params.pp
 done
 
 # install puppet modules
@@ -119,7 +118,6 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 
 sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
 
-scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
 cat >/tmp/foreman_client.sh <<EOF

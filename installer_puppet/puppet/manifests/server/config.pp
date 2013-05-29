@@ -48,7 +48,7 @@ class puppet::server::config inherits puppet::config {
 
   exec {'puppet_server_config-generate_ca_cert':
     creates => $::puppet::server::ssl_cert,
-    command => "${puppet::params::puppetca_path}/${puppet::params::puppetca_bin} --generate ${::fqdn}",
+    command => "/usr/bin/scl enable ruby193 '${puppet::params::puppetca_path}/${puppet::params::puppetca_bin} --generate ${::fqdn}'",
     require => File["${puppet::server::dir}/puppet.conf"],
     notify  => Service[$puppet::server::httpd_service],
   }
