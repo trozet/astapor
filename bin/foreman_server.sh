@@ -48,10 +48,14 @@ sudo sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/sysctl.co
 # TODO: selinux policy
 setenforce 0
 
-augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
-
-# Puppet Plugins
-augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
+# Puppet configuration
+augtool <<EOF
+set /augeas/load/Puppet/incl[last()+1] /opt/rh/ruby193/root/etc/puppet/puppet.conf
+load
+set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
+set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
+save
+EOF
 
 pushd $FOREMAN_INSTALLER_DIR
 cat > installer.pp << EOM
@@ -121,11 +125,14 @@ cat >/tmp/foreman_client.sh <<EOF
 # start with a subscribed RHEL6 box
 yum install -y augeas ruby193-puppet
 
-# Set PuppetServer
-augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
-
-# Puppet Plugins
-augtool -s set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
+# Puppet configuration
+augtool <<EOA
+set /augeas/load/Puppet/incl[last()+1] /opt/rh/ruby193/root/etc/puppet/puppet.conf
+load
+set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
+set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
+save
+EOA
 
 # check in to foreman
 scl enable ruby193 "puppet agent --test"
