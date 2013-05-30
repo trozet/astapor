@@ -65,7 +65,9 @@ chmod 775 $FOREMAN_DIR/broker-ruby
 
 pushd $FOREMAN_INSTALLER_DIR
 cat > installer.pp << EOM
-include puppet
+class { 'puppet':
+  runmode => 'cron',
+}
 include puppet::server
 include passenger
 class { 'foreman':
