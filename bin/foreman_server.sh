@@ -110,7 +110,7 @@ done
 
 # install puppet modules
 mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
-cp -r ../puppet/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
+cp -r ../puppet/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
 # reset permissions
