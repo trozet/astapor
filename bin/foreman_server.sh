@@ -36,6 +36,17 @@ if [ ! -f /etc/redhat-release ] || \
   exit 1
 fi
 
+NUM_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -v _lo|wc -l)          
+if [[ $NUM_INT -lt 2 ]] ; then                                                       
+  echo "This installer needs 2 configured interfaces - only $NUM_INT detected"    
+  exit 1                                                                             
+fi                                                                                   
+PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')                         
+SECONDARY_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
+SECONDARY_PREFIX=$(scl enable ruby193 "facter network_${SECONDARY_INT}" | cut -d. -f1-3) # -> 10.0.0 -> '0.0.10.in-addr.arpa',
+SECONDARY_REVERSE=$(echo "$SECONDARY_PREFIX" | ( IFS='.' read a b c ; echo "$c.$b.$a.in-addr.arpa" ))
+FORWARDER=$(augtool get /files/etc/resolv.conf/nameserver[1] | awk '{printf $NF}')
+
 # start with a subscribed RHEL6 box.  hint:
 #    subscription-manager register
 #    subscription-manager subscribe --auto
@@ -80,12 +91,14 @@ class { 'foreman':
 class { 'foreman_proxy':
   custom_repo => true,
   dhcp             => true,
-  dhcp_gateway     => '10.0.0.1',
-  dhcp_range       => '10.0.0.50 10.0.0.200',
-  dhcp_nameservers => '10.0.1.2,10.0.1.3',
+  dhcp_gateway     => '${SECONDARY_PREFIX}.1',
+  dhcp_range       => '${SECONDARY_PREFIX}.50 ${SECONDARY_PREFIX}.200',
+  dhcp_interface   => '${SECONDARY_INT}',
 
   dns              => true,
-  dns_reverse      => '0.0.10.in-addr.arpa',
+  dns_reverse      => '${SECONDARY_REVERSE}',
+  dns_forwarders   => ['${FORWARDER}'],
+  dns_interface    => '${SECONDARY_INT}',
 }
 EOM
 scl enable ruby193 "puppet apply --verbose installer.pp --modulepath=. "
@@ -112,6 +125,9 @@ do
   export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
   sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" ../puppet/modules/trystack/manifests/params.pp
 done
+
+sed -i "s/PRIMARY/$PRIMARY_INT/" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s/SECONDARY/$SECONDARY_INT/" ../puppet/modules/trystack/manifests/params.pp
 
 # install puppet modules
 mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
