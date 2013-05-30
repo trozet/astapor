@@ -91,11 +91,16 @@ EOM
 scl enable ruby193 "puppet apply --verbose installer.pp --modulepath=. "
 popd
 
+# reset permissions
+sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake permissions:reset"
+
 # turn on certificate autosigning
 echo '*' >> $SCL_RUBY_HOME/etc/puppet/autosign.conf
 
+sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
+
+# Add smart proxy
 scl enable ruby193 "ruby foreman-setup.rb proxy"
-scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 
 # Configure class defaults
 # This is not ideal, but will work until the API v2 is ready
@@ -113,12 +118,8 @@ mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
 cp -r ../puppet/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
-# reset permissions
-sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake permissions:reset"
-
 # Configure defaults, host groups, proxy, etc
-
-sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
+scl enable ruby193 "ruby foreman-setup.rb hostgroups"
 
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
