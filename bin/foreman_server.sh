@@ -13,6 +13,12 @@ if `echo $PUPPETMASTER | grep -v -q '\.'`; then
   exit 1
 fi
 
+# FOREMAN_PROVISIONING determines whether configure foreman for bare
+# metal provisioning including installing dns and dhcp servers.
+if [ "x$FOREMAN_PROVISIONING" = "x" ]; then
+  FOREMAN_PROVISIONING=true
+fi
+
 if [ "x$SCL_RUBY_HOME" = "x" ]; then
   SCL_RUBY_HOME=/opt/rh/ruby193/root
 fi
@@ -41,16 +47,18 @@ if [ ! -f /etc/redhat-release ] || \
   exit 1
 fi
 
-NUM_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -v _lo|wc -l)          
-if [[ $NUM_INT -lt 2 ]] ; then                                                       
-  echo "This installer needs 2 configured interfaces - only $NUM_INT detected"    
-  exit 1                                                                             
-fi                                                                                   
-PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')                         
-SECONDARY_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
-SECONDARY_PREFIX=$(scl enable ruby193 "facter network_${SECONDARY_INT}" | cut -d. -f1-3) # -> 10.0.0 -> '0.0.10.in-addr.arpa',
-SECONDARY_REVERSE=$(echo "$SECONDARY_PREFIX" | ( IFS='.' read a b c ; echo "$c.$b.$a.in-addr.arpa" ))
-FORWARDER=$(augtool get /files/etc/resolv.conf/nameserver[1] | awk '{printf $NF}')
+if [ "$FOREMAN_PROVISIONING" = "true" ]; then
+  NUM_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -v _lo|wc -l)          
+  if [[ $NUM_INT -lt 2 ]] ; then                                                       
+    echo "This installer needs 2 configured interfaces - only $NUM_INT detected"    
+    exit 1                                                                             
+  fi                                                                                   
+  PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')                         
+  SECONDARY_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
+  SECONDARY_PREFIX=$(scl enable ruby193 "facter network_${SECONDARY_INT}" | cut -d. -f1-3) # -> 10.0.0 -> '0.0.10.in-addr.arpa',
+  SECONDARY_REVERSE=$(echo "$SECONDARY_PREFIX" | ( IFS='.' read a b c ; echo "$c.$b.$a.in-addr.arpa" ))
+  FORWARDER=$(augtool get /files/etc/resolv.conf/nameserver[1] | awk '{printf $NF}')
+fi
 
 # start with a subscribed RHEL6 box.  hint:
 #    subscription-manager register
@@ -95,6 +103,10 @@ class { 'foreman':
 # Check foreman_proxy/manifests/{init,params}.pp for other options
 class { 'foreman_proxy':
   custom_repo => true,
+EOM
+
+if [ "$FOREMAN_PROVISIONING" = "true" ]; then
+cat >> installer.pp << EOM
   dhcp             => true,
   dhcp_gateway     => '${SECONDARY_PREFIX}.1',
   dhcp_range       => '${SECONDARY_PREFIX}.50 ${SECONDARY_PREFIX}.200',
@@ -106,6 +118,17 @@ class { 'foreman_proxy':
   dns_interface    => '${SECONDARY_INT}',
 }
 EOM
+
+else
+cat >> installer.pp << EOM
+  dhcp             => false,
+  dns              => false,
+  tftp             => false,
+}
+EOM
+  
+fi
+
 scl enable ruby193 "puppet apply --verbose installer.pp --modulepath=. "
 popd
 
