@@ -8,6 +8,11 @@ if [ "x$PUPPETMASTER" = "x" ]; then
   export PUPPETMASTER=$(hostname --fqdn)
 fi
 
+if `echo $PUPPETMASTER | grep -v -q '\.'`; then
+  echo "PUPPETMASTER has a value of $PUPPETMASTER but it must be a fqdn"
+  exit 1
+fi
+
 if [ "x$SCL_RUBY_HOME" = "x" ]; then
   SCL_RUBY_HOME=/opt/rh/ruby193/root
 fi
