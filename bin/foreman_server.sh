@@ -48,14 +48,15 @@ if [ ! -f /etc/redhat-release ] || \
 fi
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
-  NUM_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -v _lo|wc -l)          
-  if [[ $NUM_INT -lt 2 ]] ; then                                                       
-    echo "This installer needs 2 configured interfaces - only $NUM_INT detected"    
-    exit 1                                                                             
-  fi                                                                                   
-  PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')                         
+  NUM_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -v _lo|wc -l)
+  if [[ $NUM_INT -lt 2 ]] ; then
+    echo "This installer needs 2 configured interfaces - only $NUM_INT detected"
+    exit 1
+  fi
+  PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')
+  PRIMARY_PREFIX=$(scl enable ruby193 "facter network_${PRIMARY_INT}" | cut -d. -f1-3)
   SECONDARY_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
-  SECONDARY_PREFIX=$(scl enable ruby193 "facter network_${SECONDARY_INT}" | cut -d. -f1-3) # -> 10.0.0 -> '0.0.10.in-addr.arpa',
+  SECONDARY_PREFIX=$(scl enable ruby193 "facter network_${SECONDARY_INT}" | cut -d. -f1-3)
   SECONDARY_REVERSE=$(echo "$SECONDARY_PREFIX" | ( IFS='.' read a b c ; echo "$c.$b.$a.in-addr.arpa" ))
   FORWARDER=$(augtool get /files/etc/resolv.conf/nameserver[1] | awk '{printf $NF}')
 fi
@@ -108,7 +109,7 @@ EOM
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
 cat >> installer.pp << EOM
   dhcp             => true,
-  dhcp_gateway     => '${SECONDARY_PREFIX}.1',
+  dhcp_gateway     => false,
   dhcp_range       => '${SECONDARY_PREFIX}.50 ${SECONDARY_PREFIX}.200',
   dhcp_interface   => '${SECONDARY_INT}',
 
@@ -126,7 +127,7 @@ cat >> installer.pp << EOM
   tftp             => false,
 }
 EOM
-  
+
 fi
 
 scl enable ruby193 "puppet apply --verbose installer.pp --modulepath=. "
@@ -156,6 +157,8 @@ done
 
 sed -i "s/PRIMARY/$PRIMARY_INT/" ../puppet/modules/trystack/manifests/params.pp
 sed -i "s/SECONDARY/$SECONDARY_INT/" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s/PUB_IP/${PRIMARY_PREFIX}.3/" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s/PRIV_IP/${SECONDARY_PREFIX}.3/" ../puppet/modules/trystack/manifests/params.pp
 
 # install puppet modules
 mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules

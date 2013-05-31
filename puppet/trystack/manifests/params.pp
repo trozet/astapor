@@ -21,8 +21,8 @@ class trystack::params {
   $private_interface          = 'SECONDARY'
   $fixed_network_range        = inline_template("<%= scope.lookupvar('::network_${private_interface}') + '/' + scope.lookupvar('::netmask_${private_interface}') %>")
   $floating_network_range     = inline_template("<%= scope.lookupvar('::network_${public_interface}') + '/' + scope.lookupvar('::netmask_${public_interface}') %>")
-  $pacemaker_priv_floating_ip = inline_template("<%= scope.lookupvar('::ipaddress_${private_interface}') %>")
-  $pacemaker_pub_floating_ip  = inline_template("<%= scope.lookupvar('::ipaddress_${public_interface}') %>")
+  $pacemaker_priv_floating_ip = 'PRIV_IP'
+  $pacemaker_pub_floating_ip  = 'PUB_IP'
 
   # Logs
   $admin_email                = "admin@${::domain}"
