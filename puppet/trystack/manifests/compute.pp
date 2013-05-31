@@ -13,22 +13,22 @@ class trystack::compute (
 
     # Configure Nova
     nova_config{
-        'auto_assign_floating_ip':  value => 'True';
-        #"network_host":            value => ${pacemaker_priv_floating_ip;
-        "network_host":             value => "$::ipaddress";
-        "libvirt_inject_partition": value => "-1";
-        #"metadata_host":           value => "$pacemaker_priv_floating_ip";
-        "metadata_host":            value => "$::ipaddress";
-        "qpid_hostname":            value => "$pacemaker_priv_floating_ip";
-        "rpc_backend":              value => "nova.rpc.impl_qpid";
-        "multi_host":               value => "True";
+        'DEFAULT/auto_assign_floating_ip':  value => 'True';
+        #"DEFAULT/network_host":            value => ${pacemaker_priv_floating_ip;
+        "DEFAULT/network_host":             value => "$::ipaddress";
+        "DEFAULT/libvirt_inject_partition": value => "-1";
+        #"DEFAULT/metadata_host":           value => "$pacemaker_priv_floating_ip";
+        "DEFAULT/metadata_host":            value => "$::ipaddress";
+        "DEFAULT/multi_host":               value => "True";
     }
 
     class { 'nova':
-        sql_connection       => "mysql://nova:${nova_db_password}@${pacemaker_priv_floating_ip}/nova",
-        image_service        => 'nova.image.glance.GlanceImageService',
-        glance_api_servers   => "http://$pacemaker_priv_floating_ip:9292/v1",
-        verbose              => $verbose,
+        sql_connection     => "mysql://nova:${nova_db_password}@${pacemaker_priv_floating_ip}/nova",
+        image_service      => 'nova.image.glance.GlanceImageService',
+        glance_api_servers => "http://$pacemaker_priv_floating_ip:9292/v1",
+        rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
+        qpid_hostname      => $pacemaker_priv_floating_ip,
+        verbose            => $verbose,
     }
 
     # uncomment if on a vm

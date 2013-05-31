@@ -101,11 +101,12 @@ class trystack::controller (
 
     # Configure Nova
     class { 'nova':
-        sql_connection       => "mysql://nova:${nova_db_password}@${pacemaker_priv_floating_ip}/nova",
-        image_service        => 'nova.image.glance.GlanceImageService',
-        glance_api_servers   => "http://${pacemaker_priv_floating_ip}:9292/v1",
-        verbose              => $verbose,
-        require              => Class['openstack::db::mysql', 'qpid::server'],
+        sql_connection     => "mysql://nova:${nova_db_password}@${pacemaker_priv_floating_ip}/nova",
+        image_service      => 'nova.image.glance.GlanceImageService',
+        glance_api_servers => "http://${pacemaker_priv_floating_ip}:9292/v1",
+        rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
+        verbose            => $verbose,
+        require            => Class['openstack::db::mysql', 'qpid::server'],
     }
 
     class { 'nova::api':
@@ -115,10 +116,9 @@ class trystack::controller (
     }
 
     nova_config {
-        'auto_assign_floating_ip': value => 'True';
-        'rpc_backend':             value => 'nova.rpc.impl_qpid';
-        'multi_host':              value => 'True';
-        'force_dhcp_release':      value => 'False';
+        'DEFAULT/auto_assign_floating_ip': value => 'True';
+        'DEFAULT/multi_host':              value => 'True';
+        'DEFAULT/force_dhcp_release':      value => 'False';
     }
 
     class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth' ]:
