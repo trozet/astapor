@@ -6,7 +6,7 @@ class puppet::cron inherits puppet::service {
   }
 
   cron { 'puppet':
-    command => "/usr/bin/env puppet agent --config ${puppet::dir}/puppet.conf --onetime --no-daemonize",
+    command => "/usr/bin/env scl enable ruby193 \"puppet agent --config /opt/rh/ruby193/root/etc/puppet/puppet.conf --onetime --no-daemonize\""
     user    => root,
     minute  => ip_to_cron($puppet::cron_interval, $puppet::cron_range),
   }
