@@ -170,6 +170,10 @@ mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
 cp -r ../puppet/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
 # copy packstack
 cp -r $PACKSTACK_HOME/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
+# don't need this for puppet 3.1
+rm -rf $SCL_RUBY_HOME/etc/puppet/environments/production/modules/create_resources
+# fix an error caused by ASCII encoded comment
+sed 's/^#.*//' $SCL_RUBY_HOME/etc/puppet/environments/production/modules/horizon/manifests/init.pp
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
 # Configure defaults, host groups, proxy, etc
