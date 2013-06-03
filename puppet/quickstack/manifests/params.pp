@@ -1,4 +1,4 @@
-class trystack::params {
+class quickstack::params {
   $verbose                    = 'true'
 
   # Passwords are currently changed to decent strings by sed

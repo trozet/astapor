@@ -1,4 +1,4 @@
-class trystack::swift_storage inherits trystack::swift_common {
+class quickstack::swift_storage inherits quickstack::swift_common {
 
   #### Storage ####
   class { 'swift::storage::all':

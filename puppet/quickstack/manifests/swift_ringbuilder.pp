@@ -1,4 +1,4 @@
-class trystack::swift_ringbuilder {
+class quickstack::swift_ringbuilder {
     #### Builder ####
     class { 'swift::ringbuilder':
       part_power     => '18',

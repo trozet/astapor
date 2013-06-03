@@ -2,25 +2,25 @@
 # refine iptable rules, their probably giving access to the public
 #
 
-class trystack::controller (
-  $admin_email                = $trystack::params::admin_email,
-  $admin_password             = $trystack::params::admin_password,
-  $cinder_db_password         = $trystack::params::cinder_db_password,
-  $cinder_user_password       = $trystack::params::cinder_user_password,
-  $glance_db_password         = $trystack::params::glance_db_password,
-  $glance_user_password       = $trystack::params::glance_user_password,
-  $horizon_secret_key         = $trystack::params::horizon_secret_key,
-  $keystone_admin_token       = $trystack::params::keystone_admin_token,
-  $keystone_db_password       = $trystack::params::keystone_db_password,
-  $mysql_root_password        = $trystack::params::mysql_root_password,
-  $nova_db_password           = $trystack::params::nova_db_password,
-  $nova_user_password         = $trystack::params::nova_user_password,
-  $pacemaker_priv_floating_ip = $trystack::params::pacemaker_priv_floating_ip,
-  $pacemaker_pub_floating_ip  = $trystack::params::pacemaker_pub_floating_ip,
-  $verbose                    = $trystack::params::verbose
-) inherits trystack::params {
+class quickstack::controller (
+  $admin_email                = $quickstack::params::admin_email,
+  $admin_password             = $quickstack::params::admin_password,
+  $cinder_db_password         = $quickstack::params::cinder_db_password,
+  $cinder_user_password       = $quickstack::params::cinder_user_password,
+  $glance_db_password         = $quickstack::params::glance_db_password,
+  $glance_user_password       = $quickstack::params::glance_user_password,
+  $horizon_secret_key         = $quickstack::params::horizon_secret_key,
+  $keystone_admin_token       = $quickstack::params::keystone_admin_token,
+  $keystone_db_password       = $quickstack::params::keystone_db_password,
+  $mysql_root_password        = $quickstack::params::mysql_root_password,
+  $nova_db_password           = $quickstack::params::nova_db_password,
+  $nova_user_password         = $quickstack::params::nova_user_password,
+  $pacemaker_priv_floating_ip = $quickstack::params::pacemaker_priv_floating_ip,
+  $pacemaker_pub_floating_ip  = $quickstack::params::pacemaker_pub_floating_ip,
+  $verbose                    = $quickstack::params::verbose
+) inherits quickstack::params {
 
-    #pacemaker::corosync { 'trystack': }
+    #pacemaker::corosync { 'quickstack': }
 
     #pacemaker::corosync::node { '10.100.0.2': }
     #pacemaker::corosync::node { '10.100.0.3': }

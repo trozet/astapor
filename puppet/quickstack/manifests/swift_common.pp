@@ -1,4 +1,4 @@
-class trystack::swift_common {
+class quickstack::swift_common {
 
     #### Common ####
     class { 'ssh::server::install': }

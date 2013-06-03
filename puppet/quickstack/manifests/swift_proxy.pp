@@ -1,4 +1,4 @@
-class trystack::swift_proxy inherits trystack::swift_common {
+class quickstack::swift_proxy inherits quickstack::swift_common {
 
     #### Swift ####
     package { 'curl': ensure => present }

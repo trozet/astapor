@@ -1,4 +1,4 @@
-class trystack::cinder {
+class quickstack::cinder {
   class {'cinder::base':
       rabbit_password => '',
       sql_connection => "mysql://cinder:${cinder_db_password}@10.100.0.222/cinder"

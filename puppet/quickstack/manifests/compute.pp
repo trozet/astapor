@@ -1,15 +1,15 @@
 
-# Common trystack configurations
-class trystack::compute (
-  $fixed_network_range        = $trystack::params::fixed_network_range,
-  $floating_network_range     = $trystack::params::floating_network_range,
-  $nova_db_password           = $trystack::params::nova_db_password,
-  $nova_user_password         = $trystack::params::nova_user_password,
-  $pacemaker_priv_floating_ip = $trystack::params::pacemaker_priv_floating_ip,
-  $private_interface          = $trystack::params::private_interface,
-  $public_interface           = $trystack::params::public_interface,
-  $verbose                    = $trystack::params::verbose,
-) inherits trystack::params {
+# Common quickstack configurations
+class quickstack::compute (
+  $fixed_network_range        = $quickstack::params::fixed_network_range,
+  $floating_network_range     = $quickstack::params::floating_network_range,
+  $nova_db_password           = $quickstack::params::nova_db_password,
+  $nova_user_password         = $quickstack::params::nova_user_password,
+  $pacemaker_priv_floating_ip = $quickstack::params::pacemaker_priv_floating_ip,
+  $private_interface          = $quickstack::params::private_interface,
+  $public_interface           = $quickstack::params::public_interface,
+  $verbose                    = $quickstack::params::verbose,
+) inherits quickstack::params {
 
     # Configure Nova
     nova_config{
