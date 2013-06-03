@@ -12,10 +12,16 @@ Prerequisites:
 RHEL 6.4
  * This *should* work on other operating systems, but has only been tested on RHEL6.4
 
+Network layout
+ * Each machine has a public and a private network interface (i.e eth0 & eth1)
+ * Network gateway is at $(NETWORK).1
+
 At least 3 machines
- * 1 Foreman Host
- * 1 OpenStack Controller Node
- * 1+ OpenStack Compute Nodes 
+ * 1 Foreman Host (private address $(NETWORK).2 )
+ * 1 OpenStack Controller Node (private address $(NETWORK.3 )
+ * 1+ OpenStack Compute Nodes
+
+Ipaddress defaults can be changed in the class parameters
 
 Preconfiguration - these machines should be:
  * Running RHEL 6.4
