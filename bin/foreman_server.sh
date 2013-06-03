@@ -23,6 +23,10 @@ if [ "x$SCL_RUBY_HOME" = "x" ]; then
   SCL_RUBY_HOME=/opt/rh/ruby193/root
 fi
 
+if [ "x$PACKSTACK_HOME" = "x" ]; then
+  PACKSTACK_HOME=/usr/share/packstack
+fi
+
 if [ "x$FOREMAN_INSTALLER_DIR" = "x" ]; then
   FOREMAN_INSTALLER_DIR=/usr/share/openstack-foreman-installer/installer_puppet
 fi
@@ -162,7 +166,10 @@ sed -i "s/PRIV_IP/${SECONDARY_PREFIX}.3/" ../puppet/modules/trystack/manifests/p
 
 # install puppet modules
 mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
+# copy ntp, quickstack
 cp -r ../puppet/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
+# copy packstack
+cp -r $PACKSTACK_HOME/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
 # Configure defaults, host groups, proxy, etc
