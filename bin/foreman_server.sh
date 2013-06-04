@@ -19,6 +19,38 @@ if [ "x$FOREMAN_PROVISIONING" = "x" ]; then
   FOREMAN_PROVISIONING=true
 fi
 
+# openstack networking configs.  These must be set to something sensible.
+#PRIVATE_CONTROLLER_IP=10.0.0.10
+#PRIVATE_INTERFACE=eth1
+#PRIVATE_NETMASK=10.0.0.0/23
+#PUBLIC_CONTROLLER_IP=10.9.9.10
+#PUBLIC_INTERFACE=eth2
+#PUBLIC_NETMASK=10.9.9.0/24
+if [ "x$PRIVATE_CONTROLLER_IP" = "x" ]; then
+  echo "You must define PRIVATE_CONTROLLER_IP before running this script"
+  exit 1
+fi
+if [ "x$PRIVATE_INTERFACE" = "x" ]; then
+  echo "You must define PRIVATE_INTERFACE before running this script"
+  exit 1
+fi
+if [ "x$PRIVATE_NETMASK" = "x" ]; then
+  echo "You must define PRIVATE_NETMASK before running this script"
+  exit 1
+fi
+if [ "x$PUBLIC_CONTROLLER_IP" = "x" ]; then
+  echo "You must define PUBLIC_CONTROLLER_IP before running this script"
+  exit 1
+fi
+if [ "x$PUBLIC_INTERFACE" = "x" ]; then
+  echo "You must define PUBLIC_INTERFACE before running this script"
+  exit 1
+fi
+if [ "x$PUBLIC_NETMASK" = "x" ]; then
+  echo "You must define PUBLIC_NETMASK before running this script"
+  exit 1
+fi
+
 if [ "x$SCL_RUBY_HOME" = "x" ]; then
   SCL_RUBY_HOME=/opt/rh/ruby193/root
 fi
@@ -159,10 +191,12 @@ do
   sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" ../puppet/modules/trystack/manifests/params.pp
 done
 
-sed -i "s/PRIMARY/$PRIMARY_INT/" ../puppet/modules/trystack/manifests/params.pp
-sed -i "s/SECONDARY/$SECONDARY_INT/" ../puppet/modules/trystack/manifests/params.pp
-sed -i "s/PUB_IP/${PRIMARY_PREFIX}.3/" ../puppet/modules/trystack/manifests/params.pp
-sed -i "s/PRIV_IP/${SECONDARY_PREFIX}.3/" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" ../puppet/modules/trystack/manifests/params.pp
 
 # install puppet modules
 mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
@@ -170,6 +204,10 @@ mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
 cp -r ../puppet/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
 # copy packstack
 cp -r $PACKSTACK_HOME/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
+# don't need this for puppet 3.1
+rm -rf $SCL_RUBY_HOME/etc/puppet/environments/production/modules/create_resources
+# fix an error caused by ASCII encoded comment
+sed -i 's/^#.*//' $SCL_RUBY_HOME/etc/puppet/environments/production/modules/horizon/manifests/init.pp
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
 # Configure defaults, host groups, proxy, etc
