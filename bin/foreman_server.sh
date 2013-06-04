@@ -183,20 +183,20 @@ scl enable ruby193 "ruby foreman-setup.rb proxy"
 # Configure class defaults
 # This is not ideal, but will work until the API v2 is ready
 
-PASSWD_COUNT=$(cat ../puppet/modules/trystack/manifests/params.pp | grep CHANGEME | wc -l)
+PASSWD_COUNT=$(cat ../puppet/modules/quickstack/manifests/params.pp | grep CHANGEME | wc -l)
 
 for i in $(seq $PASSWD_COUNT)
 do
   export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
-  sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" ../puppet/modules/trystack/manifests/params.pp
+  sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" ../puppet/modules/quickstack/manifests/params.pp
 done
 
-sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" ../puppet/modules/trystack/manifests/params.pp
-sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" ../puppet/modules/trystack/manifests/params.pp
-sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" ../puppet/modules/trystack/manifests/params.pp
-sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" ../puppet/modules/trystack/manifests/params.pp
-sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" ../puppet/modules/trystack/manifests/params.pp
-sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" ../puppet/modules/trystack/manifests/params.pp
+sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" ../puppet/modules/quickstack/manifests/params.pp
+sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" ../puppet/modules/quickstack/manifests/params.pp
+sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" ../puppet/modules/quickstack/manifests/params.pp
+sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" ../puppet/modules/quickstack/manifests/params.pp
+sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" ../puppet/modules/quickstack/manifests/params.pp
+sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" ../puppet/modules/quickstack/manifests/params.pp
 
 # install puppet modules
 mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
@@ -240,8 +240,8 @@ EOF
 echo "Foreman is installed and almost ready for setting up your OpenStack"
 echo "First, you need to alter a few parameters in Foreman."
 echo "Visit:"
-echo "https://$(hostname)/puppetclasses/trystack::compute/edit"
-echo "https://$(hostname)/puppetclasses/trystack::controller/edit"
+echo "https://$(hostname)/puppetclasses/quickstack::compute/edit"
+echo "https://$(hostname)/puppetclasses/quickstack::controller/edit"
 echo "Go to the Smart Class Parameters tab and work though each of the parameters"
 echo "in the left-hand column"
 echo ""

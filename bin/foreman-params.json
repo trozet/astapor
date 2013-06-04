@@ -12,13 +12,13 @@
 	"OpenStack Controller": {
 	    "environment": "production",
 	    "puppetclasses": [
-		"trystack::controller"
+		"quickstack::controller"
 	    ]
 	},
 	"OpenStack Nova Compute": {
 	    "environment": "production",
 	    "puppetclasses": [
-		"trystack::compute"
+		"quickstack::compute"
 	    ]
 	}
     }
