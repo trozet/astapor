@@ -4,7 +4,7 @@
 %global homedir /usr/share/openstack-foreman-installer
 
 Name:	%{?scl_prefix}openstack-foreman-installer	
-Version:	0.0.11
+Version:	0.0.12
 Release:	1%{?dist}
 Summary:	Installer & Configuration tool for OpenStack
 
@@ -60,6 +60,33 @@ install -m 0644 config/ruby193-passenger.conf %{buildroot}%{homedir}/config
 %{homedir}/config/ruby193-passenger.conf
 
 %changelog
+* Mon Jun 03 2013 Jordan OMara <jomara@redhat.com> 0.0.12-1
+- tiny sed fix (cwolfe@redhat.com)
+- Make openstack IP variables configurable rather than guessing.
+  (cwolfe@redhat.com)
+- tweaks to puppet modules needed for scl puppet 3.1. tweaks to pupet modules
+  needed for client to work on scl puppet 3.1 (cwolfe@redhat.com)
+- Merge pull request #9 from gildub/patch-2 (jsomara@gmail.com)
+- Fixed missing comma in puppet crno (jomara@redhat.com)
+- Copying packstack modules (jomara@redhat.com)
+- Removing packstack puppet modules (jomara@redhat.com)
+- Update readme with netowrk assumptions (gsutclif@redhat.com)
+- fix BZ969531 - use scl to run puppet (gsutclif@redhat.com)
+- Use CIDR for network ranges, numerical netmask doesn't work
+  (gsutclif@redhat.com)
+- Assume the controller node is on $(SECONDARY_NETWORK).3 (gsutclif@redhat.com)
+- Allow gateway to be unset for private networks (gsutclif@redhat.com)
+- Run db_sync as keystone user, or it produces root-owned log files
+  (dcleal@redhat.com)
+- Merge pull request #33 from domcleal/qpid-rpc (jsomara@gmail.com)
+- Merge pull request #30 from cwolferh/subdir_cleanup (jsomara@gmail.com)
+- Fix configuration of nova.conf and Qpid as RPC backend (dcleal@redhat.com)
+- $FOREMAN_PROVISIONING - making foreman provisioning optional.
+  (cwolfe@redhat.com)
+- sanity check for $PUPPETMASTER (cwolfe@redhat.com)
+- remove duplicated subdirs. (cwolfe@redhat.com)
+- Commented apache - Puppet complains it's already defined! (gilles@redhat.com)
+
 * Thu May 30 2013 Jordan OMara <jomara@redhat.com> 0.0.11-1
 - Dynamic networking config (dcleal@redhat.com)
 - Fix ordering (dcleal@redhat.com)
