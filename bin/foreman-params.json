@@ -7,19 +7,5 @@
     "proxy": {
       "name": "proxy1",
       "host": "https://foreman_hostname:8443"
-    },
-    "hostgroups": {
-	"OpenStack Controller": {
-	    "environment": "production",
-	    "puppetclasses": [
-		"quickstack::controller"
-	    ]
-	},
-	"OpenStack Nova Compute": {
-	    "environment": "production",
-	    "puppetclasses": [
-		"quickstack::compute"
-	    ]
-	}
     }
 }

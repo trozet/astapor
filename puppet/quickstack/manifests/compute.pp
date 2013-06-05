@@ -1,4 +1,3 @@
-
 # Common quickstack configurations
 class quickstack::compute (
   $fixed_network_range        = $quickstack::params::fixed_network_range,

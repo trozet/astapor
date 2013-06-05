@@ -35,6 +35,7 @@ fi
 #PUBLIC_CONTROLLER_IP=10.9.9.10
 #PUBLIC_INTERFACE=eth2
 #PUBLIC_NETMASK=10.9.9.0/24
+#FOREMAN_GATEWAY=10.0.0.1 (or false for no gateway)
 if [ "x$PRIVATE_CONTROLLER_IP" = "x" ]; then
   echo "You must define PRIVATE_CONTROLLER_IP before running this script"
   exit 1
@@ -57,6 +58,12 @@ if [ "x$PUBLIC_INTERFACE" = "x" ]; then
 fi
 if [ "x$PUBLIC_NETMASK" = "x" ]; then
   echo "You must define PUBLIC_NETMASK before running this script"
+  exit 1
+fi
+if [ "x$FOREMAN_GATEWAY" = "x" ]; then
+  echo "You must define FOREMAN_GATEWAY before running this script"
+  echo "  Use either the gateway IP for the internal Foreman network, or"
+  echo "  use 'false' to have no gateway offered for non-routable networks"
   exit 1
 fi
 
@@ -148,13 +155,14 @@ class { 'foreman':
 #
 # Check foreman_proxy/manifests/{init,params}.pp for other options
 class { 'foreman_proxy':
-  custom_repo => true,
+  custom_repo  => true,
 EOM
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
 cat >> installer.pp << EOM
+  tftp_servername  => '$(scl enable ruby193 "facter ipaddress_${SECONDARY_INT}")',
   dhcp             => true,
-  dhcp_gateway     => false,
+  dhcp_gateway     => '${FOREMAN_GATEWAY}',
   dhcp_range       => '${SECONDARY_PREFIX}.50 ${SECONDARY_PREFIX}.200',
   dhcp_interface   => '${SECONDARY_INT}',
 
@@ -182,30 +190,14 @@ popd
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake permissions:reset"
 
 # turn on certificate autosigning
+# GSutcliffe: Should be uneccessary once Foreman Provisioning is shown to be working
 echo '*' >> $SCL_RUBY_HOME/etc/puppet/autosign.conf
 
-sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
-
 # Add smart proxy
+sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
 scl enable ruby193 "ruby foreman-setup.rb proxy"
 
-# Configure class defaults
-# This is not ideal, but will work until the API v2 is ready
-
-PASSWD_COUNT=$(cat ../puppet/modules/quickstack/manifests/params.pp | grep CHANGEME | wc -l)
-
-for i in $(seq $PASSWD_COUNT)
-do
-  export PASSWD=$(scl enable ruby193 "ruby foreman-setup.rb password")
-  sed -i "/CHANGEME/ {s/CHANGEME/$PASSWD/;:a;n;ba}" ../puppet/modules/quickstack/manifests/params.pp
-done
-
-sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" ../puppet/modules/quickstack/manifests/params.pp
-sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" ../puppet/modules/quickstack/manifests/params.pp
-sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" ../puppet/modules/quickstack/manifests/params.pp
-sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" ../puppet/modules/quickstack/manifests/params.pp
-sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" ../puppet/modules/quickstack/manifests/params.pp
-sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" ../puppet/modules/quickstack/manifests/params.pp
+# Class defaults now handled by the seed file, see below
 
 # install puppet modules
 mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
@@ -219,8 +211,22 @@ rm -rf $SCL_RUBY_HOME/etc/puppet/environments/production/modules/create_resource
 sed -i 's/^#.*//' $SCL_RUBY_HOME/etc/puppet/environments/production/modules/horizon/manifests/init.pp
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
-# Configure defaults, host groups, proxy, etc
-scl enable ruby193 "ruby foreman-setup.rb hostgroups"
+# Fix the proxy (is already done upstream)
+echo ":dns_provider: nsupdate" >> /opt/rh/ruby193/root/etc/foreman-proxy/settings.yml
+/etc/init.d/foreman-proxy restart
+
+# Set params, and run the db:seed file
+cp ./seeds.rb $FOREMAN_DIR/db/.
+sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" $FOREMAN_DIR/db/seeds.rb
+sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production"
+
+# Write the TFTP default file
+curl --user 'admin:changeme' -k 'https://127.0.0.1/api/config_templates/build_pxe_default'
 
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
