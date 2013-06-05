@@ -140,7 +140,7 @@ os.type = "Redhat"
 os.save!
 
 # Installation Media - comes as standard, just need to associate it
-m=Medium.find_or_create_by_name("Openstack RHEL mirror")
+m=Medium.find_or_create_by_name("OpenStack RHEL mirror")
 m.path="http://mirror.ox.ac.uk/sites/mirror.centos.org/$major.$minor/os/$arch"
 m.os_family="Redhat"
 m.operatingsystems << os
@@ -171,12 +171,12 @@ a.save!
 
 # Domains
 d=Domain.find_or_create_by_name Facter.domain
-d.fullname="Openstack: #{Facter.domain}"
+d.fullname="OpenStack: #{Facter.domain}"
 d.dns = Feature.find_by_name("DNS").smart_proxies.first
 d.save!
 
 # Subnets - use Import Subnet code
-s=Subnet.find_or_create_by_name "Openstack"
+s=Subnet.find_or_create_by_name "OpenStack"
 s.network=Facter.send "network_#{private_int}"
 s.mask=Facter.send "netmask_#{private_int}"
 s.dhcp = Feature.find_by_name("DHCP").smart_proxies.first
@@ -186,7 +186,7 @@ s.domains=[d]
 s.save!
 
 # Templates
-pt   = Ptable.find_or_initialize_by_name "Openstack Disk Layout"
+pt   = Ptable.find_or_initialize_by_name "OpenStack Disk Layout"
 data = {
   :layout           => ptable_text,
   :os_family        => "Redhat"
@@ -194,7 +194,7 @@ data = {
 pt.update_attributes(data)
 pt.save!
 
-pxe = ConfigTemplate.find_or_initialize_by_name "Openstack PXE Template"
+pxe = ConfigTemplate.find_or_initialize_by_name "OpenStack PXE Template"
 data = {
   :template         => pxe_text,
   :operatingsystems => ( pxe.operatingsystems << os ).uniq,
@@ -204,7 +204,7 @@ data = {
 pxe.update_attributes(data)
 pxe.save!
 
-ks = ConfigTemplate.find_or_initialize_by_name "Openstack Kickstart Template"
+ks = ConfigTemplate.find_or_initialize_by_name "OpenStack Kickstart Template"
 data = {
   :template         => provision_text,
   :operatingsystems => ( ks.operatingsystems << os ).uniq,
