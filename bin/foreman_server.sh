@@ -196,12 +196,12 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 
 # Set params, and run the db:seed file
 cp ./seeds.rb $FOREMAN_DIR/db/.
-sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMANDIR/db/seeds.rb
-sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" $FOREMANDIR/db/seeds.rb
-sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" $FOREMANDIR/db/seeds.rb
-sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" $FOREMANDIR/db/seeds.rb
-sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" $FOREMANDIR/db/seeds.rb
-sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" $FOREMANDIR/db/seeds.rb
+sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" $FOREMAN_DIR/db/seeds.rb
+sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production"
 
 # Write the TFTP default file
