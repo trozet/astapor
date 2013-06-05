@@ -194,6 +194,10 @@ rm -rf $SCL_RUBY_HOME/etc/puppet/environments/production/modules/create_resource
 sed -i 's/^#.*//' $SCL_RUBY_HOME/etc/puppet/environments/production/modules/horizon/manifests/init.pp
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
+# Fix the proxy (is already done upstream)
+echo ":dns_provider: nsupdate" >> /opt/rh/ruby193/root/etc/foreman-proxy/settings.yml
+/etc/init.d/foreman-proxy restart
+
 # Set params, and run the db:seed file
 cp ./seeds.rb $FOREMAN_DIR/db/.
 sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
