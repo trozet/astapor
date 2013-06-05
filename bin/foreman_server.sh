@@ -1,5 +1,14 @@
 #!/bin/bash
 
+echo "#################### RED HAT OPENSTACK #####################"
+echo "Thank you for using the Red Hat OpenStack Foreman Installer!"
+echo "Please note that this tool is a Technology Preview"
+echo "For more information about Red hat Technology Previews, see"
+echo "https://access.redhat.com/support/offerings/techpreview/"
+echo "############################################################"
+
+read -p "Press [Enter] to continue"
+
 # PUPPETMASTER is the fqdn that needs to be resolvable by clients.
 # Change if needed
 if [ "x$PUPPETMASTER" = "x" ]; then
