@@ -26,6 +26,7 @@ fi
 #PUBLIC_CONTROLLER_IP=10.9.9.10
 #PUBLIC_INTERFACE=eth2
 #PUBLIC_NETMASK=10.9.9.0/24
+#FOREMAN_GATEWAY=10.0.0.1 (or false for no gateway)
 if [ "x$PRIVATE_CONTROLLER_IP" = "x" ]; then
   echo "You must define PRIVATE_CONTROLLER_IP before running this script"
   exit 1
@@ -48,6 +49,12 @@ if [ "x$PUBLIC_INTERFACE" = "x" ]; then
 fi
 if [ "x$PUBLIC_NETMASK" = "x" ]; then
   echo "You must define PUBLIC_NETMASK before running this script"
+  exit 1
+fi
+if [ "x$FOREMAN_GATEWAY" = "x" ]; then
+  echo "You must define FOREMAN_GATEWAY before running this script"
+  echo "  Use either the gateway IP for the internal Foreman network, or"
+  echo "  use 'false' to have no gateway offered for non-routable networks"
   exit 1
 fi
 
@@ -146,7 +153,7 @@ if [ "$FOREMAN_PROVISIONING" = "true" ]; then
 cat >> installer.pp << EOM
   tftp_servername  => '$(scl enable ruby193 "facter ipaddress_${SECONDARY_INT}")',
   dhcp             => true,
-  dhcp_gateway     => false,
+  dhcp_gateway     => '${FOREMAN_GATEWAY}',
   dhcp_range       => '${SECONDARY_PREFIX}.50 ${SECONDARY_PREFIX}.200',
   dhcp_interface   => '${SECONDARY_INT}',
 
