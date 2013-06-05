@@ -205,8 +205,13 @@ ks.save!
 os.ptables = [pt]
 ['provision','PXELinux'].each do |kind|
   kind_id = TemplateKind.find_by_name(kind).id
+  id = kind == 'provision' ? ks.id : pxe.id
   if os.os_default_templates.where(:template_kind_id => kind_id).blank?
-    os.os_default_templates.build(:template_kind_id => kind_id, :config_template_id => ks.id)
+    os.os_default_templates.build(:template_kind_id => kind_id, :config_template_id => id)
+  else
+    odt = os.os_default_templates.where(:template_kind_id => kind_id).first
+    odt.config_template_id = id
+    odt.save!
   end
 end
 os.save!
