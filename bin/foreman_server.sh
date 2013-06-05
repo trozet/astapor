@@ -144,6 +144,7 @@ EOM
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
 cat >> installer.pp << EOM
+  tftp_servername  => '$(scl enable ruby193 "facter ipaddress_${SECONDARY_INT}")',
   dhcp             => true,
   dhcp_gateway     => false,
   dhcp_range       => '${SECONDARY_PREFIX}.50 ${SECONDARY_PREFIX}.200',
