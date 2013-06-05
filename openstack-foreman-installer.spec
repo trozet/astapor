@@ -4,7 +4,7 @@
 %global homedir /usr/share/openstack-foreman-installer
 
 Name:	%{?scl_prefix}openstack-foreman-installer	
-Version:	0.0.12
+Version:	0.0.13
 Release:	1%{?dist}
 Summary:	Installer & Configuration tool for OpenStack
 
@@ -60,6 +60,25 @@ install -m 0644 config/ruby193-passenger.conf %{buildroot}%{homedir}/config
 %{homedir}/config/ruby193-passenger.conf
 
 %changelog
+* Wed Jun 05 2013 Jordan OMara <jomara@redhat.com> 0.0.13-1
+- Merge pull request #38 from GregSutcliffe/master (jsomara@gmail.com)
+- Handle template associations better (gsutclif@redhat.com)
+- Ask the user for the gateway configuration of the foreman network
+  (gsutclif@redhat.com)
+- Adding tech preview warning to bash script (jomara@redhat.com)
+- Ensure TFTP is served from the right address (gsutclif@redhat.com)
+- Fix DNS proxy provider (gsutclif@redhat.com)
+- Fix variable typo (gsutclif@redhat.com)
+- Update OS/install paths for RHEL (dcleal@redhat.com)
+- Refresh RHEL kickstart from community-templates (dcleal@redhat.com)
+- Fix OpenStack capitalisation (dcleal@redhat.com)
+- take out illegal blank space before class definition in compute class
+  (gsutclif@redhat.com)
+- Add db:seed file to set up provisioning and class params
+  (gsutclif@redhat.com)
+- trystack -> quickstack substitutions (cwolfe@redhat.com)
+- moving quickstack dirs (jomara@redhat.com)
+
 * Mon Jun 03 2013 Jordan OMara <jomara@redhat.com> 0.0.12-1
 - tiny sed fix (cwolfe@redhat.com)
 - Make openstack IP variables configurable rather than guessing.
