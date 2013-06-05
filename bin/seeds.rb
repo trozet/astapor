@@ -119,14 +119,16 @@ Setting[:manage_puppetca] = false
 Setting[:foreman_url] = Facter.fqdn
 
 # Create an OS to assign things to. We'll come back later to finish it's config
-os = Operatingsystem.where(:name => "CentOS", :major => "6", :minor => "4").first
-os ||= Operatingsystem.create(:name => "CentOS", :major => "6", :minor => "4")
+os = Operatingsystem.where(:name => "RedHat", :major => "6", :minor => "4").first
+os ||= Operatingsystem.create(:name => "RedHat", :major => "6", :minor => "4")
 os.type = "Redhat"
 os.save!
 
 # Installation Media - comes as standard, just need to associate it
+# For RHEL this is the Binary DVD image from rhn.redhat.com downloads, loopback
+# mounted and made available over HTTP.
 m=Medium.find_or_create_by_name("OpenStack RHEL mirror")
-m.path="http://mirror.ox.ac.uk/sites/mirror.centos.org/$major.$minor/os/$arch"
+m.path="http://mirror.example.com/rhel/$major.$minor/os/$arch"
 m.os_family="Redhat"
 m.operatingsystems << os
 m.save!
@@ -149,7 +151,7 @@ end
 # Figure out how to call this before the class import
 # SmartProxy.new(:name => "OpenStack Smart Proxy", :url => "https://#{Facter.fqdn}:8443"
 
-# Architecures
+# Architectures
 a=Architecture.find_or_create_by_name "x86_64"
 a.operatingsystems << os
 a.save!
