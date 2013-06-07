@@ -156,72 +156,74 @@ a=Architecture.find_or_create_by_name "x86_64"
 a.operatingsystems << os
 a.save!
 
-# Domains
-d=Domain.find_or_create_by_name Facter.domain
-d.fullname="OpenStack: #{Facter.domain}"
-d.dns = Feature.find_by_name("DNS").smart_proxies.first
-d.save!
+if ENV["FOREMAN_PROVISIONING"] == "true" then
+  # Domains
+  d=Domain.find_or_create_by_name Facter.domain
+  d.fullname="OpenStack: #{Facter.domain}"
+  d.dns = Feature.find_by_name("DNS").smart_proxies.first
+  d.save!
 
-# Subnets - use Import Subnet code
-s=Subnet.find_or_create_by_name "OpenStack"
-s.network=Facter.send "network_#{private_int}"
-s.mask=Facter.send "netmask_#{private_int}"
-s.dhcp = Feature.find_by_name("DHCP").smart_proxies.first
-s.dns = Feature.find_by_name("DNS").smart_proxies.first
-s.tftp = Feature.find_by_name("TFTP").smart_proxies.first
-s.domains=[d]
-s.save!
+  # Subnets - use Import Subnet code
+  s=Subnet.find_or_create_by_name "OpenStack"
+  s.network=Facter.send "network_#{private_int}"
+  s.mask=Facter.send "netmask_#{private_int}"
+  s.dhcp = Feature.find_by_name("DHCP").smart_proxies.first
+  s.dns = Feature.find_by_name("DNS").smart_proxies.first
+  s.tftp = Feature.find_by_name("TFTP").smart_proxies.first
+  s.domains=[d]
+  s.save!
 
-# Templates
-pt   = Ptable.find_or_initialize_by_name "OpenStack Disk Layout"
-data = {
-  :layout           => ptable_text,
-  :os_family        => "Redhat"
-}
-pt.update_attributes(data)
-pt.save!
+  # Templates
+  pt   = Ptable.find_or_initialize_by_name "OpenStack Disk Layout"
+  data = {
+    :layout           => ptable_text,
+    :os_family        => "Redhat"
+  }
+  pt.update_attributes(data)
+  pt.save!
 
-pxe = ConfigTemplate.find_or_initialize_by_name "OpenStack PXE Template"
-data = {
-  :template         => pxe_text,
-  :operatingsystems => ( pxe.operatingsystems << os ).uniq,
-  :snippet          => false,
-  :template_kind_id => TemplateKind.find_by_name("PXELinux").id
-}
-pxe.update_attributes(data)
-pxe.save!
+  pxe = ConfigTemplate.find_or_initialize_by_name "OpenStack PXE Template"
+  data = {
+    :template         => pxe_text,
+    :operatingsystems => ( pxe.operatingsystems << os ).uniq,
+    :snippet          => false,
+    :template_kind_id => TemplateKind.find_by_name("PXELinux").id
+  }
+  pxe.update_attributes(data)
+  pxe.save!
 
-ks = ConfigTemplate.find_or_initialize_by_name "OpenStack Kickstart Template"
-data = {
-  :template         => provision_text,
-  :operatingsystems => ( ks.operatingsystems << os ).uniq,
-  :snippet          => false,
-  :template_kind_id => TemplateKind.find_by_name("provision").id
-}
-ks.update_attributes(data)
-ks.save!
+  ks = ConfigTemplate.find_or_initialize_by_name "OpenStack Kickstart Template"
+  data = {
+    :template         => provision_text,
+    :operatingsystems => ( ks.operatingsystems << os ).uniq,
+    :snippet          => false,
+    :template_kind_id => TemplateKind.find_by_name("provision").id
+  }
+  ks.update_attributes(data)
+  ks.save!
 
-# Finish updating the OS
-os.ptables = [pt]
-['provision','PXELinux'].each do |kind|
-  kind_id = TemplateKind.find_by_name(kind).id
-  id = kind == 'provision' ? ks.id : pxe.id
-  if os.os_default_templates.where(:template_kind_id => kind_id).blank?
-    os.os_default_templates.build(:template_kind_id => kind_id, :config_template_id => id)
-  else
-    odt = os.os_default_templates.where(:template_kind_id => kind_id).first
-    odt.config_template_id = id
-    odt.save!
+  # Finish updating the OS
+  os.ptables = [pt]
+  ['provision','PXELinux'].each do |kind|
+    kind_id = TemplateKind.find_by_name(kind).id
+    id = kind == 'provision' ? ks.id : pxe.id
+    if os.os_default_templates.where(:template_kind_id => kind_id).blank?
+      os.os_default_templates.build(:template_kind_id => kind_id, :config_template_id => id)
+    else
+      odt = os.os_default_templates.where(:template_kind_id => kind_id).first
+      odt.config_template_id = id
+      odt.save!
+    end
   end
-end
-os.save!
+  os.save!
 
-# Override all the puppet class params for quickstack
-primary_int=`route|grep default|awk ' { print ( $(NF) ) }'`.chomp
-primary_prefix=Facter.send("network_#{primary_int}").split('.')[0..2].join('.')
-sec_int_hash=Facter.to_hash.reject { |k| k !~ /^ipaddress_/ }.reject { |k| k =~ /lo|#{primary_int}/ }.first
-secondary_int=sec_int_hash[0].split('_').last
-secondary_prefix=sec_int_hash[1].split('.')[0..2].join('.')
+  # Override all the puppet class params for quickstack
+  primary_int=`route|grep default|awk ' { print ( $(NF) ) }'`.chomp
+  primary_prefix=Facter.send("network_#{primary_int}").split('.')[0..2].join('.')
+  sec_int_hash=Facter.to_hash.reject { |k| k !~ /^ipaddress_/ }.reject { |k| k =~ /lo|#{primary_int}/ }.first
+  secondary_int=sec_int_hash[0].split('_').last
+  secondary_prefix=sec_int_hash[1].split('.')[0..2].join('.')
+end
 
 params = {
   "verbose"                    => "true",
@@ -268,15 +270,17 @@ h_compute.environment = Environment.find_by_name('production')
 h_compute.puppetclasses = [ Puppetclass.find_by_name('quickstack::compute') ]
 h_compute.save!
 
-['OpenStack Controller','OpenStack Nova Compute'].each do |name|
-  h=Hostgroup.find_by_name name
-  h.puppet_proxy    = Feature.find_by_name("Puppet").smart_proxies.first
-  h.puppet_ca_proxy = Feature.find_by_name("Puppet CA").smart_proxies.first
-  h.os = os
-  h.architecture = a
-  h.medium = m
-  h.ptable = pt
-  h.subnet = s
-  h.domain = d
-  h.save!
+if ENV["FOREMAN_PROVISIONING"] == "true" then
+  ['OpenStack Controller','OpenStack Nova Compute'].each do |name|
+    h=Hostgroup.find_by_name name
+    h.puppet_proxy    = Feature.find_by_name("Puppet").smart_proxies.first
+    h.puppet_ca_proxy = Feature.find_by_name("Puppet CA").smart_proxies.first
+    h.os = os
+    h.architecture = a
+    h.medium = m
+    h.ptable = pt
+    h.subnet = s
+    h.domain = d
+    h.save!
+  end
 end

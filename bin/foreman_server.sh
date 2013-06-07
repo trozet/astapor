@@ -223,10 +223,12 @@ sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" $FOREMAN_DIR/db/seeds.rb
-sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production"
+sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
 
-# Write the TFTP default file
-curl --user 'admin:changeme' -k 'https://127.0.0.1/api/config_templates/build_pxe_default'
+if [ "$FOREMAN_PROVISIONING" = "true" ]; then
+  # Write the TFTP default file
+  curl --user 'admin:changeme' -k 'https://127.0.0.1/api/config_templates/build_pxe_default'
+fi
 
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed

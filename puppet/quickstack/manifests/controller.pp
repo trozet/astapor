@@ -54,7 +54,7 @@ class quickstack::controller (
         mysql_account_security => true,
 
         # Cinder
-        cinder                 => true,
+        cinder                 => false,
 
         # quantum
         quantum                => false,
@@ -81,7 +81,7 @@ class quickstack::controller (
         admin_address         => $pacemaker_priv_floating_ip,
         internal_address      => $pacemaker_priv_floating_ip,
         quantum               => false,
-        cinder                => true,
+        cinder                => false,
         enabled               => true,
         require               => Class['openstack::db::mysql'],
     }
