@@ -4,7 +4,7 @@
 %global homedir /usr/share/openstack-foreman-installer
 
 Name:	%{?scl_prefix}openstack-foreman-installer	
-Version:	0.0.13
+Version:	0.0.14
 Release:	1%{?dist}
 Summary:	Installer & Configuration tool for OpenStack
 
@@ -60,6 +60,10 @@ install -m 0644 config/ruby193-passenger.conf %{buildroot}%{homedir}/config
 %{homedir}/config/ruby193-passenger.conf
 
 %changelog
+* Thu Jun 06 2013 Jordan OMara <jomara@redhat.com> 0.0.14-1
+- do not enable the cinder endpoint (cwolfe@redhat.com)
+- non-provisioning mode fixes (cwolfe@redhat.com)
+
 * Wed Jun 05 2013 Jordan OMara <jomara@redhat.com> 0.0.13-1
 - Merge pull request #38 from GregSutcliffe/master (jsomara@gmail.com)
 - Handle template associations better (gsutclif@redhat.com)
