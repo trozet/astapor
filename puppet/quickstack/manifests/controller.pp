@@ -120,7 +120,7 @@ class quickstack::controller (
         'DEFAULT/force_dhcp_release':      value => 'False';
     }
 
-    class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth' ]:
+    class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth', 'nova::conductor' ]:
         enabled => true,
     }
 
