@@ -136,8 +136,8 @@ m.save!
 # OS parameters for RHN(S) registration, see redhat_register snippet
 {
   # "site" for local Satellite, "hosted" for RHN
-  "spacewalk_type" => "site",
-  "spacewalk_host" => "satellite.example.com",
+  "satellite_type" => "site",
+  "satellite_host" => "satellite.example.com",
   # Activation key must have OpenStack child channel
   "activation_key" => "1-example",
 }.each do |k,v|
