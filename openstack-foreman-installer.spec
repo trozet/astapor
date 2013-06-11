@@ -4,7 +4,7 @@
 %global homedir /usr/share/openstack-foreman-installer
 
 Name:	%{?scl_prefix}openstack-foreman-installer	
-Version:	0.0.16
+Version:	0.0.17
 Release:	1%{?dist}
 Summary:	Installer & Configuration tool for OpenStack
 
@@ -60,6 +60,9 @@ install -m 0644 config/ruby193-passenger.conf %{buildroot}%{homedir}/config
 %{homedir}/config/ruby193-passenger.conf
 
 %changelog
+* Tue Jun 11 2013 Jordan OMara <jomara@redhat.com> 0.0.17-1
+- replace "spacewalk" with "satellite" (cwolfe@redhat.com)
+
 * Mon Jun 10 2013 Jordan OMara <jomara@redhat.com> 0.0.16-1
 - bz972780 add nova conductor to controller (cwolfe@redhat.com)
 * Thu Jun 06 2013 Jordan OMara <jomara@redhat.com> 0.0.15-1
