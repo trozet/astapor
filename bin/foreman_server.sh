@@ -217,6 +217,7 @@ echo ":dns_provider: nsupdate" >> /opt/rh/ruby193/root/etc/foreman-proxy/setting
 
 # Set params, and run the db:seed file
 cp ./seeds.rb $FOREMAN_DIR/db/.
+sed -i "s#SECONDARY_INT#$SECONDARY_INT#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb

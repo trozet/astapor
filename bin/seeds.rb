@@ -10,8 +10,12 @@
 require 'facter'
 require 'securerandom'
 
+# for openstack
 private_int = 'PRIV_INTERFACE'
 public_int  = 'PUB_INTERFACE'
+
+# for the sub-network foreman owns
+secondary_int = 'SECONDARY_INT'
 
 # Changes from upstream:
 #  - EPEL removed
@@ -165,8 +169,8 @@ if ENV["FOREMAN_PROVISIONING"] == "true" then
 
   # Subnets - use Import Subnet code
   s=Subnet.find_or_create_by_name "OpenStack"
-  s.network=Facter.send "network_#{private_int}"
-  s.mask=Facter.send "netmask_#{private_int}"
+  s.network=Facter.send "network_#{secondary_int}"
+  s.mask=Facter.send "netmask_#{secondary_int}"
   s.dhcp = Feature.find_by_name("DHCP").smart_proxies.first
   s.dns = Feature.find_by_name("DNS").smart_proxies.first
   s.tftp = Feature.find_by_name("TFTP").smart_proxies.first
