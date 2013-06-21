@@ -4,7 +4,7 @@
 %global homedir /usr/share/openstack-foreman-installer
 
 Name:	%{?scl_prefix}openstack-foreman-installer	
-Version:	0.0.17
+Version:	0.0.18
 Release:	1%{?dist}
 Summary:	Installer & Configuration tool for OpenStack
 
@@ -60,6 +60,10 @@ install -m 0644 config/ruby193-passenger.conf %{buildroot}%{homedir}/config
 %{homedir}/config/ruby193-passenger.conf
 
 %changelog
+* Fri Jun 21 2013 Jordan OMara <jomara@redhat.com> 0.0.18-1
+- fix what interface we derive values from when setting up a subnet.
+  (cwolfe@redhat.com)
+
 * Tue Jun 11 2013 Jordan OMara <jomara@redhat.com> 0.0.17-1
 - replace "spacewalk" with "satellite" (cwolfe@redhat.com)
 
