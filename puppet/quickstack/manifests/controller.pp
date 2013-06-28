@@ -158,4 +158,11 @@ class quickstack::controller (
         dport    => ['80', '3306', '5000', '35357', '5672', '8773', '8774', '8775', '8776', '9292', '6080'],
         action   => 'accept',
     }
+
+    if ($::selinux != "false"){
+      selboolean{'httpd_can_network_connect':
+          value => on,
+          persistent => true,
+      }
+    }
 }
