@@ -93,8 +93,8 @@ class quickstack::controller (
 
     class {'openstack::glance':
         db_host               => $pacemaker_priv_floating_ip,
-        glance_user_password  => $glance_user_password,
-        glance_db_password    => $glance_db_password,
+        user_password  => $glance_user_password,
+        db_password    => $glance_db_password,
         require               => Class['openstack::db::mysql'],
     }
 
