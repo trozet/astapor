@@ -76,11 +76,11 @@ if [ "x$PACKSTACK_HOME" = "x" ]; then
 fi
 
 if [ "x$FOREMAN_INSTALLER_DIR" = "x" ]; then
-  FOREMAN_INSTALLER_DIR=/usr/share/openstack-foreman-installer/installer_puppet
+  FOREMAN_INSTALLER_DIR=/usr/share/foreman-installer
 fi
 
 if [ "x$FOREMAN_DIR" = "x" ]; then
-  FOREMAN_DIR=$SCL_RUBY_HOME/usr/share/foreman
+  FOREMAN_DIR=/usr/share/foreman
 fi
 
 if [ ! -d $FOREMAN_INSTALLER_DIR ]; then
@@ -100,15 +100,15 @@ if [ ! -f /etc/redhat-release ] || \
 fi
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
-  NUM_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -v _lo|wc -l)
+  NUM_INT=$(facter -p|grep ipaddress_|grep -v _lo|wc -l)
   if [[ $NUM_INT -lt 2 ]] ; then
     echo "This installer needs 2 configured interfaces - only $NUM_INT detected"
     exit 1
   fi
   PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')
-  PRIMARY_PREFIX=$(scl enable ruby193 "facter network_${PRIMARY_INT}" | cut -d. -f1-3)
-  SECONDARY_INT=$(scl enable ruby193 "facter -p"|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
-  SECONDARY_PREFIX=$(scl enable ruby193 "facter network_${SECONDARY_INT}" | cut -d. -f1-3)
+  PRIMARY_PREFIX=$(facter network_${PRIMARY_INT} | cut -d. -f1-3)
+  SECONDARY_INT=$(facter -p|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
+  SECONDARY_PREFIX=$(facter network_${SECONDARY_INT} | cut -d. -f1-3)
   SECONDARY_REVERSE=$(echo "$SECONDARY_PREFIX" | ( IFS='.' read a b c ; echo "$c.$b.$a.in-addr.arpa" ))
   FORWARDER=$(augtool get /files/etc/resolv.conf/nameserver[1] | awk '{printf $NF}')
 fi
@@ -126,13 +126,10 @@ sudo sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/sysctl.co
 setenforce 0
 
 # Puppet configuration
-augtool <<EOF
-set /augeas/load/Puppet/incl[last()+1] /opt/rh/ruby193/root/etc/puppet/puppet.conf
-load
-set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
-set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
-save
-EOF
+augtool -s <<EOA
+set /files/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
+set /files/etc/puppet/puppet.conf/main/pluginsync true
+EOA
 
 # fix db migrate script for scl
 cp ../config/dbmigrate $FOREMAN_DIR/extras/
@@ -149,8 +146,7 @@ include puppet::server
 include passenger
 class { 'foreman':
   db_type => 'mysql',
-  custom_repo => true,
-  app_root => '/opt/rh/ruby193/root/usr/share/foreman'
+  custom_repo => true
 }
 #
 # Check foreman_proxy/manifests/{init,params}.pp for other options
@@ -160,7 +156,7 @@ EOM
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
 cat >> installer.pp << EOM
-  tftp_servername  => '$(scl enable ruby193 "facter ipaddress_${SECONDARY_INT}")',
+  tftp_servername  => '$(facter ipaddress_${SECONDARY_INT})',
   dhcp             => true,
   dhcp_gateway     => '${FOREMAN_GATEWAY}',
   dhcp_range       => '${SECONDARY_PREFIX}.50 ${SECONDARY_PREFIX}.200',
@@ -183,7 +179,7 @@ EOM
 
 fi
 
-scl enable ruby193 "puppet apply --verbose installer.pp --modulepath=. "
+puppet apply --verbose installer.pp --modulepath=.
 popd
 
 # reset permissions
@@ -191,7 +187,7 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 
 # turn on certificate autosigning
 # GSutcliffe: Should be uneccessary once Foreman Provisioning is shown to be working
-echo '*' >> $SCL_RUBY_HOME/etc/puppet/autosign.conf
+echo '*' >> /etc/puppet/autosign.conf
 
 # Add smart proxy
 sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
@@ -200,20 +196,16 @@ scl enable ruby193 "ruby foreman-setup.rb proxy"
 # Class defaults now handled by the seed file, see below
 
 # install puppet modules
-mkdir -p $SCL_RUBY_HOME/etc/puppet/environments/production/modules
+mkdir -p /etc/puppet/environments/production/modules
 # copy ntp, quickstack
-cp -r ../puppet/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
+cp -r ../puppet/modules/* /etc/puppet/environments/production/modules/
 # copy packstack
-cp -r $PACKSTACK_HOME/modules/* $SCL_RUBY_HOME/etc/puppet/environments/production/modules/
+cp -r $PACKSTACK_HOME/modules/* /etc/puppet/environments/production/modules/
 # don't need this for puppet 3.1
-rm -rf $SCL_RUBY_HOME/etc/puppet/environments/production/modules/create_resources
+rm -rf /etc/puppet/environments/production/modules/create_resources
 # fix an error caused by ASCII encoded comment
-sed -i 's/^#.*//' $SCL_RUBY_HOME/etc/puppet/environments/production/modules/horizon/manifests/init.pp
+sed -i 's/^#.*//' /etc/puppet/environments/production/modules/horizon/manifests/init.pp
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
-
-# Fix the proxy (is already done upstream)
-echo ":dns_provider: nsupdate" >> /opt/rh/ruby193/root/etc/foreman-proxy/settings.yml
-/etc/init.d/foreman-proxy restart
 
 # Set params, and run the db:seed file
 cp ./seeds.rb $FOREMAN_DIR/db/.
@@ -235,24 +227,21 @@ fi
 # TODO don't hit yum unless packages are not installed
 cat >/tmp/foreman_client.sh <<EOF
 
-# start with a subscribed RHEL6 box
-yum install -y augeas ruby193-puppet
+# start with a subscribed RHEL6 box needs optional channels and epel
+yum install -y augeas puppet
 
 # Puppet configuration
-augtool <<EOA
-set /augeas/load/Puppet/incl[last()+1] /opt/rh/ruby193/root/etc/puppet/puppet.conf
-load
-set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
-set /files/opt/rh/ruby193/root/etc/puppet/puppet.conf/main/pluginsync true
-save
+augtool -s <<EOA
+set /files/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
+set /files/etc/puppet/puppet.conf/main/pluginsync true
 EOA
 
 # check in to foreman
-scl enable ruby193 "puppet agent --test"
+puppet agent --test
 sleep 1
-scl enable ruby193 "puppet agent --test"
+puppet agent --test
 
-/etc/init.d/ruby193-puppet start
+/etc/init.d/puppet start
 EOF
 
 echo "Foreman is installed and almost ready for setting up your OpenStack"
