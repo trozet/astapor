@@ -85,17 +85,17 @@ echo "updating system time"
 yum -t -y -e 0 update
 
 # and add the puppet package
-yum -t -y -e 0 install ruby193-puppet
+yum -t -y -e 0 install puppet
 
 echo "Configuring puppet"
-cat > /opt/rh/ruby193/root/etc/puppet/puppet.conf << EOF
+cat > /etc/puppet/puppet.conf << EOF
 <%= snippets "puppet.conf" %>
 EOF
 
 # Setup puppet to run on system reboot
-/sbin/chkconfig --level 345 ruby193-puppet on
+/sbin/chkconfig --level 345 puppet on
 
-scl enable ruby193 "puppet agent --config /opt/rh/ruby193/root/etc/puppet/puppet.conf -o --tags no_such_tag --server <%= @host.puppetmaster %>  --no-daemonize"
+puppet agent -o --tags no_such_tag --server <%= @host.puppetmaster %>  --no-daemonize
 
 sync
 
