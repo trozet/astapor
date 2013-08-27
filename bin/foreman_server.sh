@@ -241,7 +241,8 @@ puppet agent --test
 sleep 1
 puppet agent --test
 
-/etc/init.d/puppet start
+service puppet start
+chkconfig puppet on
 EOF
 
 echo "Foreman is installed and almost ready for setting up your OpenStack"
