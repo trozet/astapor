@@ -15,13 +15,24 @@ class quickstack::compute (
 
   # Configure Nova
   nova_config{
-    'DEFAULT/auto_assign_floating_ip':  value => 'True';
-    #"DEFAULT/network_host":            value => ${pacemaker_priv_floating_ip;
-    "DEFAULT/network_host":             value => "$::ipaddress";
-    "DEFAULT/libvirt_inject_partition": value => "-1";
-    #"DEFAULT/metadata_host":           value => "$pacemaker_priv_floating_ip";
-    "DEFAULT/metadata_host":            value => "$::ipaddress";
-    "DEFAULT/multi_host":               value => "True";
+      'DEFAULT/libvirt_inject_partition':             value => '-1';
+
+      ### Networking
+      'DEFAULT/service_neutron_metadata_proxy':       value => 'True';
+      'DEFAULT/neutron_metadata_proxy_shared_secret': value => 'secret';
+
+      # To review if obsolete (nova network)
+      # 'DEFAULT/auto_assign_floating_ip':              value => 'True';
+      # 'DEFAULT/network_host':            value => $pacemaker_priv_floating_ip;
+      # 'DEFAULT/metadata_host':           value => $pacemaker_priv_floating_ip;
+      # 'DEFAULT/auto_assign_floating_ip': value => 'True';
+      # 'DEFAULT/multi_host':              value => 'True';
+      # 'DEFAULT/force_dhcp_release':      value => 'False';
+
+      'keystone_authtoken/admin_tenant_name': value => 'admin';
+      'keystone_authtoken/admin_user':        value => 'admin';
+      'keystone_authtoken/admin_password':    value => $admin_password;
+      'keystone_authtoken/auth_host':         value => $pacemaker_priv_floating_ip;
     }
 
   class { 'nova':
@@ -104,17 +115,6 @@ class quickstack::compute (
       neutron_url               => 'http://192.168.0.11:9696',
       neutron_admin_auth_url    => 'http://192.168.0.11:35357/v2.0',
   }
-
-  nova_config {
-      'DEFAULT/auto_assign_floating_ip': value => 'True';
-      'DEFAULT/multi_host':              value => 'True';
-      'DEFAULT/force_dhcp_release':      value => 'False';
-
-      'keystone_authtoken/admin_tenant_name': value => 'admin';
-      'keystone_authtoken/admin_user':        value => 'admin';
-      'keystone_authtoken/admin_password':    value => $admin_password;
-      'keystone_authtoken/auth_host':         value => $pacemaker_priv_floating_ip;
-    }
 
   firewall { '001 nova compute incoming':
       proto  => 'tcp',
