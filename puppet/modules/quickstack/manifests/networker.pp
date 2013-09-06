@@ -20,12 +20,15 @@ class quickstack::networker (
         qpid_hostname         => $pacemaker_priv_floating_ip,
     }
     
-    # To be done by neutron module
+    # To be done by neutron module or something missing?
     neutron_config {
         'database/connection': value => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron";
-    }
 
-    Neutron_config<||>
+        'keystone_authtoken/admin_tenant_name': value => 'admin';
+        'keystone_authtoken/admin_user':        value => 'admin';
+        'keystone_authtoken/admin_password':    value => $admin_password;
+        'keystone_authtoken/auth_host':         value => ${pacemaker_priv_floating_ip};
+    }
   
     # OVS Plugin
     class { '::neutron::plugins::ovs':
