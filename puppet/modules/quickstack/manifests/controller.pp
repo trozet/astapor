@@ -179,8 +179,8 @@ class quickstack::controller (
     class { '::neutron::server':
         auth_host        => $::ipaddress,
         auth_password    => $admin_password,
-        auth_tenant      => 'admin',
-        auth_user        => 'admin',
+     #   auth_tenant      => 'admin',
+     #   auth_user        => 'admin',
      }   
 
     neutron_plugin_ovs {
@@ -199,7 +199,7 @@ class quickstack::controller (
         neutron_admin_tenant_name => 'admin',
         neutron_admin_username    => 'admin',
     }
-    
+
     firewall { '001 controller incoming':
         proto    => 'tcp',
         # need to refine this list
