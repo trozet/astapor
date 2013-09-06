@@ -14,6 +14,7 @@ class quickstack::controller (
   $keystone_db_password       = $quickstack::params::keystone_db_password,
   $mysql_root_password        = $quickstack::params::mysql_root_password,
   $neutron_db_password        = $quickstack::params::neutron_db_password,
+  $neutron_user_password      = $quickstack::params::neutron_user_password,
   $nova_db_password           = $quickstack::params::nova_db_password,
   $nova_user_password         = $quickstack::params::nova_user_password,
   $pacemaker_priv_floating_ip = $quickstack::params::pacemaker_priv_floating_ip,
@@ -179,8 +180,6 @@ class quickstack::controller (
     class { '::neutron::server':
         auth_host        => $::ipaddress,
         auth_password    => $admin_password,
-     #   auth_tenant      => 'admin',
-     #   auth_user        => 'admin',
      }   
 
     neutron_plugin_ovs {
@@ -195,9 +194,7 @@ class quickstack::controller (
     } 
 
     class { '::nova::network::neutron':
-        neutron_admin_password    => $admin_password,
-        neutron_admin_tenant_name => 'admin',
-        neutron_admin_username    => 'admin',
+        neutron_admin_password    => $neutron_user_password,
     }
 
     firewall { '001 controller incoming':
