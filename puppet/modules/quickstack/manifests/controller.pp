@@ -119,6 +119,11 @@ class quickstack::controller (
         'DEFAULT/auto_assign_floating_ip': value => 'True';
         'DEFAULT/multi_host':              value => 'True';
         'DEFAULT/force_dhcp_release':      value => 'False';
+
+        'keystone_authtoken/admin_tenant_name': value => 'admin';
+        'keystone_authtoken/admin_user':        value => 'admin';
+        'keystone_authtoken/admin_password':    value => $admin_password;
+        'keystone_authtoken/auth_host':         value => '127.0.0.1';
     }
 
     class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth', 'nova::conductor' ]:
@@ -194,7 +199,7 @@ class quickstack::controller (
         neutron_admin_tenant_name => 'admin',
         neutron_admin_username    => 'admin',
     }
-
+    
     firewall { '001 controller incoming':
         proto    => 'tcp',
         # need to refine this list
