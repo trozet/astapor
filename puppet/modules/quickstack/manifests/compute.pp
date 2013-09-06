@@ -18,8 +18,8 @@ class quickstack::compute (
       'DEFAULT/libvirt_inject_partition':             value => '-1';
 
       ### Networking
-      'DEFAULT/service_neutron_metadata_proxy':       value => 'True';
-      'DEFAULT/neutron_metadata_proxy_shared_secret': value => 'secret';
+      #'DEFAULT/service_neutron_metadata_proxy':       value => 'True';
+      #'DEFAULT/neutron_metadata_proxy_shared_secret': value => 'secret';
 
       # To review if obsolete (nova network)
       # 'DEFAULT/auto_assign_floating_ip':              value => 'True';
@@ -60,7 +60,7 @@ class quickstack::compute (
       vncserver_listen            => $::ipaddress,
   }
 
-  class {"nova::compute":
+  class { 'nova::compute':
       enabled => true,
       vncproxy_host => $pacemaker_pub_floating_ip,
       vncserver_proxyclient_address => $::ipaddress,
