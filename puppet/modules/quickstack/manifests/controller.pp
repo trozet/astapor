@@ -121,10 +121,13 @@ class quickstack::controller (
         'DEFAULT/multi_host':              value => 'True';
         'DEFAULT/force_dhcp_release':      value => 'False';
 
+        'DEFAULT/service_neutron_metadata_proxy':       value => 'True';
+        'DEFAULT/neutron_metadata_proxy_shared_secret': value => 'shared_secret';
+
         'keystone_authtoken/admin_tenant_name': value => 'admin';
         'keystone_authtoken/admin_user':        value => 'admin';
         'keystone_authtoken/admin_password':    value => $admin_password;
-        'keystone_authtoken/auth_host':         value => '127.0.0.1';
+        'keystone_authtoken/auth_host':         value => '127.0.0.1';  
     }
 
     class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth', 'nova::conductor' ]:
@@ -184,7 +187,7 @@ class quickstack::controller (
 
     neutron_plugin_ovs {
         'OVS/enable_tunneling': value => 'True';
-        
+
         'SECURITYGROUP/firewall_driver': 
         value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
     }  

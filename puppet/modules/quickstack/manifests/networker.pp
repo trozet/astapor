@@ -46,6 +46,13 @@ class quickstack::networker (
 
     class { '::neutron::agents::l3': }
 
+    class { 'neutron::agents::metadata': 
+        auth_password => $admin_password,
+        shared_secret => 'shared_secret',
+        auth_url      => "http://${pacemaker_priv_floating_ip}:35357/v2.0",
+        metadata_ip   => $pacemaker_priv_floating_ip,
+    }
+
     #class { 'neutron::agents::lbaas': }
     
     #class { 'neutron::agents::fwaas': }
