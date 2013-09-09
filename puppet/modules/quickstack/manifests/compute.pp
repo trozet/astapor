@@ -1,6 +1,7 @@
 # Common quickstack configurations
 class quickstack::compute (
-  $fixed_network_range        = $quickstack::params::fixed_network_range,
+  $admin_password               = $quickstack::params::admin_password,
+  $fixed_network_range          = $quickstack::params::fixed_network_range,
   $floating_network_range       = $quickstack::params::floating_network_range,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
@@ -95,7 +96,7 @@ class quickstack::compute (
   neutron_config {
       'database/connection': value => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron";
 
-      'keystone_authtoken/auth_host':         value => ${pacemaker_priv_floating_ip};
+      'keystone_authtoken/auth_host':         value => $pacemaker_priv_floating_ip;
       'keystone_authtoken/admin_tenant_name': value => 'admin';
       'keystone_authtoken/admin_user':        value => 'admin';
       'keystone_authtoken/admin_password':    value => $admin_password;
@@ -115,8 +116,8 @@ class quickstack::compute (
 
   class { '::nova::network::neutron':
       neutron_admin_password    => $neutron_user_password,
-      neutron_url               => 'http://{pacemaker_priv_floating_ip}:9696',
-      neutron_admin_auth_url    => 'http://{pacemaker_priv_floating_ip}:35357/v2.0',
+      neutron_url               => 'http://${pacemaker_priv_floating_ip}:9696',
+      neutron_admin_auth_url    => 'http://${pacemaker_priv_floating_ip}:35357/v2.0',
   }
 
   firewall { '001 nova compute incoming':
