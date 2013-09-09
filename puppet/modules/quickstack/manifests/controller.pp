@@ -184,14 +184,16 @@ class quickstack::controller (
 
     neutron_plugin_ovs {
         'OVS/enable_tunneling': value => 'True';
-        # 'keystone_authtoken/signing_dir': value => '/var/lib/neutron/keystone-signing';
+        
+        'SECURITYGROUP/firewall_driver': 
+        value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
     }  
         
     # Plugin
     class { '::neutron::plugins::ovs':
         sql_connection      => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron",
         tenant_network_type => 'gre',
-    } 
+    }    
 
     class { '::nova::network::neutron':
         neutron_admin_password    => $neutron_user_password,
