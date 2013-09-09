@@ -114,15 +114,13 @@ class quickstack::controller (
         enabled           => true,
         admin_password    => $nova_user_password,
         auth_host         => $pacemaker_priv_floating_ip,
+        neutron_metadata_proxy_shared_secret => 'shared_secret',
     }
 
     nova_config {
         'DEFAULT/auto_assign_floating_ip': value => 'True';
         'DEFAULT/multi_host':              value => 'True';
         'DEFAULT/force_dhcp_release':      value => 'False';
-
-        'DEFAULT/service_neutron_metadata_proxy':       value => 'True';
-        'DEFAULT/neutron_metadata_proxy_shared_secret': value => 'shared_secret';
 
         'keystone_authtoken/admin_tenant_name': value => 'admin';
         'keystone_authtoken/admin_user':        value => 'admin';
