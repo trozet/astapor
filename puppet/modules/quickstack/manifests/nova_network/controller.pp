@@ -2,7 +2,7 @@
 # refine iptable rules, their probably giving access to the public
 #
 
-class quickstack::controller::nova (
+class quickstack::nova_network::controller (
   $admin_email                = $quickstack::params::admin_email,
   $admin_password             = $quickstack::params::admin_password,
   $cinder_db_password         = $quickstack::params::cinder_db_password,
