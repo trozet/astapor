@@ -1,4 +1,4 @@
-  
+
 class quickstack::neutron::networker (
   $fixed_network_range        = $quickstack::params::fixed_network_range,
   $floating_network_range     = $quickstack::params::floating_network_range,
@@ -11,7 +11,7 @@ class quickstack::neutron::networker (
   $verbose                    = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
-    ### Neutron stuf
+    ### Neutron stuff
     # Configures everything in neutron.conf
     class { '::neutron':
         verbose               => true,
@@ -19,7 +19,7 @@ class quickstack::neutron::networker (
         rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
         qpid_hostname         => $pacemaker_priv_floating_ip,
     }
-    
+
     # To be done by neutron module or something missing?
     neutron_config {
         'database/connection': value => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron";
@@ -29,7 +29,7 @@ class quickstack::neutron::networker (
         'keystone_authtoken/admin_password':    value => $admin_password;
         'keystone_authtoken/auth_host':         value => $pacemaker_priv_floating_ip;
     }
-  
+
     # OVS Plugin
     class { '::neutron::plugins::ovs':
         sql_connection      => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron",
@@ -46,7 +46,7 @@ class quickstack::neutron::networker (
 
     class { '::neutron::agents::l3': }
 
-    class { 'neutron::agents::metadata': 
+    class { 'neutron::agents::metadata':
         auth_password => $admin_password,
         shared_secret => 'shared_secret',
         auth_url      => "http://${pacemaker_priv_floating_ip}:35357/v2.0",
@@ -54,7 +54,7 @@ class quickstack::neutron::networker (
     }
 
     #class { 'neutron::agents::lbaas': }
-    
+
     #class { 'neutron::agents::fwaas': }
 
     # Neutron external network for br-ex

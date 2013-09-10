@@ -7,11 +7,11 @@ PHYSICAL_INTERFACE=$2
 # create openvswitch bridge
 /usr/bin/ovs-vsctl --may-exist add-br ${BRIDGE_NAME}
 
-# mv physical interface config 
+# mv physical interface config
 /bin/mv /etc/sysconfig/network-scripts/ifcfg-${PHYSICAL_INTERFACE} /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
 
 # unset HWADDR key if exists
-/bin/sed -i s/HWADDR=.*// /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}    
+/bin/sed -i s/HWADDR=.*// /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
 
 # unset UUID key if exists
 /bin/sed -i s/UUID=.*// /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
@@ -25,7 +25,7 @@ PHYSICAL_INTERFACE=$2
 # set bridge device type
 /bin/echo -e "DEVICETYPE=ovs" >> /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
 
-# create new physical interface config 
+# create new physical interface config
 cat > /etc/sysconfig/network-scripts/ifcfg-${PHYSICAL_INTERFACE} <<EOF
 DEVICE=$PHYSICAL_INTERFACE
 DEVICETYPE=ovs

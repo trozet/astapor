@@ -91,7 +91,7 @@ class quickstack::neutron::compute (
       rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
       qpid_hostname         => $pacemaker_priv_floating_ip,
   }
-  
+
   # Neutron config
   neutron_config {
       'database/connection': value => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron";
@@ -112,7 +112,7 @@ class quickstack::neutron::compute (
   class { '::neutron::agents::ovs':
       local_ip         => $::ipaddress,
       enable_tunneling => true,
-  } 
+  }
 
   class { '::nova::network::neutron':
       neutron_admin_password    => $neutron_user_password,

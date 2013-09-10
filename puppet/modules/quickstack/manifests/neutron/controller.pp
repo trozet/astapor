@@ -157,7 +157,7 @@ class quickstack::neutron::controller (
 
     ### Neutron
     # Configures everything in neutron.conf
-    class { '::neutron': 
+    class { '::neutron':
         enabled               => true,
         verbose               => true,
         allow_overlapping_ips => true,
@@ -170,7 +170,7 @@ class quickstack::neutron::controller (
         'database/connection': value => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron";
     }
 
-    class { '::neutron::keystone::auth': 
+    class { '::neutron::keystone::auth':
         password         => $admin_password,
         public_address   => $pacemaker_pub_floating_ip,
         admin_address    => $pacemaker_priv_floating_ip,
@@ -181,20 +181,20 @@ class quickstack::neutron::controller (
     class { '::neutron::server':
         auth_host        => $::ipaddress,
         auth_password    => $admin_password,
-     }   
+     }
 
     neutron_plugin_ovs {
         'OVS/enable_tunneling': value => 'True';
 
-        'SECURITYGROUP/firewall_driver': 
+        'SECURITYGROUP/firewall_driver':
         value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
-    }  
-        
+    }
+
     # Plugin
     class { '::neutron::plugins::ovs':
         sql_connection      => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron",
         tenant_network_type => 'gre',
-    }    
+    }
 
     class { '::nova::network::neutron':
         neutron_admin_password    => $neutron_user_password,
@@ -206,7 +206,7 @@ class quickstack::neutron::controller (
         dport    => ['80', '3306', '5000', '35357', '5672', '8773', '8774', '8775', '8776', '9292', '6080', '9696'],
         action   => 'accept',
     }
-    
+
     if ($::selinux != "false"){
       selboolean { 'httpd_can_network_connect':
           value => on,
