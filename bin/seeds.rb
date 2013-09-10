@@ -255,15 +255,15 @@ params = {
 
 hostgroups = [
     {:name=>"OpenStack Controller",
-     :class=>"quickstack::controller::nova"},
+     :class=>"quickstack::nova_network::controller"},
     {:name=>"OpenStack Nova Compute",
-     :class=>"quickstack::compute::nova"},
+     :class=>"quickstack::nova_network::compute"},
     {:name=>"OpenStack Neutron Controller",
-     :class=>"quickstack::controller::neutron"},
+     :class=>"quickstack::neutron::controller "},
     {:name=>"OpenStack Neutron Compute",
-     :class=>"quickstack::compute::neutron"},
+     :class=>"quickstack::neutron::compute"},
     {:name=>"OpenStack Neutron Networker",
-     :class=>"quickstack::networker"}
+     :class=>"quickstack::neutron::networker"}
 ]
 
 hostgroups.each do |hg|
