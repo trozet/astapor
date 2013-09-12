@@ -61,7 +61,7 @@ class quickstack::neutron::controller (
         # neutron
         neutron                => true,
 
-        allowed_hosts          => ['%','host11.internal.oslab.priv'],
+        allowed_hosts          => ['%',$pacemaker_priv_floating_ip],
         enabled                => true,
     }
 
