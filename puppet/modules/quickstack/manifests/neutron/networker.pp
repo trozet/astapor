@@ -1,43 +1,39 @@
 
 class quickstack::neutron::networker (
-  $fixed_network_range        = $quickstack::params::fixed_network_range,
-  $floating_network_range     = $quickstack::params::floating_network_range,
-  $neutron_db_password        = $quickstack::params::neutron_db_password,
-  $nova_db_password           = $quickstack::params::nova_db_password,
-  $nova_user_password         = $quickstack::params::nova_user_password,
-  $private_ip                 = $quickstack::params::private_ip,
-  $pacemaker_priv_floating_ip = $quickstack::params::pacemaker_priv_floating_ip,
-  $private_interface          = $quickstack::params::private_interface,
-  $public_interface           = $quickstack::params::public_interface,
-  $verbose                    = $quickstack::params::verbose,
+  $fixed_network_range          = $quickstack::params::fixed_network_range,
+  $floating_network_range       = $quickstack::params::floating_network_range,
+  $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
+  $neutron_db_password          = $quickstack::params::neutron_db_password,
+  $nova_db_password             = $quickstack::params::nova_db_password,
+  $nova_user_password           = $quickstack::params::nova_user_password,
+  $private_ip                   = $quickstack::params::private_ip,
+  $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
+  $private_interface            = $quickstack::params::private_interface,
+  $public_interface             = $quickstack::params::public_interface,
+  $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
-    ### Neutron stuff
-    # Configures everything in neutron.conf
     class { '::neutron':
         verbose               => true,
         allow_overlapping_ips => true,
         rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
-        qpid_hostname         => $pacemaker_priv_floating_ip,
+        qpid_hostname         => $controller_priv_floating_ip,
     }
-
-    # To be done by neutron module or something missing?
+    
     neutron_config {
-        'database/connection': value => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron";
+        'database/connection': value => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron";
 
         'keystone_authtoken/admin_tenant_name': value => 'admin';
         'keystone_authtoken/admin_user':        value => 'admin';
         'keystone_authtoken/admin_password':    value => $admin_password;
-        'keystone_authtoken/auth_host':         value => $pacemaker_priv_floating_ip;
+        'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
     }
 
-    # OVS Plugin
     class { '::neutron::plugins::ovs':
-        sql_connection      => "mysql://neutron:${neutron_db_password}@${pacemaker_priv_floating_ip}/neutron",
+        sql_connection      => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron",
         tenant_network_type => 'gre',
     }
 
-    # Agents
     class { '::neutron::agents::ovs':
         local_ip         => $private_ip,
         enable_tunneling => true,
@@ -49,9 +45,9 @@ class quickstack::neutron::networker (
 
     class { 'neutron::agents::metadata':
         auth_password => $admin_password,
-        shared_secret => 'shared_secret',
-        auth_url      => "http://${pacemaker_priv_floating_ip}:35357/v2.0",
-        metadata_ip   => $pacemaker_priv_floating_ip,
+        shared_secret => $metadata_proxy_shared_secret,
+        auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
+        metadata_ip   => $controller_priv_floating_ip,
     }
 
     #class { 'neutron::agents::lbaas': }
