@@ -53,23 +53,4 @@ class quickstack::neutron::networker (
     #class { 'neutron::agents::lbaas': }
 
     #class { 'neutron::agents::fwaas': }
-
-    # Neutron external network for br-ex
-    #keystone_tenant { 'admin':
-    #    ensure => present,
-    #}
-
-    #neutron_network { 'public':
-    #    ensure          => present,
-    #    router_external => 'True',
-    #    tenant_name     => 'admin',
-
-    #neutron_subnet { 'public_subnet':
-    #    ensure           => 'present',
-    #    cidr             => '10.16.16.0/22',
-    #    gateway_ip       => '10.16.19.254',
-    #    allocation_pools => 'start=10.16.18.1,end=10.16.18.254',
-    #    network_name     => 'public',
-    #    tenant_name      => 'admin',
-    #}
 }
