@@ -6,7 +6,6 @@ class quickstack::neutron::networker (
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $nova_db_password             = $quickstack::params::nova_db_password,
   $nova_user_password           = $quickstack::params::nova_user_password,
-  $private_ip                   = $quickstack::params::private_ip,
   $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
   $private_interface            = $quickstack::params::private_interface,
   $public_interface             = $quickstack::params::public_interface,
@@ -35,7 +34,7 @@ class quickstack::neutron::networker (
     }
 
     class { '::neutron::agents::ovs':
-        local_ip         => $private_ip,
+        local_ip         => getvar("ipaddress_${private_interface}"),
         enable_tunneling => true,
     }
 
