@@ -287,6 +287,7 @@ hostgroups.each do |hg|
   h=Hostgroup.find_or_create_by_name hg[:name]
   h.environment = Environment.find_by_name('production')
   h.puppetclasses = [ Puppetclass.find_by_name(hg[:class])]
+  h.save!
 end
 
 if ENV["FOREMAN_PROVISIONING"] == "true" then
