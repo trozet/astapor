@@ -7,7 +7,7 @@ class quickstack::heat_controller(
   $verbose,
 ) {
 
-  if $heat_cfn == true {
+  if str2bool($heat_cfn) == true {
     class {"heat::keystone::auth":
       password => $heat_user_password,
       heat_public_address => $controller_priv_floating_ip,
@@ -36,12 +36,12 @@ class quickstack::heat_controller(
       verbose           => $verbose,
   }
 
-  if $heat_cfn == true {
+  if str2bool($heat_cfn) == true {
     class { 'heat::api_cfn':
     }
   }
 
-  if $heat_cloudwatch == true {
+  if str2bool($heat_cloudwatch) == true {
     class { 'heat::api_cfn':
     }
   }
