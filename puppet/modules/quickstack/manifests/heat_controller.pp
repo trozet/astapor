@@ -42,7 +42,7 @@ class quickstack::heat_controller(
   }
 
   if str2bool($heat_cloudwatch) == true {
-    class { 'heat::api_cfn':
+    class { 'heat::api_cloudwatch':
     }
   }
 
