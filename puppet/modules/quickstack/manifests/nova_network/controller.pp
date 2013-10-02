@@ -71,31 +71,47 @@ class quickstack::nova_network::controller (
     }
 
     class {'openstack::keystone':
-        db_host               => $controller_priv_floating_ip,
-        db_password           => $keystone_db_password,
-        admin_token           => $keystone_admin_token,
-        admin_email           => $admin_email,
-        admin_password        => $admin_password,
-        glance_user_password  => $glance_user_password,
-        nova_user_password    => $nova_user_password,
-        cinder_user_password  => $cinder_user_password,
-        neutron_user_password => "",
-        public_address        => $controller_pub_floating_ip,
-        admin_address         => $controller_priv_floating_ip,
-        internal_address      => $controller_priv_floating_ip,
-        neutron               => false,
-        enabled               => true,
-        require               => Class['openstack::db::mysql'],
+        db_host                 => $controller_priv_floating_ip,
+        db_password             => $keystone_db_password,
+        admin_token             => $keystone_admin_token,
+        admin_email             => $admin_email,
+        admin_password          => $admin_password,
+        glance_user_password    => $glance_user_password,
+        nova_user_password      => $nova_user_password,
+        cinder_user_password    => $cinder_user_password,
+        neutron_user_password   => "",
+
+        public_address          => $controller_pub_floating_ip,
+        admin_address           => $controller_priv_floating_ip,
+        internal_address        => $controller_priv_floating_ip,
+
+        glance_public_address   => $controller_pub_floating_ip,
+        glance_admin_address    => $controller_priv_floating_ip,
+        glance_internal_address => $controller_priv_floating_ip,
+
+        nova_public_address     => $controller_pub_floating_ip,
+        nova_admin_address      => $controller_priv_floating_ip,
+        nova_internal_address   => $controller_priv_floating_ip,
+
+        cinder_public_address   => $controller_pub_floating_ip,
+        cinder_admin_address    => $controller_priv_floating_ip,
+        cinder_internal_address => $controller_priv_floating_ip,
+
+        neutron                 => false,
+        enabled                 => true,
+        require                 => Class['openstack::db::mysql'],
     }
 
     class { 'swift::keystone::auth':
-        password => $swift_admin_password,
-        address  => $controller_priv_floating_ip,
+        password         => $swift_admin_password,
+        public_address   => $controller_pub_floating_ip,
+        internal_address => $controller_priv_floating_ip,
+        admin_address    => $controller_priv_floating_ip,
     }
 
     class { 'ceilometer::keystone::auth':
         password => $ceilometer_user_password,
-        public_address => $controller_priv_floating_ip,
+        public_address => $controller_pub_floating_ip,
         admin_address => $controller_priv_floating_ip,
         internal_address => $controller_priv_floating_ip,
     }
@@ -157,6 +173,7 @@ class quickstack::nova_network::controller (
       heat_user_password          => $heat_user_password,
       heat_db_password            => $heat_db_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
+      controller_pub_floating_ip  => $controller_pub_floating_ip,
       verbose                     => $verbose,
     }
 
