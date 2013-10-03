@@ -33,7 +33,21 @@ class quickstack::params {
   $controller_priv_floating_ip   = 'PRIV_IP'
   $controller_pub_floating_ip    = 'PUB_IP'
   $metadata_proxy_shared_secret  = 'CHANGEME'
+  $bridge_interface              = 'eth1'
+  $enable_ovs_agent              = 'true'
+  $ovs_vlan_ranges               = 'physnet1:1000:2000'
+  $ovs_bridge_mappings           = ['physnet1:br-ex']
+  $ovs_bridge_uplinks            = ['br-ex:eth1']
+  $tenant_network_type           = 'vlan'
 
+  # neutron plugin config
+  $neutron_core_plugin           = 'ovs'
+  # If using the Cisco plugin, use either OVS or n1k for virtualised l2
+  $cisco_vswitch_plugin          = 'ovs'
+  # If using the Cisco plugin, Nexus hardware can be used for l2
+  $cisco_nexus_plugin            = 'nexus'
+  $nexus_credentials             = ['1.1.1.1/nexus_username1/secret1',
+                                    '2.2.2.2/nexus_username2/secret2']
   # Logs
   $admin_email                = "admin@${::domain}"
 }

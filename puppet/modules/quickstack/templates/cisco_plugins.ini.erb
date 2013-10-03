@@ -1,0 +1,20 @@
+[CISCO_PLUGINS]
+nexus_plugin=<%= @cisco_nexus_plugin_real %>
+vswitch_plugin=<%= @cisco_vswitch_plugin_real %>
+
+[CISCO]
+nexus_driver=neutron.plugins.cisco.nexus.cisco_nexus_network_driver_v2.CiscoNEXUSDriver
+
+[NEXUS_SWITCH]
+<% @nexus_config.each do |switch_ip, hosts| %>
+[[<%= switch_ip %>]]
+<% hosts.each do |host_name, ports| %>
+[[[<%=host_name%>]]]
+ports=<%=ports%>
+<% end %>
+[[[ssh_port]]]
+ssh_port=22
+<% end %>
+
+[DATABASE]
+sql_connection=mysql://neutron:<%= @neutron_db_password %>@<%= @controller_priv_floating_ip %>/neutron 
