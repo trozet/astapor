@@ -258,7 +258,18 @@ params = {
   "controller_pub_floating_ip"   => 'PUB_IP',
   "admin_email"                  => "admin@#{Facter.domain}",
   "private_ip"                   => "$ipaddress_@#{private_int}",
-  "metadata_proxy_shared_secret" => SecureRandom.hex
+  "metadata_proxy_shared_secret" => SecureRandom.hex,
+  "bridge_interface"             => private_int,
+  "enable_ovs_agent"             => "true",
+  "ovs_vlan_ranges"              => undef,
+  "ovs_bridge_mappings"          => [undef],
+  "ovs_bridge_uplinks"           => [undef],
+  "tenant_network_type"          => 'vlan',
+  "neutron_core_plugin"          => 'ovs',
+  "cisco_vswitch_plugin"         => 'ovs',
+  "cisco_nexus_plugin"           => 'nexus',
+  "nexus_credentials"            => ['1.1.1.1/nexus_username1/secret1',
+                                     '2.2.2.2/nexus_username2/secret2']
 }
 
 hostgroups = [
