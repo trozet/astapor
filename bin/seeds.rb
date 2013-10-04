@@ -258,7 +258,11 @@ params = {
   "controller_pub_floating_ip"   => 'PUB_IP',
   "admin_email"                  => "admin@#{Facter.domain}",
   "private_ip"                   => "$ipaddress_@#{private_int}",
-  "metadata_proxy_shared_secret" => SecureRandom.hex
+  "metadata_proxy_shared_secret" => SecureRandom.hex,
+  "lb_private_vip"               => '',
+  "lb_public_vip"                => '',
+  "lb_member_names"              => '',
+  "lb_member_addrs"              => '',
 }
 
 hostgroups = [
@@ -274,6 +278,8 @@ hostgroups = [
      :class=>"quickstack::neutron::networker"},
     {:name=>"OpenStack Block Storage",
      :class=>"quickstack::cinder_storage"},
+    {:name=>"OpenStack Load Balancer",
+     :class=>"quickstack::load_balancer"},
 ]
 
 hostgroups.each do |hg|
