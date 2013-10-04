@@ -265,9 +265,9 @@ params = {
   "ovs_bridge_mappings"          => [undef],
   "ovs_bridge_uplinks"           => [undef],
   "tenant_network_type"          => 'vlan',
-  "neutron_core_plugin"          => 'ovs',
-  "cisco_vswitch_plugin"         => 'ovs',
-  "cisco_nexus_plugin"           => 'nexus',
+  "neutron_core_plugin"          => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
+  "cisco_vswitch_plugin"         => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
+  "cisco_nexus_plugin"           => 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin',
   "nexus_credentials"            => ['1.1.1.1/nexus_username1/secret1',
                                      '2.2.2.2/nexus_username2/secret2']
 }
