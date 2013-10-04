@@ -25,6 +25,8 @@ class quickstack::ceilometer_controller(
         verbose         => $verbose,
     }
 
+    # FIXME: passwordless connection is insecure, also we might use a
+    # way to run mongo on a different host in the future
     class { 'ceilometer::db':
         database_connection => 'mongodb://localhost:27017/ceilometer',
         require             => Class['mongodb'],
