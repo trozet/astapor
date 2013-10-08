@@ -48,6 +48,8 @@ class quickstack::params {
   $cisco_nexus_plugin            = 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin'
   $nexus_credentials             = ['1.1.1.1/nexus_username1/secret1',
                                     '2.2.2.2/nexus_username2/secret2']
+  $provider_vlan_auto_create     = 'false'
+  $provider_vlan_auto_trunk      = 'false'
   # Logs
   $admin_email                = "admin@${::domain}"
 }

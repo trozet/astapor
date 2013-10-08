@@ -268,8 +268,10 @@ params = {
   "neutron_core_plugin"          => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
   "cisco_vswitch_plugin"         => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
   "cisco_nexus_plugin"           => 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin',
-  "nexus_credentials"            => nil #['1.1.1.1/nexus_username1/secret1',
+  "nexus_credentials"            => nil, #['1.1.1.1/nexus_username1/secret1',
                                           # '2.2.2.2/nexus_username2/secret2']
+  "provider_vlan_auto_create"    => "false",
+  "provider_vlan_auto_trunk"     => "false",
 }
 
 hostgroups = [

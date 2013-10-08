@@ -30,6 +30,8 @@ class quickstack::neutron::plugins::cisco (
   $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
   $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
   $nexus_credentials            = $quickstack::params::nexus_credentials,
+  $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
+  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
   $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
 ) inherits quickstack::params {
 
