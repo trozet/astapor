@@ -236,7 +236,7 @@ class quickstack::neutron::controller (
     }
 
     if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
-        class quickstack::neutron::plugins::cisco {  }
+        class { 'quickstack::neutron::plugins::cisco': }
     }
     
     class { '::nova::network::neutron':

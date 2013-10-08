@@ -261,15 +261,15 @@ params = {
   "metadata_proxy_shared_secret" => SecureRandom.hex,
   "bridge_interface"             => private_int,
   "enable_ovs_agent"             => "true",
-  "ovs_vlan_ranges"              => undef,
-  "ovs_bridge_mappings"          => [undef],
-  "ovs_bridge_uplinks"           => [undef],
-  "tenant_network_type"          => 'vlan',
+  "ovs_vlan_ranges"              => nil,
+  "ovs_bridge_mappings"          => nil,
+  "ovs_bridge_uplinks"           => nil,
+  "tenant_network_type"          => 'gre',
   "neutron_core_plugin"          => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
   "cisco_vswitch_plugin"         => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
   "cisco_nexus_plugin"           => 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin',
-  "nexus_credentials"            => ['1.1.1.1/nexus_username1/secret1',
-                                     '2.2.2.2/nexus_username2/secret2']
+  "nexus_credentials"            => nil #['1.1.1.1/nexus_username1/secret1',
+                                          # '2.2.2.2/nexus_username2/secret2']
 }
 
 hostgroups = [
