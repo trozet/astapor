@@ -32,7 +32,7 @@ class quickstack::neutron::plugins::cisco (
   $nexus_credentials            = $quickstack::params::nexus_credentials,
   $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
   $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
-  $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
+  $mysql_host                  = $quickstack::params::mysql_host,
 ) inherits quickstack::params {
 
 
@@ -55,7 +55,7 @@ class quickstack::neutron::plugins::cisco (
     }
 
     class { '::neutron::plugins::ovs':
-      sql_connection      => "mysql://neutron:${neutron_db_password}@${controller_priv_floating_ip}/neutron",
+      sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
       tenant_network_type => $tenant_network_type,
       network_vlan_ranges => $ovs_vlan_ranges,
     }
