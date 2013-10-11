@@ -37,10 +37,10 @@ class quickstack::params {
   $metadata_proxy_shared_secret  = 'CHANGEME'
   $bridge_interface              = 'PRIV_IP'
   $enable_ovs_agent              = 'true'
-  $ovs_vlan_ranges               = undef
-  $ovs_bridge_mappings           = [undef]
-  $ovs_bridge_uplinks            = [undef]
   $tenant_network_type           = 'gre'
+  $ovs_vlan_ranges               = undef
+  $ovs_bridge_mappings           = undef
+  $ovs_bridge_uplinks            = undef
 
   # neutron plugin config
   $neutron_core_plugin           = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'
@@ -48,8 +48,17 @@ class quickstack::params {
   $cisco_vswitch_plugin          = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'
   # If using the Cisco plugin, Nexus hardware can be used for l2
   $cisco_nexus_plugin            = 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin'
-  $nexus_credentials             = ['1.1.1.1/nexus_username1/secret1',
-                                    '2.2.2.2/nexus_username2/secret2']
+
+  # If using the nexus sub plugin, specify the hardware layout by
+  # using the following syntax:
+  # $nexus_config = { 'SWITCH_IP' => { 'COMPUTE_NODE_NAME' : 'PORT' } }
+  $nexus_config                  = undef
+
+  # Set the nexus login credentials by creating a list
+  # of switch_ip/username/password strings as per the example below:
+  $nexus_credentials             = undef
+
+  # provider network settings
   $provider_vlan_auto_create     = 'false'
   $provider_vlan_auto_trunk      = 'false'
   # Logs

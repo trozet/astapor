@@ -12,12 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# @author: Pradeep Kilambi, Cisco Systems, Inc.
-
 class quickstack::neutron::plugins::cisco (
-  # Set DHCP/L3 Agents on Primary Controller
-  $enable_ovs_agent             = false,
-  $enable_server                = true,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
   # ovs config
@@ -25,18 +20,22 @@ class quickstack::neutron::plugins::cisco (
   $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
   $ovs_bridge_mappings          = $quickstack::params::ovs_bridge_mappings,
   $ovs_bridge_uplinks           = $quickstack::params::ovs_bridge_uplinks,
-  $tenant_network_type          = 'vlan',
   # cisco config
   $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
+  $nexus_config                 = $quickstack::params::nexus_config,
   $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
   $nexus_credentials            = $quickstack::params::nexus_credentials,
   $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
   $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
-  $mysql_host                  = $quickstack::params::mysql_host,
+  $mysql_host                   = $quickstack::params::mysql_host,
+  $enable_server                = true,
+  $enable_ovs_agent             = false,
+  $tenant_network_type          = 'vlan',
 ) inherits quickstack::params {
 
 
   if $cisco_vswitch_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
+    # vswitch plugin is ovs, setup the ovs plugin
     if ($ovs_bridge_mappings != []) {
       $br_map_str = join($ovs_bridge_mappings, ',')
       neutron_plugin_ovs {
@@ -62,7 +61,7 @@ class quickstack::neutron::plugins::cisco (
   }
 
   if $cisco_nexus_plugin == 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin' {
-
+    # nexus plugin, setup necessary dependencies and config files"
     package { 'python-ncclient':
       ensure => installed,
     } ~> Service['neutron']
