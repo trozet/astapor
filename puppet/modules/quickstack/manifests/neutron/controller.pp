@@ -146,6 +146,8 @@ class quickstack::neutron::controller (
       cinder_db_password          => $cinder_db_password,
       cinder_user_password        => $cinder_user_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
+      mysql_host                  => $mysql_host,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
