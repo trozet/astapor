@@ -138,6 +138,7 @@ class quickstack::neutron::controller (
       ceilometer_user_password    => $ceilometer_user_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       controller_pub_floating_ip  => $controller_pub_floating_ip,
+      qpid_host                   => $qpid_host,
       verbose                     => $verbose,
     }
 
