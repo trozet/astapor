@@ -64,14 +64,14 @@ class quickstack::neutron::plugins::cisco (
     # nexus plugin, setup necessary dependencies and config files"
     package { 'python-ncclient':
       ensure => installed,
-    } ~> Service['neutron']
+    } ~> Service['neutron-server']
 
     Neutron_plugin_cisco<||> ->
     file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
       owner => 'root',
       group => 'root',
-      content => template('cisco_plugins.ini.erb')
-    } ~> Service['neutron']
+      content => template('quickstack/cisco_plugins.ini.erb')
+    } ~> Service['neutron-server']
   }
 
   if $nexus_credentials {
