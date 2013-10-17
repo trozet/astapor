@@ -20,7 +20,15 @@ class quickstack::neutron::controller (
   $neutron_user_password        = $quickstack::params::neutron_user_password,
   $neutron_core_plugin          = $quickstack::params::neutron_core_plugin,
   $tenant_network_type          = $quickstack::params::tenant_network_type,
-  
+  $bridge_interface             = $quickstack::params::external_interface,
+  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
+  # cisco config
+  $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
+  $nexus_config                 = $quickstack::params::nexus_config,
+  $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
+  $nexus_credentials            = $quickstack::params::nexus_credentials,
+  $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
+  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,  
   $nova_db_password             = $quickstack::params::nova_db_password,
   $nova_user_password           = $quickstack::params::nova_user_password,
   $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
@@ -224,7 +232,20 @@ class quickstack::neutron::controller (
     }
 
     if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
-        class { 'quickstack::neutron::plugins::cisco': }
+        class { 'quickstack::neutron::plugins::cisco': 
+            neutron_db_password          => $neutron_db_password,
+            neutron_user_password        => $neutron_user_password,
+            bridge_interface             => $external_interface,
+            ovs_vlan_ranges              => $ovs_vlan_ranges,
+            cisco_vswitch_plugin         => $cisco_vswitch_plugin,
+            nexus_config                 => $nexus_config,
+            cisco_nexus_plugin           => $cisco_nexus_plugin,
+            nexus_credentials            => $nexus_credentials,
+            provider_vlan_auto_create    => $provider_vlan_auto_create,
+            provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
+            mysql_host                   => $mysql_host,
+            tenant_network_type          => $tenant_network_type,
+        }
     }
     
     class { '::nova::network::neutron':

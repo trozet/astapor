@@ -15,6 +15,8 @@ class quickstack::neutron::compute (
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
+  $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
+  $ovs_bridge_uplinks          = $quickstack::params::ovs_bridge_uplinks,
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose,
@@ -99,6 +101,8 @@ class quickstack::neutron::compute (
   }
 
   class { '::neutron::agents::ovs':
+      bridge_uplinks   => $ovs_bridge_uplinks,
+      bridge_mappings  => $ovs_bridge_mappings,
       local_ip         => getvar("ipaddress_${private_interface}"),
       enable_tunneling => true,
   }
