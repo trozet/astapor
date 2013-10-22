@@ -286,11 +286,23 @@ hostgroups = [
      :class=>"quickstack::hamysql::node"},
 ]
 
+def get_key_type(value)
+  key_list = LookupKey::KEY_TYPES
+  value_type = value.class.to_s.downcase
+  if key_list.include?(value_type)
+   value_type
+  elsif [FalseClass, TrueClass].include? value.class
+    'boolean'
+  end
+  # If we need to handle actual number classes like Fixnum, add those here
+end
+
 hostgroups.each do |hg|
 pclass = Puppetclass.find_by_name hg[:class]
   params.each do |k,v|
     p = pclass.class_params.find_by_key(k)
     unless p.nil?
+      p.key_type = get_key_type(v)
       p.default_value = v
       p.override = true
       p.save
