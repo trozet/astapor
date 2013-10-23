@@ -35,7 +35,6 @@ class quickstack::load_balancer (
   
   quickstack::load_balancer::proxy { 'cinder': port => '8776' }
   quickstack::load_balancer::proxy { 'glance': port => '9292' }
-  quickstack::load_balancer::proxy { 'swift-proxy': port => '8080' }
   quickstack::load_balancer::proxy { 'glance-registry': port => '9191' }
   quickstack::load_balancer::proxy { 'keystone-admin': port => '35357' }
   quickstack::load_balancer::proxy { 'keystone-public': port => '5000' }
@@ -43,6 +42,10 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'nova-ec2': port => '8773' }
   quickstack::load_balancer::proxy { 'nova-compute': port => '8774' }
   quickstack::load_balancer::proxy { 'nova-metadata': port => '8775' }
+  quickstack::load_balancer::proxy { 'heat-api': port => '8004' }
+  quickstack::load_balancer::proxy { 'heat-cfn': port => '8000' }
+  quickstack::load_balancer::proxy { 'swift-proxy': port => '8080' }
+  quickstack::load_balancer::proxy { 'ceilometer': port => '8777' }
 
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
 }
