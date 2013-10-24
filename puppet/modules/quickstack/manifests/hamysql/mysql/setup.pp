@@ -3,7 +3,6 @@ class quickstack::hamysql::mysql::setup (
   $glance_db_password,
   $nova_db_password,
   $cinder_db_password,
-  $mysql_bind_address     = '0.0.0.0',
   # Keystone
   $keystone_db_user       = 'keystone',
   $keystone_db_dbname     = 'keystone',
@@ -21,59 +20,74 @@ class quickstack::hamysql::mysql::setup (
   $neutron                = true,
   $neutron_db_user        = 'neutron',
   $neutron_db_dbname      = 'neutron',
-
-  # TODO's:
-  #  -mysql bind only on its vip, not 0.0.0.0
-  #  -mysql account security
-  #  -parameterize cluster member IP's
-  #  -parameterize vip
 ) {
 
   if str2bool("$hamysql_active_node") {
-    # TODO use IP other than 127.0.0.1 if $mysql_bind_address is not 0.0.0.0
+    class { 'quickstack::hamysql::mysql::account_security': }
+
     database { $keystone_db_dbname:
       ensure   => 'present',
       provider => 'mysql',
       require  => Class['quickstack::hamysql::mysql::rootpw'],
     }
-    database_user { "$keystone_db_user@127.0.0.1":
+    database_user { "$keystone_db_user@%":
       ensure => 'present',
       password_hash => mysql_password($keystone_db_password),
       provider      => 'mysql',
       require => Database[$keystone_db_dbname],
+    }
+    database_grant { "$keystone_db_user@%/$keystone_db_dbname":
+      privileges => 'all',
+      provider   => 'mysql',
+      require    => Database_user["$keystone_db_user@%"]
     }
 
     database { $glance_db_dbname:
       ensure => 'present',
       provider => 'mysql',
     }
-    database_user { "$glance_db_user@127.0.0.1":
+    database_user { "$glance_db_user@%":
       ensure => 'present',
       password_hash => mysql_password($glance_db_password),
       provider      => 'mysql',
       require => Database[$glance_db_dbname],
+    }
+    database_grant { "$glance_db_user@%/$glance_db_dbname":
+      privileges => 'all',
+      provider   => 'mysql',
+      require    => Database_user["$glance_db_user@%"]
     }
 
     database { $nova_db_dbname:
       ensure => 'present',
       provider => 'mysql',
     }
-    database_user { "$nova_db_user@127.0.0.1":
+    database_user { "$nova_db_user@%":
       ensure => 'present',
       password_hash => mysql_password($nova_db_password),
       provider      => 'mysql',
       require => Database[$nova_db_dbname],
+    }
+    database_grant { "$nova_db_user@%/$nova_db_dbname":
+      privileges => 'all',
+      provider   => 'mysql',
+      require    => Database_user["$nova_db_user@%"]
     }
 
     database { $cinder_db_dbname:
       ensure => 'present',
       provider => 'mysql',
     }
-    database_user { "$cinder_db_user@127.0.0.1":
+    database_user { "$cinder_db_user@%":
       ensure => 'present',
       password_hash => mysql_password($cinder_db_password),
       provider      => 'mysql',
       require => Database[$cinder_db_dbname],
+    }
+    database_grant { "$cinder_db_user@%/$cinder_db_dbname":
+      privileges => 'all',
+      provider   => 'mysql',
+      require    => Database_user["$cinder_db_user@%"]
     }
   }
 }
