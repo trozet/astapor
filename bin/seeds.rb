@@ -257,6 +257,14 @@ params = {
   "controller_priv_floating_ip"  => 'PRIV_IP',
   "controller_pub_floating_ip"   => 'PUB_IP',
   "mysql_host"                   => 'PRIV_IP',
+  "mysql_virtual_ip"             => 'PRIV_IP',
+  "mysql_bind_address"           => '0.0.0.0',
+  "mysql_virt_ip_nic"            => 'eth2',
+  "mysql_virt_ip_cidr_mask"      =>  '24',  
+  "mysql_shared_storage_device"  => '192.168.200.200:/mnt/mysql',
+  "mysql_shared_storage_type"    => 'nfs',
+  "mysql_resource_group_name"    => 'mysqlgrp',
+  "mysql_clu_member_addrs"       => '192.168.200.11 192.168.200.12 192.168.200.13',
   "qpid_host"                    => 'PRIV_IP',
   "admin_email"                  => "admin@#{Facter.domain}",
   "private_ip"                   => "$ipaddress_@#{private_int}",
@@ -295,13 +303,27 @@ hostgroups = [
      :class=>"quickstack::cinder_storage"},
     {:name=>"OpenStack Load Balancer",
      :class=>"quickstack::load_balancer"},
+    {:name=>"HA Mysql Node",
+     :class=>"quickstack::hamysql::node"},
 ]
+
+def get_key_type(value)
+  key_list = LookupKey::KEY_TYPES
+  value_type = value.class.to_s.downcase
+  if key_list.include?(value_type)
+   value_type
+  elsif [FalseClass, TrueClass].include? value.class
+    'boolean'
+  end
+  # If we need to handle actual number classes like Fixnum, add those here
+end
 
 hostgroups.each do |hg|
 pclass = Puppetclass.find_by_name hg[:class]
   params.each do |k,v|
     p = pclass.class_params.find_by_key(k)
     unless p.nil?
+      p.key_type = get_key_type(v)
       p.default_value = v
       p.override = true
       p.save

@@ -61,6 +61,13 @@ class quickstack::params {
   # provider network settings
   $provider_vlan_auto_create     = 'false'
   $provider_vlan_auto_trunk      = 'false'
+  $mysql_virt_ip_nic             = 'PRIV_IP'
+  $mysql_virt_ip_cidr_mask       = 'MYSQL_CIDR_MASK'
+  $mysql_shared_storage_device   = 'MYSQL_SHARED_STORAGE_DEVICE'
+  # e.g. "nfs"
+  $mysql_shared_storage_type     = 'MYSQL_SHARED_STORAGE_TYPE'
+  $mysql_clu_member_addrs        = 'SPACE_SEPARATED_IP_ADDRS'
+  $mysql_resource_group_name     = 'mysqlgroup'
   # Logs
   $admin_email                = "admin@${::domain}"
 }
