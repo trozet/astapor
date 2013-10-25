@@ -107,4 +107,10 @@ class quickstack::hamysql::node (
       cinder_db_password   => $cinder_db_password,
       require              => Class['quickstack::hamysql::mysql::rootpw'],
     }
+
+    firewall { '002 mysql incoming':
+      proto => 'tcp',
+      dport => ['3306'],
+      action => 'accept',
+    }
 }
