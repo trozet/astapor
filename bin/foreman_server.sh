@@ -39,8 +39,8 @@ if [ "x$SCL_RUBY_HOME" = "x" ]; then
   SCL_RUBY_HOME=/opt/rh/ruby193/root
 fi
 
-if [ "x$PACKSTACK_HOME" = "x" ]; then
-  PACKSTACK_HOME=/usr/share/packstack
+if [ "x$OPENSTACK_PUPPET_HOME" = "x" ]; then
+  OPENSTACK_PUPPET_HOME=/usr/share/openstack-puppet
 fi
 
 if [ "x$QUICKSTACK_HOME" = "x" ]; then
@@ -122,7 +122,7 @@ class { 'puppet':
   server  => true,
   server_common_modules_path => [
     '$QUICKSTACK_HOME/puppet/modules',
-    '$PACKSTACK_HOME/modules',
+    '$OPENSTACK_PUPPET_HOME/modules',
   ],
 }
 include passenger
