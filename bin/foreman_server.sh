@@ -75,6 +75,10 @@ if [ "x$PACKSTACK_HOME" = "x" ]; then
   PACKSTACK_HOME=/usr/share/packstack
 fi
 
+if [ "x$QUICKSTACK_HOME" = "x" ]; then
+  QUICKSTACK_HOME=$(cd $(dirname ${BASH_SOURCE[0]})/.. && pwd)
+fi
+
 if [ "x$FOREMAN_INSTALLER_DIR" = "x" ]; then
   FOREMAN_INSTALLER_DIR=/usr/share/foreman-installer
 fi
@@ -141,8 +145,12 @@ pushd $FOREMAN_INSTALLER_DIR
 cat > installer.pp << EOM
 class { 'puppet':
   runmode => 'cron',
+  server  => true,
+  server_common_modules_path => [
+    '$QUICKSTACK_HOME/puppet/modules',
+    '$PACKSTACK_HOME/modules',
+  ],
 }
-include puppet::server
 include passenger
 class { 'foreman':
   db_type => 'mysql',
@@ -193,21 +201,10 @@ echo '*' >> /etc/puppet/autosign.conf
 sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
 scl enable ruby193 "ruby foreman-setup.rb proxy"
 
-# Class defaults now handled by the seed file, see below
-
-# install puppet modules
-mkdir -p /etc/puppet/environments/production/modules
-# copy packstack
-cp -r $PACKSTACK_HOME/modules/* /etc/puppet/environments/production/modules/
-# copy ntp, quickstack
-cp -r ../puppet/modules/* /etc/puppet/environments/production/modules/
-# don't need this for puppet 3.1
-rm -rf /etc/puppet/environments/production/modules/create_resources
-# fix an error caused by ASCII encoded comment
-sed -i 's/^#.*//' /etc/puppet/environments/production/modules/horizon/manifests/init.pp
+# Import puppet class definitions into Foreman
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
-# Set params, and run the db:seed file
+# Set params, and run the db:seed file to set class parameter defaults
 cp ./seeds.rb $FOREMAN_DIR/db/.
 sed -i "s#SECONDARY_INT#$SECONDARY_INT#" $FOREMAN_DIR/db/seeds.rb
 sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
