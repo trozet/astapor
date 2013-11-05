@@ -197,10 +197,6 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 # GSutcliffe: Should be uneccessary once Foreman Provisioning is shown to be working
 echo '*' >> /etc/puppet/autosign.conf
 
-# Add smart proxy
-sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
-scl enable ruby193 "ruby foreman-setup.rb proxy"
-
 # Import puppet class definitions into Foreman
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
