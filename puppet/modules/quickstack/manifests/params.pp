@@ -93,6 +93,4 @@ class quickstack::params {
   $mysql_shared_storage_type     = 'MYSQL_SHARED_STORAGE_TYPE'
   $mysql_clu_member_addrs        = 'SPACE_SEPARATED_IP_ADDRS'
   $mysql_resource_group_name     = 'mysqlgroup'
-  # Logs
-  $admin_email                = "admin@${::domain}"
 }
