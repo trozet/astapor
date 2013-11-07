@@ -21,13 +21,6 @@ class quickstack::hamysql::node (
 
 ) inherits quickstack::params {
 
-    yumrepo { 'clusterlabs' :
-      baseurl => "http://clusterlabs.org/64z.repo",
-      enabled => 1,
-      priority => 1,
-      gpgcheck => 0, # since the packages (eg pcs) don't appear to be signed
-    }
-
     package { 'mysql-server':
       ensure => installed,
     }
@@ -48,7 +41,7 @@ class quickstack::hamysql::node (
     class {'pacemaker::corosync':
       cluster_name => "hamysql",
       cluster_members => $mysql_clu_member_addrs,
-      require => [Yumrepo['clusterlabs'],Package['mysql-server'],
+      require => [Package['mysql-server'],
                   Package['MySQL-python'],Package['ccs'],
                   Class['quickstack::hamysql::mysql::config']],
     }
