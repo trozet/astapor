@@ -159,7 +159,9 @@ class { 'foreman':
 #
 # Check foreman_proxy/manifests/{init,params}.pp for other options
 class { 'foreman_proxy':
-  custom_repo  => true,
+  custom_repo          => true,
+  port                 => '9090',
+  registered_proxy_url => "https://\${::fqdn}:9090",
 EOM
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
@@ -196,10 +198,6 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 # turn on certificate autosigning
 # GSutcliffe: Should be uneccessary once Foreman Provisioning is shown to be working
 echo '*' >> /etc/puppet/autosign.conf
-
-# Add smart proxy
-sed -i "s/foreman_hostname/$PUPPETMASTER/" foreman-params.json
-scl enable ruby193 "ruby foreman-setup.rb proxy"
 
 # Import puppet class definitions into Foreman
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
