@@ -7,7 +7,11 @@ class quickstack::neutron::controller (
   $heat_cloudwatch              = $quickstack::params::heat_cloudwatch,
   $heat_user_password           = $quickstack::params::heat_user_password,
   $heat_db_password             = $quickstack::params::heat_db_password,
+  $cinder_backend_gluster       = $quickstack::params::cinder_backend_gluster,
+  $cinder_backend_iscsi         = $quickstack::params::cinder_backend_iscsi,
   $cinder_db_password           = $quickstack::params::cinder_db_password,
+  $cinder_gluster_volume        = $quickstack::params::cinder_gluster_volume,
+  $cinder_gluster_peers         = $quickstack::params::cinder_gluster_peers,
   $cinder_user_password         = $quickstack::params::cinder_user_password,
   $glance_db_password           = $quickstack::params::glance_db_password,
   $glance_user_password         = $quickstack::params::glance_user_password,
@@ -154,7 +158,11 @@ class quickstack::neutron::controller (
     }
 
     class { 'quickstack::cinder_controller':
+      cinder_backend_gluster      => $cinder_backend_gluster,
+      cinder_backend_iscsi        => $cinder_backend_iscsi,
       cinder_db_password          => $cinder_db_password,
+      cinder_gluster_volume       => $cinder_gluster_volume,
+      cinder_gluster_peers        => $cinder_gluster_peers,
       cinder_user_password        => $cinder_user_password,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       mysql_host                  => $mysql_host,
