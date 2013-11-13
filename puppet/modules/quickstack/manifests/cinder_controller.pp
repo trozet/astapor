@@ -5,6 +5,8 @@ class quickstack::cinder_controller(
   $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
   $cinder_gluster_peers        = $quickstack::params::cinder_gluster_peers,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
+  $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
+  $cinder_gluster_peers        = $quickstack::params::cinder_gluster_peers,
   $cinder_user_password        = $quickstack::params::cinder_user_password,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $mysql_host                  = $quickstack::params::mysql_host,
