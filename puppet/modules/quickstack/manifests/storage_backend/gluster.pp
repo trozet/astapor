@@ -40,5 +40,5 @@ class quickstack::storage_backend::gluster(
     #dport  => port_range('24009', '6'),
     dport    => [ '24009', '24010', '24011', '24012', '24013', '24014' ],
     action => 'accept',
-  } 
+  }
 }
