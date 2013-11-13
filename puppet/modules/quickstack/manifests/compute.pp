@@ -1,7 +1,7 @@
 # Quickstack compute node
 class quickstack::compute (
-  $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
+  $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
   $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
