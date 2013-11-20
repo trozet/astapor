@@ -214,7 +214,7 @@ class quickstack::neutron::controller (
     }
 
     class { '::neutron::keystone::auth':
-        password         => $admin_password,
+        password         => $neutron_user_password,
         public_address   => $controller_pub_floating_ip,
         admin_address    => $controller_priv_floating_ip,
         internal_address => $controller_priv_floating_ip,
@@ -222,7 +222,7 @@ class quickstack::neutron::controller (
 
     class { '::neutron::server':
         auth_host        => $::ipaddress,
-        auth_password    => $admin_password,
+        auth_password    => $neutron_user_password,
      }
 
     if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {

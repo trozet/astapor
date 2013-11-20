@@ -265,14 +265,14 @@ params = {
   "controller_priv_floating_ip"  => 'PRIV_IP',
   "controller_pub_floating_ip"   => 'PUB_IP',
   "mysql_host"                   => 'PRIV_IP',
-  "mysql_virtual_ip"             => 'PRIV_IP',
+  "mysql_virtual_ip"             => '192.168.200.220',
   "mysql_bind_address"           => '0.0.0.0',
-  "mysql_virt_ip_nic"            => 'eth2',
+  "mysql_virt_ip_nic"            => 'eth1',
   "mysql_virt_ip_cidr_mask"      =>  '24',  
-  "mysql_shared_storage_device"  => '192.168.200.200:/mnt/mysql',
+  "mysql_shared_storage_device"  => '192.168.203.200:/mnt/mysql',
   "mysql_shared_storage_type"    => 'nfs',
   "mysql_resource_group_name"    => 'mysqlgrp',
-  "mysql_clu_member_addrs"       => '192.168.200.11 192.168.200.12 192.168.200.13',
+  "mysql_clu_member_addrs"       => '192.168.203.11 192.168.203.12 192.168.203.13',
   "qpid_host"                    => 'PRIV_IP',
   "admin_email"                  => "admin@#{Facter.domain}",
   "private_ip"                   => "$ipaddress_@#{private_int}",
@@ -294,6 +294,7 @@ params = {
   "lb_public_vip"                => '',
   "lb_member_names"              => '',
   "lb_member_addrs"              => '',
+  "configure_ovswitch"           => "true",
 }
 
 hostgroups = [

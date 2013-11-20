@@ -4,6 +4,7 @@ class quickstack::hamysql::node (
   $glance_db_password          = $quickstack::params::glance_db_password,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
+  $heat_db_password            = $quickstack::params::heat_db_password,
 
   # these two variables are distinct because you may want to bind on
   # '0.0.0.0' rather than just the floating ip
@@ -19,13 +20,6 @@ class quickstack::hamysql::node (
   $mysql_clu_member_addrs      = $quickstack::params::mysql_clu_member_addrs,
 
 ) inherits quickstack::params {
-
-    yumrepo { 'clusterlabs' :
-      baseurl => "http://clusterlabs.org/64z.repo",
-      enabled => 1,
-      priority => 1,
-      gpgcheck => 0, # since the packages (eg pcs) don't appear to be signed
-    }
 
     package { 'mysql-server':
       ensure => installed,
@@ -47,7 +41,7 @@ class quickstack::hamysql::node (
     class {'pacemaker::corosync':
       cluster_name => "hamysql",
       cluster_members => $mysql_clu_member_addrs,
-      require => [Yumrepo['clusterlabs'],Package['mysql-server'],
+      require => [Package['mysql-server'],
                   Package['MySQL-python'],Package['ccs'],
                   Class['quickstack::hamysql::mysql::config']],
     }
@@ -105,6 +99,7 @@ class quickstack::hamysql::node (
       glance_db_password   => $glance_db_password,
       nova_db_password     => $nova_db_password,
       cinder_db_password   => $cinder_db_password,
+      heat_db_password     => $heat_db_password,
       require              => Class['quickstack::hamysql::mysql::rootpw'],
     }
 

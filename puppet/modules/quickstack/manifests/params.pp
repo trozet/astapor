@@ -65,6 +65,7 @@ class quickstack::params {
   $ovs_vlan_ranges               = undef
   $ovs_bridge_mappings           = []
   $ovs_bridge_uplinks            = []
+  $configure_ovswitch            = 'true'
 
   # neutron plugin config
   $neutron_core_plugin           = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'

@@ -3,6 +3,7 @@ class quickstack::hamysql::mysql::setup (
   $glance_db_password,
   $nova_db_password,
   $cinder_db_password,
+  $heat_db_password,
   # Keystone
   $keystone_db_user       = 'keystone',
   $keystone_db_dbname     = 'keystone',
@@ -12,6 +13,9 @@ class quickstack::hamysql::mysql::setup (
   # Nova
   $nova_db_user           = 'nova',
   $nova_db_dbname         = 'nova',
+  # Heat
+  $heat_db_user           = 'heat',
+  $heat_db_dbname         = 'heat',
   # Cinder
   $cinder                 = true,
   $cinder_db_user         = 'cinder',
@@ -88,6 +92,22 @@ class quickstack::hamysql::mysql::setup (
       privileges => 'all',
       provider   => 'mysql',
       require    => Database_user["$cinder_db_user@%"]
+    }
+
+    database { $heat_db_dbname:
+      ensure => 'present',
+      provider => 'mysql',
+    }
+    database_user { "$heat_db_user@%":
+      ensure => 'present',
+      password_hash => mysql_password($heat_db_password),
+      provider      => 'mysql',
+      require => Database[$heat_db_dbname],
+    }
+    database_grant { "$heat_db_user@%/$heat_db_dbname":
+      privileges => 'all',
+      provider   => 'mysql',
+      require    => Database_user["$heat_db_user@%"]
     }
   }
 }

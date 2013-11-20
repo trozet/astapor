@@ -1,5 +1,6 @@
 
 class quickstack::neutron::networker (
+  $configure_ovswitch           = $quickstack::params::configure_ovswitch,
   $fixed_network_range          = $quickstack::params::fixed_network_range,
   $metadata_proxy_shared_secret = $quickstack::params::metadata_proxy_shared_secret,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
@@ -13,6 +14,21 @@ class quickstack::neutron::networker (
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+    if str2bool("$configure_ovswitch") {
+        vs_bridge { 'br-ex':
+            provider => ovs_redhat,
+            ensure   => present,
+        } ->
+        vs_port { 'external':
+            bridge    => 'br-ex',
+            interface => $public_interface,
+            keep_ip   => true,
+            sleep     => '30',
+            provider  => ovs_redhat,
+            ensure    => present,
+        }
+    }
+
     class { '::neutron':
         verbose               => true,
         allow_overlapping_ips => true,
@@ -22,10 +38,9 @@ class quickstack::neutron::networker (
 
     neutron_config {
         'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
-
-        'keystone_authtoken/admin_tenant_name': value => 'admin';
-        'keystone_authtoken/admin_user':        value => 'admin';
-        'keystone_authtoken/admin_password':    value => $admin_password;
+        'keystone_authtoken/admin_tenant_name': value => 'services';
+        'keystone_authtoken/admin_user':        value => 'neutron';
+        'keystone_authtoken/admin_password':    value => $neutron_user_password;
         'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
     }
 
