@@ -35,6 +35,8 @@ class quickstack::cinder_controller(
   class {'cinder::scheduler': }
 
   if str2bool($cinder_backend_gluster) == true {
+    class { 'cinder::volume': }
+
     class { 'gluster::client': }
 
     class { 'cinder::volume::glusterfs':
