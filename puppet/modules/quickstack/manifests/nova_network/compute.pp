@@ -14,6 +14,10 @@ class quickstack::nova_network::compute (
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+    if $glance_backend_gluster == true {
+      class { 'gluster::client': }
+    }
+
     # Configure Nova
     nova_config{
         'DEFAULT/auto_assign_floating_ip':  value => 'True';
