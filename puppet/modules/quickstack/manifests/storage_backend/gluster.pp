@@ -34,11 +34,17 @@ class quickstack::storage_backend::gluster(
     action => 'accept',
   }
 
+  firewall { '001 RPC and gluster daemon incoming UDP':
+    proto  => 'udp',
+    dport  => [ '111' ],
+    action => 'accept',
+  }
+
   # 1 port per brick
   firewall { '002 gluster bricks incoming':
     proto  => 'tcp',
-    #dport  => port_range('24009', '6'),
-    dport    => [ '24009', '24010', '24011', '24012', '24013', '24014' ],
+    #dport  => port_range('49152', '6'),
+    dport    => [ '49152', '49153', '49154', '49155', '49156', '49157' ],
     action => 'accept',
   }
 }
