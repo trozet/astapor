@@ -2,6 +2,7 @@
 class quickstack::nova_network::compute (
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
+  $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
   $fixed_network_range         = $quickstack::params::fixed_network_range,
   $floating_network_range      = $quickstack::params::floating_network_range,
   $nova_db_password            = $quickstack::params::nova_db_password,
@@ -14,7 +15,7 @@ class quickstack::nova_network::compute (
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
-    if $glance_backend_gluster == true {
+    if str2bool($cinder_backend_gluster) == true {
       class { 'gluster::client': }
     }
 
