@@ -90,9 +90,9 @@ class quickstack::neutron::compute (
   neutron_config {
       'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
       'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
-      'keystone_authtoken/admin_tenant_name': value => 'admin';
-      'keystone_authtoken/admin_user':        value => 'admin';
-      'keystone_authtoken/admin_password':    value => $admin_password;
+      'keystone_authtoken/admin_tenant_name': value => 'services';
+      'keystone_authtoken/admin_user':        value => 'neutron';
+      'keystone_authtoken/admin_password':    value => $neutron_user_password;
   }
 
   class { '::neutron::plugins::ovs':
