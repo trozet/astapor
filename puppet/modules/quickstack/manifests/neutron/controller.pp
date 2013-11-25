@@ -20,7 +20,7 @@ class quickstack::neutron::controller (
   $neutron_user_password        = $quickstack::params::neutron_user_password,
   $neutron_core_plugin          = $quickstack::params::neutron_core_plugin,
   $tenant_network_type          = $quickstack::params::tenant_network_type,
-  $bridge_interface             = $quickstack::params::external_interface,
+  $bridge_interface             = $quickstack::params::bridge_interface,
   $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
   # cisco config
   $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
@@ -235,7 +235,7 @@ class quickstack::neutron::controller (
         class { 'quickstack::neutron::plugins::cisco':
             neutron_db_password          => $neutron_db_password,
             neutron_user_password        => $neutron_user_password,
-            bridge_interface             => $external_interface,
+            bridge_interface             => $bridge_interface,
             ovs_vlan_ranges              => $ovs_vlan_ranges,
             cisco_vswitch_plugin         => $cisco_vswitch_plugin,
             nexus_config                 => $nexus_config,
