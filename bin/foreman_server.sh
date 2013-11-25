@@ -192,9 +192,6 @@ fi
 puppet apply --verbose installer.pp --modulepath=modules
 popd
 
-# reset permissions
-sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake permissions:reset"
-
 # turn on certificate autosigning
 # GSutcliffe: Should be uneccessary once Foreman Provisioning is shown to be working
 echo '*' >> /etc/puppet/autosign.conf
@@ -241,7 +238,11 @@ chkconfig puppet on
 EOF
 
 echo "Foreman is installed and almost ready for setting up your OpenStack"
-echo "First, you need to alter a few parameters in Foreman."
+echo "You'll find Foreman at https://$(hostname)"
+echo "The user name is 'admin' and default password is 'changeme'."
+echo "Please change the password at https://$(hostname)/users/1-admin/edit"
+echo ""
+echo "Then you need to alter a few parameters in Foreman."
 echo "Visit: https://$(hostname)/hostgroups"
 echo "From this list, click on each class that you plan to use"
 echo "Go to the Smart Class Parameters tab and work though each of the parameters"
