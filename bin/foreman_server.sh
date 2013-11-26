@@ -235,6 +235,11 @@ puppet agent --test
 
 service puppet start
 chkconfig puppet on
+
+echo "NOTE: If you saw an error above including:
+'Warning: 400 on SERVER: Failed to find....'
+This may be ignored, as it means this host was unknown to Foreman at the start
+of the Puppet run."
 EOF
 
 echo "Foreman is installed and almost ready for setting up your OpenStack"
