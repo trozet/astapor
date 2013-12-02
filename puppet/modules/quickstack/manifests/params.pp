@@ -27,7 +27,7 @@ class quickstack::params {
   $cinder_db_password           = 'CHANGEME'
   $cinder_user_password         = 'CHANGEME'
   # Cinder backend - Several backends should be able to coexist
-  $cinder_backend_gluster       = true
+  $cinder_backend_gluster       = false
   $cinder_backend_iscsi         = false
   # Cinder gluster
   $cinder_gluster_volume        = 'cinder'
