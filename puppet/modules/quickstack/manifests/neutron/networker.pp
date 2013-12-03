@@ -12,18 +12,20 @@ class quickstack::neutron::networker (
   $public_interface             = $quickstack::params::public_interface,
   $mysql_host                   = $quickstack::params::mysql_host,
   $qpid_host                    = $quickstack::params::qpid_host,
+  $bridge_name                  = 'br-ex',
+  $bridge_keep_ip               = true,
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
     if str2bool("$configure_ovswitch") {
-        vs_bridge { 'br-ex':
+        vs_bridge { $bridge_name:
             provider => ovs_redhat,
             ensure   => present,
         } ->
         vs_port { 'external':
-            bridge    => 'br-ex',
+            bridge    => $bridge_name,
             interface => $public_interface,
-            keep_ip   => true,
+            keep_ip   => $bridge_keep_ip,
             sleep     => '30',
             provider  => ovs_redhat,
             ensure    => present,
