@@ -1,7 +1,0 @@
-cp puppet/modules/quickstack/manifests/compute.pp ../foo/
-cp puppet/modules/quickstack/manifests/controller.pp ../foo/
-cp puppet/modules/quickstack/manifests/neutron/compute.pp ../foo/neutron/
-cp puppet/modules/quickstack/manifests/neutron/controller.pp ../foo/neutron/
-cp puppet/modules/quickstack/manifests/neutron/networker.pp  ../foo/neutron/
-cp puppet/modules/quickstack/manifests/nova_network/compute.pp ../foo/nova_network/
-cp puppet/modules/quickstack/manifests/nova_network/controller.pp ../foo/nova_network
