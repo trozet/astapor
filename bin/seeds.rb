@@ -330,15 +330,14 @@ def get_key_type(value)
 end
 
 hostgroups.each do |hg|
-pclass = Puppetclass.find_by_name hg[:class]
-  params.each do |k,v|
-    p = pclass.class_params.find_by_key(k)
-    unless p.nil?
-      p.key_type = get_key_type(v)
-      p.default_value = v
-      p.override = true
-      p.save
+  pclass = Puppetclass.find_by_name hg[:class]
+  pclass.class_params.each do |p|
+    if params.include?(p.key)
+      p.key_type = get_key_type(params[p.key])
+      p.default_value = params[p.key]
     end
+    p.override = true
+    p.save
   end
 end
 
