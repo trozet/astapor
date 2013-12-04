@@ -39,6 +39,7 @@ class quickstack::controller (
   $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
   $qpid_host                    = $quickstack::params::qpid_host,
   $tenant_network_type          = $quickstack::params::tenant_network_type,
+  $auto_assign_floating_ip      = $quickstack::params::auto_assign_floating_ip,
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -217,7 +218,9 @@ class quickstack::controller (
     }
   }
   else {
-    class { '::quickstack::nova_network::controller': }
+    class { '::quickstack::nova_network::controller':
+      auto_assign_floating_ip => $auto_assign_floating_ip,
+    }
   }
 
   firewall { '001 controller incoming':
