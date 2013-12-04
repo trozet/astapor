@@ -299,17 +299,17 @@ params = {
 }
 
 hostgroups = [
-    {:name=>"OpenStack Controller",
+    {:name=>"Controller",
      :class=>"quickstack::controller"},
-    {:name=>"OpenStack Compute",
+    {:name=>"Compute",
      :class=>"quickstack::compute"},
-    {:name=>"OpenStack Neutron Networker",
+    {:name=>"Neutron Networker",
      :class=>"quickstack::neutron::networker"},
-    {:name=>"OpenStack Gluster Storage",
+    {:name=>"Gluster Storage",
      :class=>"quickstack::storage_backend::gluster"},
-    {:name=>"OpenStack LVM Block Storage",
+    {:name=>"LVM Block Storage",
      :class=>"quickstack::storage_backend::lvm_cinder"},
-    {:name=>"OpenStack Load Balancer",
+    {:name=>"Load Balancer",
      :class=>"quickstack::load_balancer"},
     {:name=>"HA Mysql Node",
      :class=>"quickstack::hamysql::node"},
