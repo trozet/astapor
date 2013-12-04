@@ -16,6 +16,8 @@ class quickstack::neutron::controller (
   $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
   $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
   $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
+  $enable_tunneling             = $quickstack::params::enable_tunneling,
+  $tunnel_id_ranges             = '1:1000',
   $qpid_host                    = $quickstack::params::qpid_host,
   $tenant_network_type          = $quickstack::params::tenant_network_type,
   $verbose                      = $quickstack::params::verbose,
@@ -48,7 +50,7 @@ class quickstack::neutron::controller (
 
   if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
     neutron_plugin_ovs {
-      'OVS/enable_tunneling': value => 'True';
+      'OVS/enable_tunneling': value => $enable_tunneling;
       'SECURITYGROUP/firewall_driver':
       value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
     }
@@ -56,6 +58,8 @@ class quickstack::neutron::controller (
     class { '::neutron::plugins::ovs':
       sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
       tenant_network_type => $tenant_network_type,
+      network_vlan_ranges => $ovs_vlan_ranges,
+      tunnel_id_ranges    => $tunnel_id_ranges,
     }
   }
 
