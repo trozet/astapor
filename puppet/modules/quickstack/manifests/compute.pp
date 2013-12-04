@@ -21,6 +21,7 @@ class quickstack::compute (
   $public_interface            = $quickstack::params::public_interface,
   $qpid_host                   = $quickstack::params::qpid_host,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
+  $auto_assign_floating_ip     = $quickstack::params::auto_assign_floating_ip,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -109,6 +110,7 @@ class quickstack::compute (
       floating_network_range      => $floating_network_range,
       private_interface           => $private_interface,
       public_interface            => $public_interface,
+      auto_assign_floating_ip     => $auto_assign_floating_ip,
     }
   }
 

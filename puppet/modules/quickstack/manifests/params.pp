@@ -54,6 +54,7 @@ class quickstack::params {
   # Nova-network specific
   $fixed_network_range           = 'PRIV_RANGE'
   $floating_network_range        = 'PUB_RANGE'
+  $auto_assign_floating_ip       = 'True'
 
   # Neutron specific
   $metadata_proxy_shared_secret  = 'CHANGEME'

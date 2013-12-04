@@ -6,11 +6,12 @@ class quickstack::nova_network::compute (
   $floating_network_range      = $quickstack::params::floating_network_range,
   $private_interface           = $quickstack::params::private_interface,
   $public_interface            = $quickstack::params::public_interface,
+  $auto_assign_floating_ip
 ) inherits quickstack::params {
 
   # Configure Nova
   nova_config{
-    'DEFAULT/auto_assign_floating_ip':  value => 'True';
+    'DEFAULT/auto_assign_floating_ip':  value => $auto_assign_floating_ip;
     #"DEFAULT/network_host":            value => ${controller_priv_floating_ip;
     "DEFAULT/network_host":             value => "$::ipaddress";
     #"DEFAULT/metadata_host":           value => "$controller_priv_floating_ip";
