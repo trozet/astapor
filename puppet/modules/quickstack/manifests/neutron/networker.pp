@@ -14,6 +14,11 @@ class quickstack::neutron::networker (
   $qpid_host                    = $quickstack::params::qpid_host,
   $bridge_name                  = 'br-ex',
   $bridge_keep_ip               = true,
+  $tenant_network_type          = $quickstack::params::tenant_network_type,
+  $ovs_bridge_mappings          = $quickstack::params::ovs_bridge_mappings,
+  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
+  $tunnel_id_ranges             = '1:1000',
+  $enable_tunneling             = $quickstack::params::enable_tunneling,
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -49,12 +54,15 @@ class quickstack::neutron::networker (
 
   class { '::neutron::plugins::ovs':
     sql_connection      => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
-    tenant_network_type => 'gre',
+    tenant_network_type => $tenant_network_type,
+    network_vlan_ranges => $ovs_vlan_ranges,
+    tunnel_id_ranges    => $tunnel_id_ranges,
   }
 
   class { '::neutron::agents::ovs':
-    local_ip         => getvar("ipaddress_${private_interface}"),
-    enable_tunneling => true,
+    local_ip            => getvar("ipaddress_${private_interface}"),
+    bridge_mappings     => $ovs_bridge_mappings,
+    enable_tunneling    => str2bool("$enable_tunneling"),
   }
 
   class { '::neutron::agents::dhcp': }

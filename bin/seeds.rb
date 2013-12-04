@@ -283,6 +283,7 @@ params = {
   "ovs_bridge_mappings"          => [],
   "ovs_bridge_uplinks"           => [],
   "tenant_network_type"          => 'gre',
+  "enable_tunneling"             => 'True',
   "auto_assign_floating_ip"      => 'True',
   "neutron_core_plugin"          => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
   "cisco_vswitch_plugin"         => 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
