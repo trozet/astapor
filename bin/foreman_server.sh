@@ -2,9 +2,6 @@
 
 echo "#################### RED HAT OPENSTACK #####################"
 echo "Thank you for using the Red Hat OpenStack Foreman Installer!"
-echo "Please note that this tool is a Technology Preview"
-echo "For more information about Red hat Technology Previews, see"
-echo "https://access.redhat.com/support/offerings/techpreview/"
 echo "############################################################"
 
 read -p "Press [Enter] to continue"
@@ -124,10 +121,6 @@ fi
 # enable ip forwarding
 sudo sysctl -w net.ipv4.ip_forward=1
 sudo sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
-
-# disable selinux in /etc/selinux/config
-# TODO: selinux policy
-setenforce 0
 
 # Puppet configuration
 augtool -s <<EOA
