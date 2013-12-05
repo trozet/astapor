@@ -22,6 +22,14 @@ class quickstack::neutron::networker (
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+  # str2bool expects the string to already be downcased.  all-righty.
+  # (i.e. str2bool('True') would blow up, so work around it.)
+  $enable_tunneling_bool = $enable_tunneling ? {
+      /(?i:true)/   => true,
+      /(?i:false)/  => false,
+      default => str2bool("$enable_tunneling"),
+  }
+
   if str2bool("$configure_ovswitch") {
     vs_bridge { $bridge_name:
       provider => ovs_redhat,
@@ -62,7 +70,7 @@ class quickstack::neutron::networker (
   class { '::neutron::agents::ovs':
     local_ip            => getvar("ipaddress_${private_interface}"),
     bridge_mappings     => $ovs_bridge_mappings,
-    enable_tunneling    => str2bool("$enable_tunneling"),
+    enable_tunneling    => $enable_tunneling_bool,
   }
 
   class { '::neutron::agents::dhcp': }

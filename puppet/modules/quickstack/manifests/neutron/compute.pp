@@ -17,6 +17,14 @@ class quickstack::neutron::compute (
   $tunnel_id_ranges            = '1:1000',
 ) inherits quickstack::params {
 
+  # str2bool expects the string to already be downcased.  all-righty.
+  # (i.e. str2bool('True') would blow up, so work around it.)
+  $enable_tunneling_bool = $enable_tunneling ? {
+      /(?i:true)/   => true,
+      /(?i:false)/  => false,
+      default => str2bool("$enable_tunneling"),
+  }
+
   class { '::neutron':
     allow_overlapping_ips => true,
     rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
@@ -43,7 +51,7 @@ class quickstack::neutron::compute (
     bridge_uplinks      => $ovs_bridge_uplinks,
     bridge_mappings     => $ovs_bridge_mappings,
     local_ip            => getvar("ipaddress_${private_interface}"),
-    enable_tunneling    => str2bool("$enable_tunneling"),
+    enable_tunneling    => $enable_tunneling_bool,
   }
 
   class { '::nova::network::neutron':
