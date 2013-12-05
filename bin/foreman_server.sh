@@ -125,10 +125,6 @@ fi
 sudo sysctl -w net.ipv4.ip_forward=1
 sudo sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
 
-# disable selinux in /etc/selinux/config
-# TODO: selinux policy
-setenforce 0
-
 # Puppet configuration
 augtool -s <<EOA
 set /files/etc/puppet/puppet.conf/agent/server $PUPPETMASTER
