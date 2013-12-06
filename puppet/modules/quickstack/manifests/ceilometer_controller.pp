@@ -37,9 +37,13 @@ class quickstack::ceilometer_controller(
         require => Class['ceilometer::db'],
     }
 
-    class { 'ceilometer::agent::central':
+    class { 'ceilometer::agent::auth':
         auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
         auth_password => $ceilometer_user_password,
+    }
+
+    class { 'ceilometer::agent::central':
+        enabled => true,
     }
 
     class { 'ceilometer::api':

@@ -69,9 +69,13 @@ class quickstack::compute_common (
     verbose         => $verbose,
   }
 
-  class { 'ceilometer::agent::compute':
+  class { 'ceilometer::agent::auth':
     auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
     auth_password => $ceilometer_user_password,
+  }
+
+  class { 'ceilometer::agent::compute':
+    enabled => true,
   }
 
   firewall { '001 nova compute incoming':
