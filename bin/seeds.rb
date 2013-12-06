@@ -303,6 +303,18 @@ params = {
   "lb_member_addrs"               => '',
   "configure_ovswitch"            => "true",
   "neutron"                       => "false",
+  "ssl"                           => "false",
+  "freeipa"                       => "false",
+  "mysql_ca"                      => "/etc/ipa/ca.crt",
+  "mysql_cert"                    => "/etc/pki/tls/certs/PRIV_HOST-mysql.crt",
+  "mysql_key"                     => "/etc/pki/tls/private/PRIV_HOST-mysql.key",
+  "qpid_ca"                       => "/etc/ipa/ca.crt",
+  "qpid_cert"                     => "/etc/pki/tls/certs/PRIV_HOST-qpid.crt",
+  "qpid_key"                      => "/etc/pki/tls/private/PRIV_HOST-qpid.key",
+  "horizon_ca"                    => "/etc/ipa/ca.crt",
+  "horizon_cert"                  => "/etc/pki/tls/certs/PUB_HOST-horizon.crt",
+  "horizon_key"                   => "/etc/pki/tls/private/PUB_HOST-horizon.key",
+  "qpid_nssdb_password"           => SecureRandom.hex,
 }
 
 hostgroups = [
