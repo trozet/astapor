@@ -57,7 +57,7 @@ class quickstack::params {
   $auto_assign_floating_ip       = 'True'
 
   # Neutron specific
-  $metadata_proxy_shared_secret  = 'CHANGEME'
+  $neutron_metadata_proxy_secret  = 'CHANGEME'
 
   $mysql_host                    = 'PRIV_IP'
   $qpid_host                     = 'PRIV_IP'
