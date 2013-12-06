@@ -2,6 +2,7 @@
 class quickstack::controller (
   $admin_email                  = $quickstack::params::admin_email,
   $admin_password               = $quickstack::params::admin_password,
+  $auto_assign_floating_ip      = $quickstack::params::auto_assign_floating_ip,
   $bridge_interface             = $quickstack::params::bridge_interface,
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
@@ -28,6 +29,7 @@ class quickstack::controller (
   $mysql_host                   = $quickstack::params::mysql_host,
   $mysql_root_password          = $quickstack::params::mysql_root_password,
   $neutron                      = $quickstack::params::neutron,
+  $neutron_core_plugin          = $quickstack::params::neutron_core_plugin,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
   $nexus_config                 = $quickstack::params::nexus_config,
@@ -39,7 +41,6 @@ class quickstack::controller (
   $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
   $qpid_host                    = $quickstack::params::qpid_host,
   $tenant_network_type          = $quickstack::params::tenant_network_type,
-  $auto_assign_floating_ip      = $quickstack::params::auto_assign_floating_ip,
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
