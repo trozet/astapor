@@ -33,6 +33,18 @@ class quickstack::nova_network::controller (
   $swift_storage_ips             = ["192.168.203.2","192.168.203.3","192.168.203.4"],
   $swift_storage_device          = 'device1',
   $verbose                       = $quickstack::params::verbose,
+  $ssl                           = $quickstack::params::ssl,
+  $freeipa                       = $quickstack::params::freeipa,
+  $mysql_ca                      = $quickstack::params::mysql_ca,
+  $mysql_cert                    = $quickstack::params::mysql_cert,
+  $mysql_key                     = $quickstack::params::mysql_key,
+  $qpid_ca                       = $quickstack::params::qpid_ca,
+  $qpid_cert                     = $quickstack::params::qpid_cert,
+  $qpid_key                      = $quickstack::params::qpid_key,
+  $horizon_ca                    = $quickstack::params::horizon_ca,
+  $horizon_cert                  = $quickstack::params::horizon_cert,
+  $horizon_key                   = $quickstack::params::horizon_key,
+  $qpid_nssdb_password           = $quickstack::params::qpid_nssdb_password,
 
   $auto_assign_floating_ip
 ) inherits quickstack::params {
@@ -78,5 +90,18 @@ class quickstack::nova_network::controller (
     swift_storage_ips            => $swift_storage_ips,
     swift_storage_device         => $swift_storage_device,
     verbose                      => $verbose,
+
+    ssl                          => $ssl,
+    freeipa                      => $freeipa,
+    mysql_ca                     => $mysql_ca,
+    mysql_cert                   => $mysql_cert,
+    mysql_key                    => $mysql_key,
+    qpid_ca                      => $qpid_ca,
+    qpid_cert                    => $qpid_cert,
+    qpid_key                     => $qpid_key,
+    horizon_ca                   => $horizon_ca,
+    horizon_cert                 => $horizon_cert,
+    horizon_key                  => $horizon_key,
+    qpid_nssdb_password          => $qpid_nssdb_password,
   }
 }
