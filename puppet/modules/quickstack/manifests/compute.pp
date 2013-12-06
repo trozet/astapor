@@ -1,6 +1,7 @@
 # Quickstack compute node
 class quickstack::compute (
   $admin_password              = $quickstack::params::admin_password,
+  $auto_assign_floating_ip     = $quickstack::params::auto_assign_floating_ip,
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
@@ -21,7 +22,6 @@ class quickstack::compute (
   $public_interface            = $quickstack::params::public_interface,
   $qpid_host                   = $quickstack::params::qpid_host,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
-  $auto_assign_floating_ip     = $quickstack::params::auto_assign_floating_ip,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -104,13 +104,13 @@ class quickstack::compute (
   }
   else {
     class { '::quickstack::nova_network::compute':
+      auto_assign_floating_ip     => $auto_assign_floating_ip,
       controller_priv_floating_ip => $controller_priv_floating_ip,
       controller_pub_floating_ip  => $controller_pub_floating_ip,
       fixed_network_range         => $fixed_network_range,
       floating_network_range      => $floating_network_range,
       private_interface           => $private_interface,
       public_interface            => $public_interface,
-      auto_assign_floating_ip     => $auto_assign_floating_ip,
     }
   }
 
