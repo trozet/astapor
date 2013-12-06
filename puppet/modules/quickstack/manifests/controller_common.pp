@@ -117,11 +117,19 @@ class quickstack::controller_common (
     require            => Class['openstack::db::mysql', 'qpid::server'],
   }
 
-  class { 'nova::api':
-    enabled           => true,
-    admin_password    => $nova_user_password,
-    auth_host         => $controller_priv_floating_ip,
-    neutron_metadata_proxy_shared_secret => $metadata_proxy_shared_secret,
+  if str2bool("$neutron") {
+    class { 'nova::api':
+      enabled           => true,
+      admin_password    => $nova_user_password,
+      auth_host         => $controller_priv_floating_ip,
+      neutron_metadata_proxy_shared_secret => $metadata_proxy_shared_secret,
+    }
+  } else {
+    class { 'nova::api':
+      enabled           => true,
+      admin_password    => $nova_user_password,
+      auth_host         => $controller_priv_floating_ip,
+    }
   }
 
   class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth', 'nova::conductor' ]:
