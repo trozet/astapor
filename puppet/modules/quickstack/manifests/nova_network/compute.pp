@@ -1,11 +1,21 @@
 # Quickstack compute node configuration for nova network
 class quickstack::nova_network::compute (
-  $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
-  $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
-  $fixed_network_range         = $quickstack::params::fixed_network_range,
-  $floating_network_range      = $quickstack::params::floating_network_range,
-  $private_interface           = $quickstack::params::private_interface,
-  $public_interface            = $quickstack::params::public_interface,
+  $admin_password               = $quickstack::params::admin_password,
+  $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
+  $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
+  $cinder_backend_gluster       = $quickstack::params::cinder_backend_gluster,
+  $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
+  $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
+  $fixed_network_range          = $quickstack::params::fixed_network_range,
+  $floating_network_range       = $quickstack::params::floating_network_range,
+  $mysql_host                   = $quickstack::params::mysql_host,
+  $nova_db_password             = $quickstack::params::nova_db_password,
+  $nova_user_password           = $quickstack::params::nova_user_password,
+  $private_interface            = $quickstack::params::private_interface,
+  $public_interface             = $quickstack::params::public_interface,
+  $qpid_host                    = $quickstack::params::qpid_host,
+  $verbose                      = $quickstack::params::verbose,
+
   $auto_assign_floating_ip
 ) inherits quickstack::params {
 
@@ -29,5 +39,20 @@ class quickstack::nova_network::compute (
     create_networks   => true,
     enabled           => true,
     install_service   => true,
+  }
+
+
+  class { 'quickstack::compute_common':
+    admin_password              => $admin_password,
+    ceilometer_metering_secret  => $ceilometer_metering_secret,
+    ceilometer_user_password    => $ceilometer_user_password,
+    cinder_backend_gluster      => $cinder_backend_gluster,
+    controller_priv_floating_ip => $controller_priv_floating_ip,
+    controller_pub_floating_ip  => $controller_pub_floating_ip,
+    mysql_host                  => $mysql_host,
+    nova_db_password            => $nova_db_password,
+    nova_user_password          => $nova_user_password,
+    qpid_host                   => $qpid_host,
+    verbose                     => $verbose,
   }
 }

@@ -1,9 +1,7 @@
 # Quickstack controller node
-class quickstack::controller (
+class quickstack::controller_common (
   $admin_email                  = $quickstack::params::admin_email,
   $admin_password               = $quickstack::params::admin_password,
-  $auto_assign_floating_ip      = $quickstack::params::auto_assign_floating_ip,
-  $bridge_interface             = $quickstack::params::bridge_interface,
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster       = $quickstack::params::cinder_backend_gluster,
@@ -12,8 +10,6 @@ class quickstack::controller (
   $cinder_gluster_peers         = $quickstack::params::cinder_gluster_peers,
   $cinder_gluster_volume        = $quickstack::params::cinder_gluster_volume,
   $cinder_user_password         = $quickstack::params::cinder_user_password,
-  $cisco_nexus_plugin           = $quickstack::params::cisco_nexus_plugin,
-  $cisco_vswitch_plugin         = $quickstack::params::cisco_vswitch_plugin,
   $controller_priv_floating_ip  = $quickstack::params::controller_priv_floating_ip,
   $controller_pub_floating_ip   = $quickstack::params::controller_pub_floating_ip,
   $glance_db_password           = $quickstack::params::glance_db_password,
@@ -32,15 +28,9 @@ class quickstack::controller (
   $neutron_core_plugin          = $quickstack::params::neutron_core_plugin,
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
-  $nexus_config                 = $quickstack::params::nexus_config,
-  $nexus_credentials            = $quickstack::params::nexus_credentials,
   $nova_db_password             = $quickstack::params::nova_db_password,
   $nova_user_password           = $quickstack::params::nova_user_password,
-  $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
-  $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
-  $provider_vlan_auto_trunk     = $quickstack::params::provider_vlan_auto_trunk,
   $qpid_host                    = $quickstack::params::qpid_host,
-  $tenant_network_type          = $quickstack::params::tenant_network_type,
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
@@ -127,11 +117,19 @@ class quickstack::controller (
     require            => Class['openstack::db::mysql', 'qpid::server'],
   }
 
-  class { 'nova::api':
-    enabled           => true,
-    admin_password    => $nova_user_password,
-    auth_host         => $controller_priv_floating_ip,
-    neutron_metadata_proxy_shared_secret => $metadata_proxy_shared_secret,
+  if str2bool("$neutron") {
+    class { 'nova::api':
+      enabled           => true,
+      admin_password    => $nova_user_password,
+      auth_host         => $controller_priv_floating_ip,
+      neutron_metadata_proxy_shared_secret => $metadata_proxy_shared_secret,
+    }
+  } else {
+    class { 'nova::api':
+      enabled           => true,
+      admin_password    => $nova_user_password,
+      auth_host         => $controller_priv_floating_ip,
+    }
   }
 
   class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth', 'nova::conductor' ]:
@@ -194,35 +192,6 @@ class quickstack::controller (
   }
 
   class {'memcached':}
-
-  if str2bool("$neutron") {
-    class { '::quickstack::neutron::controller':
-      admin_email                  => $admin_email,
-      admin_password               => $admin_password,
-      bridge_interface             => $bridge_interface,
-      cisco_nexus_plugin           => $cisco_nexus_plugin,
-      cisco_vswitch_plugin         => $cisco_vswitch_plugin,
-      controller_priv_floating_ip  => $controller_priv_floating_ip,
-      controller_pub_floating_ip   => $controller_pub_floating_ip,
-      mysql_host                   => $mysql_host,
-      neutron_core_plugin          => $neutron_core_plugin,
-      neutron_db_password          => $neutron_db_password,
-      neutron_user_password        => $neutron_user_password,
-      nexus_config                 => $nexus_config,
-      nexus_credentials            => $nexus_credentials,
-      ovs_vlan_ranges              => $ovs_vlan_ranges,
-      provider_vlan_auto_create    => $provider_vlan_auto_create,
-      provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
-      qpid_host                    => $qpid_host,
-      tenant_network_type          => $tenant_network_type,
-      verbose                      => $verbose
-    }
-  }
-  else {
-    class { '::quickstack::nova_network::controller':
-      auto_assign_floating_ip => $auto_assign_floating_ip,
-    }
-  }
 
   firewall { '001 controller incoming':
     proto    => 'tcp',
