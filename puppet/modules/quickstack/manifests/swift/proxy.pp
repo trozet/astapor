@@ -1,51 +1,55 @@
-class quickstack::swift_proxy inherits quickstack::swift_common {
+class quickstack::swift::proxy (
+  $controller_pub_floating_ip,
+  $swift_admin_password,
+  $swift_shared_secret,
+) inherits quickstack::params {
 
     #### Swift ####
     package { 'curl': ensure => present }
-    
-    #class { 'memcached': }
-    
-    class { 'swift::proxy':
-      proxy_local_net_ip => '10.100.0.222', #swift proxy address
+
+    class { '::swift::proxy':
+      proxy_local_net_ip => $controller_pub_floating_ip,
       pipeline           => [
-    #    'catch_errors',
         'healthcheck',
         'cache',
-    #    'ratelimit',
         'authtoken',
         'keystone',
         'proxy-server'
       ],
       account_autocreate => true,
     }
-    
+
     # configure all of the middlewares
     class { [
-        'swift::proxy::catch_errors',
-        'swift::proxy::healthcheck',
-        'swift::proxy::cache',
+        '::swift::proxy::catch_errors',
+        '::swift::proxy::healthcheck',
+        '::swift::proxy::cache',
     ]: }
-    
-    class { 'swift::proxy::ratelimit':
+
+    class { '::swift::proxy::ratelimit':
         clock_accuracy         => 1000,
         max_sleep_time_seconds => 60,
         log_sleep_time_seconds => 0,
         rate_buffer_seconds    => 5,
         account_ratelimit      => 0
     }
-    
-    class { 'swift::proxy::keystone':
+
+    class { '::swift::proxy::keystone':
         operator_roles => ['admin', 'SwiftOperator'],
     }
-    
-    class { 'swift::proxy::authtoken':
+
+    class { '::swift::proxy::authtoken':
         admin_user        => 'swift',
         admin_tenant_name => 'services',
         admin_password    => $swift_admin_password,
         # assume that the controller host is the swift api server
-        auth_host         => '10.100.0.222', #keystone
+        auth_host         => $controller_pub_floating_ip,
     }
-    
+
+    class {'quickstack::swift::common':
+      swift_shared_secret => $swift_shared_secret,
+    }
+
     firewall { '001 swift proxy incoming':
         proto    => 'tcp',
         dport    => ['8080'],
