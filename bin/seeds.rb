@@ -301,10 +301,14 @@ params = {
 }
 
 hostgroups = [
-    {:name=>"Controller",
-     :class=>"quickstack::controller"},
-    {:name=>"Compute",
-     :class=>"quickstack::compute"},
+    {:name=>"Controller (Nova Network)",
+     :class=>"quickstack::nova_network::controller"},
+    {:name=>"Compute (Nova Network)",
+     :class=>"quickstack::nova_network::compute"},
+    {:name=>"Controller (Neutron)",
+     :class=>"quickstack::neutron::controller"},
+    {:name=>"Compute (Neutron)",
+     :class=>"quickstack::neutron::compute"},
     {:name=>"Neutron Networker",
      :class=>"quickstack::neutron::networker"},
     {:name=>"Gluster Storage",
