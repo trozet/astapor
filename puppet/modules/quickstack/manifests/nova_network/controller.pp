@@ -21,7 +21,6 @@ class quickstack::nova_network::controller (
   $horizon_secret_key            = $quickstack::params::horizon_secret_key,
   $keystone_admin_token          = $quickstack::params::keystone_admin_token,
   $keystone_db_password          = $quickstack::params::keystone_db_password,
-  $neutron_metadata_proxy_secret = $quickstack::params::neutron_metadata_proxy_secret,
   $mysql_host                    = $quickstack::params::mysql_host,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
   $nova_db_password              = $quickstack::params::nova_db_password,
