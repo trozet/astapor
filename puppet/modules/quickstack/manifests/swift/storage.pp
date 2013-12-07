@@ -1,14 +1,14 @@
 class quickstack::swift::storage (
-  # an array
-  $all_swift_ips                  = $quickstack::params::all_swift_ips,
-  $ext4_device                    = $quickstack::params::swift_ext4_device,
-  $loopback                       = $quickstack::params::swift_loopback,
-  $ring_server                    = $quickstack::params::swift_proxy_ip,
-  $swift_hash_suffix              = $quickstack::params::swift_hash_suffix,
-  $swift_local_interface          = $quickstack::params::swift_local_interface,
+  # an array, the storage nodes and proxy node(s)
+  $swift_all_ips                  = [],
+  $swift_ext4_device              = '/dev/sdc2',
+  $swift_local_interface          = 'eth3',
+  $swift_loopback                 = true,
+  $swift_ring_server              = '',  # an ip addr
+  $swift_shared_secret            = '',
 ) inherits quickstack::params {
 
-  class { 'swift::storage::all':
+  class { '::swift::storage::all':
     storage_local_net_ip => getvar("ipaddress_${swift_local_interface}"),
     require => Class['swift'],
   }
@@ -23,7 +23,7 @@ class quickstack::swift::storage (
   }
 
   swift::ringsync{["account","container","object"]:
-      ring_server => $ring_server,
+      ring_server => $swift_ring_server,
       before => Class['swift::storage::all'],
       require => Class['swift'],
   }
@@ -41,7 +41,7 @@ class quickstack::swift::storage (
       }
   }
 
-  if str2bool($loopback) {{
+  if str2bool($swift_loopback) {
     swift::storage::loopback { ['device1']:
       base_dir     => '/srv/loopback-device',
       mnt_base_dir => '/srv/node',
@@ -50,7 +50,9 @@ class quickstack::swift::storage (
       seek         => '1048576',
     }
   } else {
-    # ########################################################### TODO!
+    swift::storage::ext4 { "swiftstorage":
+      device => $swift,
+    }
   }
 
   # Create firewall rules to allow only the hosts that need to connect
@@ -70,7 +72,7 @@ class quickstack::swift::storage (
   Class['swift'] -> Service <| |>
   class { 'swift':
       # not sure how I want to deal with this shared secret
-      swift_hash_suffix => '5f10e7b60b0846f6',
+      swift_hash_suffix => $swift_shared_secret,
       package_ensure    => latest,
   }
 

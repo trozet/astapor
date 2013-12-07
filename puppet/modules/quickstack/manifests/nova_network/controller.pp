@@ -26,6 +26,8 @@ class quickstack::nova_network::controller (
   $nova_db_password              = $quickstack::params::nova_db_password,
   $nova_user_password            = $quickstack::params::nova_user_password,
   $qpid_host                     = $quickstack::params::qpid_host,
+  $swift_shared_secret           = $quickstack::params::swift_shared_secret,
+  $swift_admin_password          = $quickstack::params::swift_admin_password,
   $verbose                       = $quickstack::params::verbose,
 
   $auto_assign_floating_ip
@@ -65,6 +67,8 @@ class quickstack::nova_network::controller (
     nova_db_password             => $nova_db_password,
     nova_user_password           => $nova_user_password,
     qpid_host                    => $qpid_host,
+    swift_shared_secret          => $swift_shared_secret,
+    swift_admin_password         => $swift_admin_password,
     verbose                      => $verbose,
   }
 }

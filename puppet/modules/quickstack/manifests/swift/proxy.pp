@@ -55,4 +55,21 @@ class quickstack::swift::proxy (
         dport    => ['8080'],
         action   => 'accept',
     }
+
+    swift::ringsync{["account","container","object"]:
+        ring_server => $controller_pub_floating_ip,
+    }
+
+    class { '::swift::ringbuilder':
+        part_power     => '18',
+        replicas       => '1',
+        min_part_hours => 1,
+        require        => Class['swift'],
+    }
+
+    # sets up an rsync db that can be used to sync the ring DB
+    class { '::swift::ringserver':
+        local_net_ip => $controller_pub_floating_ip,
+    }
+
 }
