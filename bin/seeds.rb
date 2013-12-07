@@ -319,6 +319,8 @@ hostgroups = [
      :class=>"quickstack::load_balancer"},
     {:name=>"HA Mysql Node",
      :class=>"quickstack::hamysql::node"},
+    {:name=>"Swift Storage Node",
+     :class=>"quickstack::swift::storage"},
 ]
 
 def get_key_type(value)
