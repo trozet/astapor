@@ -3,6 +3,9 @@ class quickstack::load_balancer (
   $lb_public_vip,
   $lb_member_names,
   $lb_member_addrs,
+  $neutron         = $quickstack::params::neutron,
+  $heat_cfn        = $quickstack::params::heat_cfn,
+  $heat_cloudwatch = $quickstack::params::heat_cloudwatch,
 ) inherits quickstack::params {
 
   class { 'haproxy':
@@ -47,80 +50,106 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'keystone-public':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '5000',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'keystone-admin':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '35357',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
-  }  
-  quickstack::load_balancer::proxy { 'heat-cfn':
-    addr => [ $lb_public_vip, $lb_private_vip ],
-    port => '8000',
-    listen_options => { 'option' => [ 'httplog' ] },
-    member_options => [ 'check' ],
+  }
+  if str2bool($heat_cfn) == true {
+    quickstack::load_balancer::proxy { 'heat-cfn':
+      addr => [ $lb_public_vip, $lb_private_vip ],
+      port => '8000',
+      mode => 'http',
+      listen_options => { 'option' => [ 'httplog' ] },
+      member_options => [ 'check' ],
+    }
+  }
+  if str2bool($heat_cloudwatch) == true {
+    quickstack::load_balancer::proxy { 'heat-cloudwatch':
+      addr => [ $lb_public_vip, $lb_private_vip ],
+      port => '8003',
+      mode => 'http',
+      listen_options => { 'option' => [ 'httplog' ] },
+      member_options => [ 'check' ],
+    }
   }
   quickstack::load_balancer::proxy { 'heat-api':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '8004',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
-  # quickstack::load_balancer::proxy { 'swift-proxy':
-  #   addr => [ $lb_public_vip, $lb_private_vip ],
-  #   port => '8080',
-  #   listen_options => { 'option' => [ 'httplog' ] },
-  #   member_options => [ 'check' ],
-  # }
+  quickstack::load_balancer::proxy { 'swift-proxy':
+    addr => [ $lb_public_vip, $lb_private_vip ],
+    port => '8080',
+    mode => 'http',
+    listen_options => { 'option' => [ 'httplog' ] },
+    member_options => [ 'check' ],
+  }
   quickstack::load_balancer::proxy { 'nova-ec2':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '8773',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'nova-compute':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '8774',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'nova-metadata':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '8775',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
-  }  
+  }
   quickstack::load_balancer::proxy { 'cinder-api':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '8776',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'ceilometer-api':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '8777',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'glance-registry':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '9191',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'glance-api':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '9292',
+    mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
-  quickstack::load_balancer::proxy { 'neutron-api':
-    addr => [ $lb_public_vip, $lb_private_vip ],
-    port => '9696',
-    listen_options => { 'option' => [ 'httplog' ] },
-    member_options => [ 'check' ],
+  if str2bool($neutron) == true {
+    quickstack::load_balancer::proxy { 'neutron-api':
+      addr => [ $lb_public_vip, $lb_private_vip ],
+      port => '9696',
+      mode => 'http',
+      listen_options => { 'option' => [ 'httplog' ] },
+      member_options => [ 'check' ],
+    }
   }
 
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
@@ -129,7 +158,7 @@ class quickstack::load_balancer (
 define quickstack::load_balancer::proxy (
   $addr,
   $port,
-  $mode = 'tcp',
+  $mode,
   $listen_options,
   $member_options,
   $define_cookies = false,
