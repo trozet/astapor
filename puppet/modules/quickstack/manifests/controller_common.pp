@@ -30,6 +30,8 @@ class quickstack::controller_common (
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nova_db_password              = $quickstack::params::nova_db_password,
   $nova_user_password            = $quickstack::params::nova_user_password,
+  $swift_shared_secret           = $quickstack::params::swift_shared_secret,
+  $swift_admin_password          = $quickstack::params::swift_admin_password,
   $qpid_host                     = $quickstack::params::qpid_host,
   $verbose                       = $quickstack::params::verbose,
 ) inherits quickstack::params {
@@ -148,6 +150,12 @@ class quickstack::controller_common (
     controller_pub_floating_ip  => $controller_pub_floating_ip,
     qpid_host                   => $qpid_host,
     verbose                     => $verbose,
+  }
+
+  class {'quickstack::swift::proxy':
+    controller_pub_floating_ip => $controller_pub_floating_ip,
+    swift_admin_password       => $swift_admin_password,
+    swift_shared_secret        => $swift_shared_secret,
   }
 
   class { 'quickstack::cinder_controller':

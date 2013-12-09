@@ -258,6 +258,13 @@ params = {
   "neutron_user_password"         => SecureRandom.hex,
   "nova_db_password"              => SecureRandom.hex,
   "nova_user_password"            => SecureRandom.hex,
+  "swift_admin_password"          => SecureRandom.hex,
+  "swift_shared_secret"           => SecureRandom.hex,
+  "swift_all_ips"                 => [],
+  "swift_ext4_device"             => '/dev/sdc2',
+  "swift_local_interface"         => 'eth3',
+  "swift_loopback"                => true,
+  "swift_ring_server"             => 'PRIV_IP',
   "private_interface"             => private_int,
   "public_interface"              => public_int,
   "fixed_network_range"           => 'PRIV_RANGE',
@@ -319,6 +326,8 @@ hostgroups = [
      :class=>"quickstack::load_balancer"},
     {:name=>"HA Mysql Node",
      :class=>"quickstack::hamysql::node"},
+    {:name=>"Swift Storage Node",
+     :class=>"quickstack::swift::storage"},
 ]
 
 def get_key_type(value)
