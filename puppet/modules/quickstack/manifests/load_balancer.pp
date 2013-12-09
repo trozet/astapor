@@ -3,6 +3,9 @@ class quickstack::load_balancer (
   $lb_public_vip,
   $lb_member_names,
   $lb_member_addrs,
+  $neutron         = $quickstack::params::neutron,
+  $heat_cfn        = $quickstack::params::heat_cfn,
+  $heat_cloudwatch = $quickstack::params::heat_cloudwatch,
 ) inherits quickstack::params {
 
   class { 'haproxy':
@@ -55,12 +58,22 @@ class quickstack::load_balancer (
     port => '35357',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
-  }  
-  quickstack::load_balancer::proxy { 'heat-cfn':
-    addr => [ $lb_public_vip, $lb_private_vip ],
-    port => '8000',
-    listen_options => { 'option' => [ 'httplog' ] },
-    member_options => [ 'check' ],
+  }
+  if str2bool($heat_cfn) == true {
+    quickstack::load_balancer::proxy { 'heat-cfn':
+      addr => [ $lb_public_vip, $lb_private_vip ],
+      port => '8000',
+      listen_options => { 'option' => [ 'httplog' ] },
+      member_options => [ 'check' ],
+    }
+  }
+  if str2bool($heat_cloudwatch) == true {
+    quickstack::load_balancer::proxy { 'heat-cloudwatch':
+      addr => [ $lb_public_vip, $lb_private_vip ],
+      port => '8003',
+      listen_options => { 'option' => [ 'httplog' ] },
+      member_options => [ 'check' ],
+    }
   }
   quickstack::load_balancer::proxy { 'heat-api':
     addr => [ $lb_public_vip, $lb_private_vip ],
@@ -91,7 +104,7 @@ class quickstack::load_balancer (
     port => '8775',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
-  }  
+  }
   quickstack::load_balancer::proxy { 'cinder-api':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '8776',
@@ -116,11 +129,13 @@ class quickstack::load_balancer (
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
-  quickstack::load_balancer::proxy { 'neutron-api':
-    addr => [ $lb_public_vip, $lb_private_vip ],
-    port => '9696',
-    listen_options => { 'option' => [ 'httplog' ] },
-    member_options => [ 'check' ],
+  if str2bool($neutron) == true {
+    quickstack::load_balancer::proxy { 'neutron-api':
+      addr => [ $lb_public_vip, $lb_private_vip ],
+      port => '9696',
+      listen_options => { 'option' => [ 'httplog' ] },
+      member_options => [ 'check' ],
+    }
   }
 
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
