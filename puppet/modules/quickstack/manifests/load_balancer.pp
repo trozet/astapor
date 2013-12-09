@@ -86,13 +86,13 @@ class quickstack::load_balancer (
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
-  # quickstack::load_balancer::proxy { 'swift-proxy':
-  #   addr => [ $lb_public_vip, $lb_private_vip ],
-  #   port => '8080',
-  #   mode => 'http',
-  #   listen_options => { 'option' => [ 'httplog' ] },
-  #   member_options => [ 'check' ],
-  # }
+  quickstack::load_balancer::proxy { 'swift-proxy':
+    addr => [ $lb_public_vip, $lb_private_vip ],
+    port => '8080',
+    mode => 'http',
+    listen_options => { 'option' => [ 'httplog' ] },
+    member_options => [ 'check' ],
+  }
   quickstack::load_balancer::proxy { 'nova-ec2':
     addr => [ $lb_public_vip, $lb_private_vip ],
     port => '8773',
