@@ -108,6 +108,7 @@ exit 0
 '
 pxe_text='default linux
 label linux
+IPAPPEND 2
 kernel <%= @kernel %>
 append initrd=<%= @initrd %> ks=<%= foreman_url("provision")%> ksdevice=bootif network kssendmac
 '
