@@ -46,13 +46,6 @@ class quickstack::neutron::controller (
   $verbose                       = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
-  nova_config {
-    'keystone_authtoken/admin_tenant_name': value => 'admin';
-    'keystone_authtoken/admin_user':        value => 'admin';
-    'keystone_authtoken/admin_password':    value => $admin_password;
-    'keystone_authtoken/auth_host':         value => '127.0.0.1';
-  }
-
   class { '::neutron':
     enabled               => true,
     verbose               => $verbose,
@@ -62,13 +55,11 @@ class quickstack::neutron::controller (
     core_plugin           => $neutron_core_plugin
   }
 
-  neutron_config {
-    'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
-  }
-
   class { '::neutron::server':
     auth_host        => $::ipaddress,
     auth_password    => $neutron_user_password,
+    connection       => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
+    sql_connection   => false,
   }
 
   if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {

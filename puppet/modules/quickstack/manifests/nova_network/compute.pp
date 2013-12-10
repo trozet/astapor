@@ -22,13 +22,18 @@ class quickstack::nova_network::compute (
   # Configure Nova
   nova_config{
     'DEFAULT/auto_assign_floating_ip':  value => $auto_assign_floating_ip;
-    #"DEFAULT/network_host":            value => ${controller_priv_floating_ip;
     "DEFAULT/network_host":             value => "$::ipaddress";
-    #"DEFAULT/metadata_host":           value => "$controller_priv_floating_ip";
     "DEFAULT/metadata_host":            value => "$::ipaddress";
     "DEFAULT/multi_host":               value => "True";
   }
 
+  nova::generic_service { 'metadata-api':
+    enabled        => true,
+    ensure_package => 'present',
+    package_name   => 'openstack-nova-api',
+    service_name   => 'openstack-nova-metadata-api',
+  }
+  
   class { 'nova::network':
     private_interface => "$private_interface",
     public_interface  => "$public_interface",
@@ -40,7 +45,6 @@ class quickstack::nova_network::compute (
     enabled           => true,
     install_service   => true,
   }
-
 
   class { 'quickstack::compute_common':
     admin_password              => $admin_password,
