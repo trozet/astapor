@@ -19,10 +19,6 @@ class quickstack::compute_common (
 
   nova_config {
     'DEFAULT/libvirt_inject_partition':     value => '-1';
-    'keystone_authtoken/admin_tenant_name': value => 'admin';
-    'keystone_authtoken/admin_user':        value => 'admin';
-    'keystone_authtoken/admin_password':    value => $admin_password;
-    'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
   }
 
   class { 'nova':
@@ -54,12 +50,6 @@ class quickstack::compute_common (
     enabled => true,
     vncproxy_host => $controller_pub_floating_ip,
     vncserver_proxyclient_address => $::ipaddress,
-  }
-
-  class { 'nova::api':
-    enabled           => true,
-    admin_password    => $nova_user_password,
-    auth_host         => $controller_priv_floating_ip,
   }
 
   class { 'ceilometer':
