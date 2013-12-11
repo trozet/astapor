@@ -12,6 +12,8 @@ class quickstack::heat_controller(
   $qpid_host,
   $qpid_port,
   $qpid_protocol,
+  $qpid_username,
+  $qpid_password,
   $verbose,
 ) {
 
@@ -33,6 +35,8 @@ class quickstack::heat_controller(
       qpid_hostname     => $qpid_host,
       qpid_port         => $qpid_port,
       qpid_protocol     => $qpid_protocol,
+      qpid_username     => $qpid_username,
+      qpid_password     => $qpid_password,
       verbose           => $verbose,
   }
 

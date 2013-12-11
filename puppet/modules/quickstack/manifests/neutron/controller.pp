@@ -51,6 +51,8 @@ class quickstack::neutron::controller (
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
   $qpid_host                     = $quickstack::params::qpid_host,
+  $qpid_username                 = $quickstack::params::qpid_username,
+  $qpid_password                 = $quickstack::params::qpid_password,
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
   $swift_ringserver_ip           = '192.168.203.1',
@@ -117,6 +119,8 @@ class quickstack::neutron::controller (
     nova_user_password            => $nova_user_password,
     nova_default_floating_pool    => $nova_default_floating_pool,
     qpid_host                     => $qpid_host,
+    qpid_username                 => $qpid_username,
+    qpid_password                 => $qpid_password,
     swift_shared_secret           => $swift_shared_secret,
     swift_admin_password          => $swift_admin_password,
     swift_ringserver_ip           => $swift_ringserver_ip,
@@ -145,6 +149,8 @@ class quickstack::neutron::controller (
     qpid_hostname         => $qpid_host,
     qpid_port             => $qpid_port,
     qpid_protocol         => $qpid_protocol,
+    qpid_username         => $qpid_username,
+    qpid_password         => $qpid_password,
     core_plugin           => $neutron_core_plugin
   }
   ->
