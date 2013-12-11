@@ -8,6 +8,8 @@ class quickstack::storage_backend::lvm_cinder(
   $cinder_iscsi_iface          = 'em1',
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_username               = $quickstack::params::qpid_username,
+  $qpid_password               = $quickstack::params::qpid_password,
   $verbose                     = $quickstack::params::verbose,
   $ssl                         = $quickstack::params::ssl,
   $mysql_ca                    = $quickstack::params::mysql_ca,
@@ -29,7 +31,8 @@ class quickstack::storage_backend::lvm_cinder(
     qpid_hostname  => $qpid_host,
     qpid_port      => $qpid_port,
     qpid_protocol  => $qpid_protocol,
-    qpid_password  => 'guest',
+    qpid_username  => $qpid_username,
+    qpid_password  => $qpid_password,
     sql_connection => $sql_connection,
     verbose        => $verbose,
   }
