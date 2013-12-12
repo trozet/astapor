@@ -49,6 +49,7 @@ class quickstack::params {
 
   # Networking
   $neutron                       = 'false'
+  $controller_admin_host         = '172.16.0.1'
   $controller_priv_host          = '172.16.0.1'
   $controller_pub_host           = '172.16.1.1'
 

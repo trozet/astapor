@@ -3,6 +3,7 @@ class quickstack::heat_controller(
   $heat_cloudwatch,
   $heat_user_password,
   $heat_db_password,
+  $controller_admin_host,
   $controller_priv_host,
   $controller_pub_host,
   $mysql_host,
@@ -13,10 +14,10 @@ class quickstack::heat_controller(
   class {"heat::keystone::auth":
       password => $heat_user_password,
       heat_public_address => $controller_pub_host,
-      heat_admin_address => $controller_priv_host,
+      heat_admin_address => $controller_admin_host,
       heat_internal_address => $controller_priv_host,
       cfn_public_address => $controller_pub_host,
-      cfn_admin_address => $controller_priv_host,
+      cfn_admin_address => $controller_admin_host,
       cfn_internal_address => $controller_priv_host,
   }
 

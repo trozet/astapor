@@ -4,6 +4,7 @@ class quickstack::neutron::compute (
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
+  $controller_admin_host       = $quickstack::params::controller_admin_host,
   $controller_priv_host        = $quickstack::params::controller_priv_host,
   $controller_pub_host         = $quickstack::params::controller_pub_host,
   $enable_tunneling            = $quickstack::params::enable_tunneling,
@@ -63,7 +64,7 @@ class quickstack::neutron::compute (
   class { '::nova::network::neutron':
     neutron_admin_password    => $neutron_user_password,
     neutron_url               => "http://${controller_priv_host}:9696",
-    neutron_admin_auth_url    => "http://${controller_priv_host}:35357/v2.0",
+    neutron_admin_auth_url    => "http://${controller_admin_host}:35357/v2.0",
   }
 
 
