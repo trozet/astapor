@@ -51,7 +51,7 @@ class quickstack::swift::storage (
     }
   } else {
     swift::storage::ext4 { "swiftstorage":
-      device => $swift,
+      device => $swift_ext4_device,
     }
   }
 
