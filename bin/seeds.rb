@@ -126,6 +126,7 @@ Setting[:foreman_url] = Facter.fqdn
 os = Operatingsystem.where(:name => "RedHat", :major => "6", :minor => "4").first
 os ||= Operatingsystem.create(:name => "RedHat", :major => "6", :minor => "4")
 os.type = "Redhat"
+os.description = "RHEL 6.4" if os.respond_to? :description=
 os.save!
 
 # Installation Media - comes as standard, just need to associate it
