@@ -44,6 +44,9 @@ class quickstack::params {
   $glance_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $glance_gluster_replica_count = '3'
 
+  # Gluster
+  $gluster_open_port_count      = '10'
+
   # Networking
   $neutron                       = 'false'
   $private_interface             = 'PRIV_INTERFACE'
