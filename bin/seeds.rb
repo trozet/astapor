@@ -248,6 +248,7 @@ params = {
   "glance_gluster_peers"          => [],
   "glance_gluster_volume"         => "glance",
   "glance_gluster_replica_count"  => '3',
+  "gluster_open_port_count"       => '10',
   "heat_db_password"              => SecureRandom.hex,
   "heat_user_password"            => SecureRandom.hex,
   "horizon_secret_key"            => SecureRandom.hex,
