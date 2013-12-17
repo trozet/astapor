@@ -46,6 +46,43 @@ class quickstack::neutron::controller (
   $verbose                       = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
+  class { 'quickstack::controller_common':
+    admin_email                   => $admin_email,
+    admin_password                => $admin_password,
+    ceilometer_metering_secret    => $ceilometer_metering_secret,
+    ceilometer_user_password      => $ceilometer_user_password,
+    cinder_backend_gluster        => $cinder_backend_gluster,
+    cinder_backend_iscsi          => $cinder_backend_iscsi,
+    cinder_db_password            => $cinder_db_password,
+    cinder_gluster_peers          => $cinder_gluster_peers,
+    cinder_gluster_volume         => $cinder_gluster_volume,
+    cinder_user_password          => $cinder_user_password,
+    controller_priv_floating_ip   => $controller_priv_floating_ip,
+    controller_pub_floating_ip    => $controller_pub_floating_ip,
+    glance_db_password            => $glance_db_password,
+    glance_user_password          => $glance_user_password,
+    heat_cfn                      => $heat_cfn,
+    heat_cloudwatch               => $heat_cloudwatch,
+    heat_db_password              => $heat_db_password,
+    heat_user_password            => $heat_user_password,
+    horizon_secret_key            => $horizon_secret_key,
+    keystone_admin_token          => $keystone_admin_token,
+    keystone_db_password          => $keystone_db_password,
+    neutron_metadata_proxy_secret => $neutron_metadata_proxy_secret,
+    mysql_host                    => $mysql_host,
+    mysql_root_password           => $mysql_root_password,
+    neutron                       => true,
+    neutron_core_plugin           => $neutron_core_plugin,
+    neutron_db_password           => $neutron_db_password,
+    neutron_user_password         => $neutron_user_password,
+    nova_db_password              => $nova_db_password,
+    nova_user_password            => $nova_user_password,
+    qpid_host                     => $qpid_host,
+    swift_shared_secret           => $swift_shared_secret,
+    swift_admin_password          => $swift_admin_password,
+    verbose                       => $verbose,
+  }
+  ->
   class { '::neutron':
     enabled               => true,
     verbose               => $verbose,
@@ -54,14 +91,7 @@ class quickstack::neutron::controller (
     qpid_hostname         => $qpid_host,
     core_plugin           => $neutron_core_plugin
   }
-
-  class { '::neutron::server':
-    auth_host        => $::ipaddress,
-    auth_password    => $neutron_user_password,
-    connection       => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
-    sql_connection   => false,
-  }
-
+  ->
   # FIXME: This really should be handled by the neutron-puppet module, which has
   # a review request open right now: https://review.openstack.org/#/c/50162/
   # If and when that is merged (or similar), the below can be removed.
@@ -73,6 +103,14 @@ class quickstack::neutron::controller (
     before      => Service['neutron-server'],
     require     => [Neutron_config['database/connection'], Neutron_config['DEFAULT/core_plugin']],
   }
+
+  class { '::neutron::server':
+    auth_host        => $::ipaddress,
+    auth_password    => $neutron_user_password,
+    connection       => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron",
+    sql_connection   => false,
+  }
+
 
   if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
     neutron_plugin_ovs {
@@ -114,43 +152,5 @@ class quickstack::neutron::controller (
     proto    => 'tcp',
     dport    => ['9696'],
     action   => 'accept',
-  }
-
-
-  class { 'quickstack::controller_common':
-    admin_email                   => $admin_email,
-    admin_password                => $admin_password,
-    ceilometer_metering_secret    => $ceilometer_metering_secret,
-    ceilometer_user_password      => $ceilometer_user_password,
-    cinder_backend_gluster        => $cinder_backend_gluster,
-    cinder_backend_iscsi          => $cinder_backend_iscsi,
-    cinder_db_password            => $cinder_db_password,
-    cinder_gluster_peers          => $cinder_gluster_peers,
-    cinder_gluster_volume         => $cinder_gluster_volume,
-    cinder_user_password          => $cinder_user_password,
-    controller_priv_floating_ip   => $controller_priv_floating_ip,
-    controller_pub_floating_ip    => $controller_pub_floating_ip,
-    glance_db_password            => $glance_db_password,
-    glance_user_password          => $glance_user_password,
-    heat_cfn                      => $heat_cfn,
-    heat_cloudwatch               => $heat_cloudwatch,
-    heat_db_password              => $heat_db_password,
-    heat_user_password            => $heat_user_password,
-    horizon_secret_key            => $horizon_secret_key,
-    keystone_admin_token          => $keystone_admin_token,
-    keystone_db_password          => $keystone_db_password,
-    neutron_metadata_proxy_secret => $neutron_metadata_proxy_secret,
-    mysql_host                    => $mysql_host,
-    mysql_root_password           => $mysql_root_password,
-    neutron                       => true,
-    neutron_core_plugin           => $neutron_core_plugin,
-    neutron_db_password           => $neutron_db_password,
-    neutron_user_password         => $neutron_user_password,
-    nova_db_password              => $nova_db_password,
-    nova_user_password            => $nova_user_password,
-    qpid_host                     => $qpid_host,
-    swift_shared_secret           => $swift_shared_secret,
-    swift_admin_password          => $swift_admin_password,
-    verbose                       => $verbose,
   }
 }
