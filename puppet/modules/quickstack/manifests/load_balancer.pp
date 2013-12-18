@@ -1,4 +1,5 @@
 class quickstack::load_balancer (
+  $controller_admin_floating_ip,
   $controller_priv_floating_ip,
   $controller_pub_floating_ip,
   $backend_server_names,
@@ -37,7 +38,9 @@ class quickstack::load_balancer (
   }
 
   quickstack::load_balancer::proxy { 'horizon':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '80',
     mode => 'http',
     listen_options => {
@@ -48,14 +51,18 @@ class quickstack::load_balancer (
     define_cookies => true,
   }
   quickstack::load_balancer::proxy { 'keystone-public':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '5000',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'keystone-admin':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '35357',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -63,7 +70,9 @@ class quickstack::load_balancer (
   }
   if str2bool($heat_cfn) == true {
     quickstack::load_balancer::proxy { 'heat-cfn':
-      addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
       port => '8000',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
@@ -72,7 +81,9 @@ class quickstack::load_balancer (
   }
   if str2bool($heat_cloudwatch) == true {
     quickstack::load_balancer::proxy { 'heat-cloudwatch':
-      addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
       port => '8003',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
@@ -80,63 +91,81 @@ class quickstack::load_balancer (
     }
   }
   quickstack::load_balancer::proxy { 'heat-api':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '8004',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'swift-proxy':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '8080',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'nova-ec2':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '8773',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'nova-compute':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '8774',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'nova-metadata':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '8775',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'cinder-api':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '8776',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'ceilometer-api':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '8777',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'glance-registry':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '9191',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'glance-api':
-    addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
     port => '9292',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -144,7 +173,9 @@ class quickstack::load_balancer (
   }
   if str2bool($neutron) == true {
     quickstack::load_balancer::proxy { 'neutron-api':
-      addr => [ $controller_pub_floating_ip, $controller_priv_floating_ip ],
+    addr => [ $controller_pub_floating_ip,
+              $controller_priv_floating_ip,
+              $controller_admin_floating_ip ]
       port => '9696',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
