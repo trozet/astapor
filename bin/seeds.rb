@@ -301,8 +301,8 @@ params = {
   "nexus_credentials"             => [],
   "provider_vlan_auto_create"     => "false",
   "provider_vlan_auto_trunk"      => "false",
-  "lb_member_names"               => '',
-  "lb_member_addrs"               => '',
+  "backend_server_names"          => [],
+  "backend_server_addrs"          => [],
   "configure_ovswitch"            => "true",
   "neutron"                       => "false",
 }

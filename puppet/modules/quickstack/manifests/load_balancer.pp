@@ -1,11 +1,11 @@
 class quickstack::load_balancer (
   $controller_priv_floating_ip,
   $controller_pub_floating_ip,
-  $lb_member_names,
-  $lb_member_addrs,
-  $neutron         = $quickstack::params::neutron,
-  $heat_cfn        = $quickstack::params::heat_cfn,
-  $heat_cloudwatch = $quickstack::params::heat_cloudwatch,
+  $backend_server_names,
+  $backend_server_addrs,
+  $neutron,
+  $heat_cfn,
+  $heat_cloudwatch,
 ) inherits quickstack::params {
 
   class { 'haproxy':
@@ -176,8 +176,8 @@ define quickstack::load_balancer::proxy (
   haproxy::balancermember { $name:
     listening_service => $name,
     ports             => $port,
-    server_names      => split($quickstack::load_balancer::lb_member_names, ','),
-    ipaddresses       => split($quickstack::load_balancer::lb_member_addrs, ','),
+    server_names      => $quickstack::load_balancer::backend_server_names,
+    ipaddresses       => $quickstack::load_balancer::backend_server_addrs,
     options           => $member_options,
     define_cookies    => $define_cookies,
   }
