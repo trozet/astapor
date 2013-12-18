@@ -15,6 +15,11 @@ class quickstack::compute_common (
 
   if str2bool($cinder_backend_gluster) == true {
     class { 'gluster::client': }
+
+    selboolean {'virt_use_fusefs':
+      persistent => true,
+      value      => on,
+    }
   }
 
   nova_config {
