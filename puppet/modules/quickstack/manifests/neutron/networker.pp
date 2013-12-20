@@ -1,6 +1,5 @@
 # Quickstack network node configuration for neutron (OpenStack Networking)
 class quickstack::neutron::networker (
-  $configure_ovswitch            = $quickstack::params::configure_ovswitch,
   $fixed_network_range           = $quickstack::params::fixed_network_range,
   $neutron_metadata_proxy_secret = $quickstack::params::neutron_metadata_proxy_secret,
   $neutron_db_password           = $quickstack::params::neutron_db_password,
@@ -12,10 +11,11 @@ class quickstack::neutron::networker (
   $public_interface              = $quickstack::params::public_interface,
   $mysql_host                    = $quickstack::params::mysql_host,
   $qpid_host                     = $quickstack::params::qpid_host,
-  $bridge_name                   = 'br-ex',
+  $external_network_bridge       = 'br-ex',
   $bridge_keep_ip                = true,
   $tenant_network_type           = $quickstack::params::tenant_network_type,
   $ovs_bridge_mappings           = $quickstack::params::ovs_bridge_mappings,
+  $ovs_bridge_uplinks            = $quickstack::params::ovs_bridge_uplinks,
   $ovs_vlan_ranges               = $quickstack::params::ovs_vlan_ranges,
   $tunnel_id_ranges              = '1:1000',
   $enable_tunneling              = $quickstack::params::enable_tunneling,
@@ -28,21 +28,6 @@ class quickstack::neutron::networker (
       /(?i:true)/   => true,
       /(?i:false)/  => false,
       default => str2bool("$enable_tunneling"),
-  }
-
-  if str2bool("$configure_ovswitch") {
-    vs_bridge { $bridge_name:
-      provider => ovs_redhat,
-      ensure   => present,
-    } ->
-    vs_port { 'external':
-      bridge    => $bridge_name,
-      interface => $public_interface,
-      keep_ip   => $bridge_keep_ip,
-      sleep     => '30',
-      provider  => ovs_redhat,
-      ensure    => present,
-    }
   }
 
   class { '::neutron':
@@ -68,6 +53,7 @@ class quickstack::neutron::networker (
   }
 
   class { '::neutron::agents::ovs':
+    bridge_uplinks      => $ovs_bridge_uplinks,
     local_ip            => getvar("ipaddress_${private_interface}"),
     bridge_mappings     => $ovs_bridge_mappings,
     enable_tunneling    => $enable_tunneling_bool,
@@ -75,7 +61,9 @@ class quickstack::neutron::networker (
 
   class { '::neutron::agents::dhcp': }
 
-  class { '::neutron::agents::l3': }
+  class { '::neutron::agents::l3':
+    external_network_bridge => $external_network_bridge,
+  }
 
   class { 'neutron::agents::metadata':
     auth_password => $admin_password,
