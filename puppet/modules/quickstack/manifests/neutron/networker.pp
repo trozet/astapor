@@ -11,7 +11,7 @@ class quickstack::neutron::networker (
   $public_interface              = $quickstack::params::public_interface,
   $mysql_host                    = $quickstack::params::mysql_host,
   $qpid_host                     = $quickstack::params::qpid_host,
-  $bridge_name                   = 'br-ex',
+  $external_network_bridge       = 'br-ex',
   $bridge_keep_ip                = true,
   $tenant_network_type           = $quickstack::params::tenant_network_type,
   $ovs_bridge_mappings           = $quickstack::params::ovs_bridge_mappings,
@@ -61,7 +61,9 @@ class quickstack::neutron::networker (
 
   class { '::neutron::agents::dhcp': }
 
-  class { '::neutron::agents::l3': }
+  class { '::neutron::agents::l3':
+    external_network_bridge => $external_network_bridge,
+  }
 
   class { 'neutron::agents::metadata':
     auth_password => $admin_password,
