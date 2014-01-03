@@ -12,7 +12,6 @@ class quickstack::neutron::networker (
   $mysql_host                    = $quickstack::params::mysql_host,
   $qpid_host                     = $quickstack::params::qpid_host,
   $external_network_bridge       = 'br-ex',
-  $bridge_keep_ip                = true,
   $tenant_network_type           = $quickstack::params::tenant_network_type,
   $ovs_bridge_mappings           = $quickstack::params::ovs_bridge_mappings,
   $ovs_bridge_uplinks            = $quickstack::params::ovs_bridge_uplinks,
