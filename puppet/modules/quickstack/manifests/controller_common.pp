@@ -183,8 +183,12 @@ class quickstack::controller_common (
     verbose                     => $verbose,
   }
 
-  package {'horizon-packages':
-    name   => ['python-memcached', 'python-netaddr'],
+  # horizon packages
+  package {'python-memcached':
+    ensure => installed,
+  }~>
+  package {'python-netaddr':
+    ensure => installed,
     notify => Class['horizon'],
   }
 
