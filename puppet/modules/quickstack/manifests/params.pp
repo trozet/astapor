@@ -1,4 +1,6 @@
 class quickstack::params {
+  # This class needs to go away.
+
   # Logs
   $admin_email                = "admin@${::domain}"
   $verbose                    = 'true'
@@ -34,6 +36,7 @@ class quickstack::params {
   $cinder_gluster_path          = '/srv/gluster/cinder'
   $cinder_gluster_peers         = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
   $cinder_gluster_replica_count = '3'
+  $cinder_gluster_servers       = [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ]
 
   # Glance
   $glance_db_password           = 'CHANGEME'
@@ -46,22 +49,19 @@ class quickstack::params {
 
   # Networking
   $neutron                       = 'false'
-  $private_interface             = 'PRIV_INTERFACE'
-  $public_interface              = 'PUB_INTERFACE'
-  $controller_priv_floating_ip   = 'PRIV_IP'
-  $controller_pub_floating_ip    = 'PUB_IP'
+  $controller_priv_ip            = '172.16.0.1'
+  $controller_pub_ip             = '172.16.1.1'
 
   # Nova-network specific
-  $fixed_network_range           = 'PRIV_RANGE'
-  $floating_network_range        = 'PUB_RANGE'
+  $fixed_network_range           = '10.0.0.0/24'
+  $floating_network_range        = '10.0.1.0/24'
   $auto_assign_floating_ip       = 'True'
 
   # Neutron specific
   $neutron_metadata_proxy_secret  = 'CHANGEME'
 
-  $mysql_host                    = 'PRIV_IP'
-  $qpid_host                     = 'PRIV_IP'
-  $bridge_interface              = 'PRIV_IP'
+  $mysql_host                    = '172.16.0.1'
+  $qpid_host                     = '172.16.0.1'
   $enable_ovs_agent              = 'true'
   $tenant_network_type           = 'gre'
   $ovs_vlan_ranges               = undef
@@ -89,7 +89,7 @@ class quickstack::params {
   # provider network settings
   $provider_vlan_auto_create     = 'false'
   $provider_vlan_auto_trunk      = 'false'
-  $mysql_virt_ip_nic             = 'PRIV_IP'
+  $mysql_virt_ip_nic             = '172.16.0.1'
   $mysql_virt_ip_cidr_mask       = 'MYSQL_CIDR_MASK'
   $mysql_shared_storage_device   = 'MYSQL_SHARED_STORAGE_DEVICE'
   # e.g. "nfs"

@@ -1,5 +1,5 @@
 class quickstack::swift::proxy (
-  $controller_pub_floating_ip,
+  $controller_pub_ip,
   $swift_admin_password,
   $swift_shared_secret,
 ) inherits quickstack::params {
@@ -8,7 +8,7 @@ class quickstack::swift::proxy (
     package { 'curl': ensure => present }
 
     class { '::swift::proxy':
-      proxy_local_net_ip => $controller_pub_floating_ip,
+      proxy_local_net_ip => $controller_pub_ip,
       pipeline           => [
         'healthcheck',
         'cache',
@@ -43,7 +43,7 @@ class quickstack::swift::proxy (
         admin_tenant_name => 'services',
         admin_password    => $swift_admin_password,
         # assume that the controller host is the swift api server
-        auth_host         => $controller_pub_floating_ip,
+        auth_host         => $controller_pub_ip,
     }
 
     class {'quickstack::swift::common':
@@ -57,7 +57,7 @@ class quickstack::swift::proxy (
     }
 
     swift::ringsync{["account","container","object"]:
-        ring_server => $controller_pub_floating_ip,
+        ring_server => $controller_pub_ip,
     }
 
     class { '::swift::ringbuilder':
@@ -69,7 +69,7 @@ class quickstack::swift::proxy (
 
     # sets up an rsync db that can be used to sync the ring DB
     class { '::swift::ringserver':
-        local_net_ip => $controller_pub_floating_ip,
+        local_net_ip => $controller_pub_ip,
     }
 
 }

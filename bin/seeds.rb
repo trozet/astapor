@@ -10,10 +10,6 @@
 require 'facter'
 require 'securerandom'
 
-# for openstack
-private_int = 'PRIV_INTERFACE'
-public_int  = 'PUB_INTERFACE'
-
 # for the sub-network foreman owns
 secondary_int = 'SECONDARY_INT'
 
@@ -266,14 +262,12 @@ params = {
   "swift_ext4_device"             => '/dev/sdc2',
   "swift_local_interface"         => 'eth3',
   "swift_loopback"                => true,
-  "swift_ring_server"             => 'PRIV_IP',
-  "private_interface"             => private_int,
-  "public_interface"              => public_int,
-  "fixed_network_range"           => 'PRIV_RANGE',
-  "floating_network_range"        => 'PUB_RANGE',
-  "controller_priv_floating_ip"   => 'PRIV_IP',
-  "controller_pub_floating_ip"    => 'PUB_IP',
-  "mysql_host"                    => 'PRIV_IP',
+  "swift_ring_server"             => '172.16.0.1',
+  "fixed_network_range"           => '10.0.0.0/24',
+  "floating_network_range"        => '10.0.1.0/24',
+  "controller_priv_ip"            => '172.16.0.1',
+  "controller_pub_ip"             => '172.16.1.1',
+  "mysql_host"                    => '172.16.0.1',
   "mysql_virtual_ip"              => '192.168.200.220',
   "mysql_bind_address"            => '0.0.0.0',
   "mysql_virt_ip_nic"             => 'eth1',
@@ -282,11 +276,9 @@ params = {
   "mysql_shared_storage_type"     => 'nfs',
   "mysql_resource_group_name"     => 'mysqlgrp',
   "mysql_clu_member_addrs"        => '192.168.203.11 192.168.203.12 192.168.203.13',
-  "qpid_host"                     => 'PRIV_IP',
+  "qpid_host"                     => '172.16.0.1',
   "admin_email"                   => "admin@#{Facter.domain}",
-  "private_ip"                    => "$ipaddress_@#{private_int}",
   "neutron_metadata_proxy_secret" => SecureRandom.hex,
-  "bridge_interface"              => private_int,
   "enable_ovs_agent"              => "true",
   "ovs_vlan_ranges"               => '',
   "ovs_bridge_mappings"           => [],
