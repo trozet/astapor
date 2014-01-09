@@ -4,8 +4,8 @@ class quickstack::compute_common (
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
-  $controller_priv_floating_ip = $quickstack::params::controller_priv_floating_ip,
-  $controller_pub_floating_ip  = $quickstack::params::controller_pub_floating_ip,
+  $controller_priv_ip          = $quickstack::params::controller_priv_ip,
+  $controller_pub_ip           = $quickstack::params::controller_pub_ip,
   $mysql_host                  = $quickstack::params::mysql_host,
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
@@ -29,7 +29,7 @@ class quickstack::compute_common (
   class { 'nova':
     sql_connection     => "mysql://nova:${nova_db_password}@${mysql_host}/nova",
     image_service      => 'nova.image.glance.GlanceImageService',
-    glance_api_servers => "http://${controller_priv_floating_ip}:9292/v1",
+    glance_api_servers => "http://${controller_priv_ip}:9292/v1",
     rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
     qpid_hostname      => $qpid_host,
     verbose            => $verbose,
@@ -53,7 +53,7 @@ class quickstack::compute_common (
 
   class { 'nova::compute':
     enabled => true,
-    vncproxy_host => $controller_pub_floating_ip,
+    vncproxy_host => $controller_pub_ip,
     vncserver_proxyclient_address => $::ipaddress,
   }
 
@@ -65,7 +65,7 @@ class quickstack::compute_common (
   }
 
   class { 'ceilometer::agent::auth':
-    auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
+    auth_url      => "http://${controller_priv_ip}:35357/v2.0",
     auth_password => $ceilometer_user_password,
   }
 

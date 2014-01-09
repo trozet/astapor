@@ -25,43 +25,14 @@ if [ "x$FOREMAN_PROVISIONING" = "x" ]; then
   FOREMAN_PROVISIONING=true
 fi
 
-# openstack networking configs.  These must be set to something sensible.
-#PRIVATE_CONTROLLER_IP=10.0.0.10
-#PRIVATE_INTERFACE=eth1
-#PRIVATE_NETMASK=10.0.0.0/23
-#PUBLIC_CONTROLLER_IP=10.9.9.10
-#PUBLIC_INTERFACE=eth2
-#PUBLIC_NETMASK=10.9.9.0/24
-#FOREMAN_GATEWAY=10.0.0.1 (or false for no gateway)
-if [ "x$PRIVATE_CONTROLLER_IP" = "x" ]; then
-  echo "You must define PRIVATE_CONTROLLER_IP before running this script"
-  exit 1
-fi
-if [ "x$PRIVATE_INTERFACE" = "x" ]; then
-  echo "You must define PRIVATE_INTERFACE before running this script"
-  exit 1
-fi
-if [ "x$PRIVATE_NETMASK" = "x" ]; then
-  echo "You must define PRIVATE_NETMASK before running this script"
-  exit 1
-fi
-if [ "x$PUBLIC_CONTROLLER_IP" = "x" ]; then
-  echo "You must define PUBLIC_CONTROLLER_IP before running this script"
-  exit 1
-fi
-if [ "x$PUBLIC_INTERFACE" = "x" ]; then
-  echo "You must define PUBLIC_INTERFACE before running this script"
-  exit 1
-fi
-if [ "x$PUBLIC_NETMASK" = "x" ]; then
-  echo "You must define PUBLIC_NETMASK before running this script"
-  exit 1
-fi
+# FOREMAN_GATEWAY must be set when using foreman for provisioning
+if [ "$FOREMAN_PROVISIONING" = "true" ]; then
 if [ "x$FOREMAN_GATEWAY" = "x" ]; then
   echo "You must define FOREMAN_GATEWAY before running this script"
   echo "  Use either the gateway IP for the internal Foreman network, or"
   echo "  use 'false' to have no gateway offered for non-routable networks"
   exit 1
+fi
 fi
 
 if [ "x$SCL_RUBY_HOME" = "x" ]; then
@@ -195,12 +166,6 @@ sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake p
 # Set params, and run the db:seed file to set class parameter defaults
 cp ./seeds.rb $FOREMAN_DIR/db/.
 sed -i "s#SECONDARY_INT#$SECONDARY_INT#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PRIV_INTERFACE#$PRIVATE_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PUB_INTERFACE#$PUBLIC_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PRIV_IP#$PRIVATE_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PUB_IP#$PUBLIC_CONTROLLER_IP#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PRIV_RANGE#$PRIVATE_NETMASK#" $FOREMAN_DIR/db/seeds.rb
-sed -i "s#PUB_RANGE#$PUBLIC_NETMASK#" $FOREMAN_DIR/db/seeds.rb
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
