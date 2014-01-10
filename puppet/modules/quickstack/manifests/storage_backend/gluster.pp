@@ -1,4 +1,4 @@
-# quickstack storage class
+# quickstack storage class.  *experimental*
 class quickstack::storage_backend::gluster(
   $cinder_gluster_path          = $quickstack::params::cinder_gluster_path,
   $cinder_gluster_peers         = $quickstack::params::cinder_gluster_peers,
