@@ -6,9 +6,8 @@ class quickstack::neutron::networker (
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nova_db_password              = $quickstack::params::nova_db_password,
   $nova_user_password            = $quickstack::params::nova_user_password,
-  $controller_priv_floating_ip   = $quickstack::params::controller_priv_floating_ip,
-  $private_interface             = $quickstack::params::private_interface,
-  $public_interface              = $quickstack::params::public_interface,
+  $controller_priv_ip            = $quickstack::params::controller_priv_ip,
+  $ovs_tunnel_iface              = 'em1',
   $mysql_host                    = $quickstack::params::mysql_host,
   $qpid_host                     = $quickstack::params::qpid_host,
   $external_network_bridge       = 'br-ex',
@@ -41,7 +40,7 @@ class quickstack::neutron::networker (
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
-    'keystone_authtoken/auth_host':         value => $controller_priv_floating_ip;
+    'keystone_authtoken/auth_host':         value => $controller_priv_ip;
   }
 
   class { '::neutron::plugins::ovs':
@@ -53,7 +52,7 @@ class quickstack::neutron::networker (
 
   class { '::neutron::agents::ovs':
     bridge_uplinks      => $ovs_bridge_uplinks,
-    local_ip            => getvar("ipaddress_${private_interface}"),
+    local_ip            => getvar("ipaddress_${ovs_tunnel_iface}"),
     bridge_mappings     => $ovs_bridge_mappings,
     enable_tunneling    => $enable_tunneling_bool,
   }
@@ -67,8 +66,8 @@ class quickstack::neutron::networker (
   class { 'neutron::agents::metadata':
     auth_password => $admin_password,
     shared_secret => $neutron_metadata_proxy_secret,
-    auth_url      => "http://${controller_priv_floating_ip}:35357/v2.0",
-    metadata_ip   => $controller_priv_floating_ip,
+    auth_url      => "http://${controller_priv_ip}:35357/v2.0",
+    metadata_ip   => $controller_priv_ip,
   }
 
   #class { 'neutron::agents::lbaas': }
