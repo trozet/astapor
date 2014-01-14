@@ -1,4 +1,6 @@
 class quickstack::storage_backend::lvm_cinder(
+  $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
+  $cinder_backend_iscsi        = $quickstack::params::cinder_backend_iscsi,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
   $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
   $cinder_gluster_peers        = $quickstack::params::cinder_gluster_peers,
@@ -19,7 +21,7 @@ class quickstack::storage_backend::lvm_cinder(
 
   class { 'cinder::volume': }
 
-  if $cinder_backend_gluster == true {
+  if str2bool($cinder_backend_gluster) {
     class { 'gluster::client': }
 
     if ($::selinux != "false") {
@@ -35,7 +37,7 @@ class quickstack::storage_backend::lvm_cinder(
     }
   }
 
-  if $cinder_backend_iscsi == true {
+  if str2bool($cinder_backend_iscsi) {
     class { 'cinder::volume::iscsi':
       iscsi_ip_address => getvar("ipaddress_${cinder_iscsi_iface}"),
     }
