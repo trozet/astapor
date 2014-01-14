@@ -5,6 +5,8 @@ class quickstack::hamysql::node (
   $nova_db_password            = $quickstack::params::nova_db_password,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
   $heat_db_password            = $quickstack::params::heat_db_password,
+  $neutron_db_password         = $quickstack::params::neutron_db_password,
+  $neutron                     = $quickstack::params::neutron,
 
   # these two variables are distinct because you may want to bind on
   # '0.0.0.0' rather than just the floating ip
@@ -100,6 +102,8 @@ class quickstack::hamysql::node (
       nova_db_password     => $nova_db_password,
       cinder_db_password   => $cinder_db_password,
       heat_db_password     => $heat_db_password,
+      neutron_db_password  => $neutron_db_password,
+      neutron              => str2bool_i("$neutron"),
       require              => Class['quickstack::hamysql::mysql::rootpw'],
     }
 
