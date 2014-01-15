@@ -49,8 +49,8 @@ class quickstack::params {
 
   # Networking
   $neutron                       = 'false'
-  $controller_priv_ip            = '172.16.0.1'
-  $controller_pub_ip             = '172.16.1.1'
+  $controller_priv_host          = '172.16.0.1'
+  $controller_pub_host           = '172.16.1.1'
 
   # Nova-network specific
   $fixed_network_range           = '10.0.0.0/24'

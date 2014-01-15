@@ -4,7 +4,7 @@ class quickstack::storage_backend::lvm_cinder(
   $cinder_db_password          = $quickstack::params::cinder_db_password,
   $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
   $cinder_gluster_peers        = $quickstack::params::cinder_gluster_peers,
-  $controller_priv_ip          = $quickstack::params::controller_priv_ip,
+  $controller_priv_host        = $quickstack::params::controller_priv_host,
   $cinder_iscsi_iface          = 'em1',
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,

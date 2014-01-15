@@ -4,8 +4,8 @@ class quickstack::neutron::compute (
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
-  $controller_priv_ip          = $quickstack::params::controller_priv_ip,
-  $controller_pub_ip           = $quickstack::params::controller_pub_ip,
+  $controller_priv_host        = $quickstack::params::controller_priv_host,
+  $controller_pub_host         = $quickstack::params::controller_pub_host,
   $enable_tunneling            = $quickstack::params::enable_tunneling,
   $mysql_host                  = $quickstack::params::mysql_host,
   $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
@@ -40,7 +40,7 @@ class quickstack::neutron::compute (
 
   neutron_config {
     'database/connection': value => "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron";
-    'keystone_authtoken/auth_host':         value => $controller_priv_ip;
+    'keystone_authtoken/auth_host':         value => $controller_priv_host;
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
@@ -62,8 +62,8 @@ class quickstack::neutron::compute (
 
   class { '::nova::network::neutron':
     neutron_admin_password    => $neutron_user_password,
-    neutron_url               => "http://${controller_priv_ip}:9696",
-    neutron_admin_auth_url    => "http://${controller_priv_ip}:35357/v2.0",
+    neutron_url               => "http://${controller_priv_host}:9696",
+    neutron_admin_auth_url    => "http://${controller_priv_host}:35357/v2.0",
   }
 
 
@@ -72,8 +72,8 @@ class quickstack::neutron::compute (
     ceilometer_metering_secret  => $ceilometer_metering_secret,
     ceilometer_user_password    => $ceilometer_user_password,
     cinder_backend_gluster      => $cinder_backend_gluster,
-    controller_priv_ip          => $controller_priv_ip,
-    controller_pub_ip           => $controller_pub_ip,
+    controller_priv_host        => $controller_priv_host,
+    controller_pub_host         => $controller_pub_host,
     mysql_host                  => $mysql_host,
     nova_db_password            => $nova_db_password,
     nova_user_password          => $nova_user_password,

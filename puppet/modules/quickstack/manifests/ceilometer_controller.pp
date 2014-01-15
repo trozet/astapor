@@ -1,17 +1,17 @@
 class quickstack::ceilometer_controller(
   $ceilometer_metering_secret,
   $ceilometer_user_password,
-  $controller_priv_ip,
-  $controller_pub_ip,
+  $controller_priv_host,
+  $controller_pub_host,
   $qpid_host,
   $verbose,
 ) {
 
     class { 'ceilometer::keystone::auth':
         password => $ceilometer_user_password,
-        public_address => $controller_pub_ip,
-        admin_address => $controller_priv_ip,
-        internal_address => $controller_priv_ip,
+        public_address => $controller_pub_host,
+        admin_address => $controller_priv_host,
+        internal_address => $controller_priv_host,
     }
 
     class { 'mongodb':
@@ -38,7 +38,7 @@ class quickstack::ceilometer_controller(
     }
 
     class { 'ceilometer::agent::auth':
-        auth_url      => "http://${controller_priv_ip}:35357/v2.0",
+        auth_url      => "http://${controller_priv_host}:35357/v2.0",
         auth_password => $ceilometer_user_password,
     }
 
@@ -47,7 +47,7 @@ class quickstack::ceilometer_controller(
     }
 
     class { 'ceilometer::api':
-        keystone_host     => $controller_priv_ip,
+        keystone_host     => $controller_priv_host,
         keystone_password => $ceilometer_user_password,
         require           => Class['mongodb'],
     }

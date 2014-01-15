@@ -69,9 +69,9 @@ class quickstack::neutron::plugins::cisco (
   class { '::neutron::plugins::cisco':
     database_user     => $neutron_db_user,
     database_pass     => $neutron_db_password,
-    database_host     => $controller_priv_ip,
+    database_host     => $controller_priv_host,
     keystone_password => $admin_password,
-    keystone_auth_url => "http://${controller_priv_ip}:35357/v2.0/",
+    keystone_auth_url => "http://${controller_priv_host}:35357/v2.0/",
     vswitch_plugin    => $cisco_vswitch_plugin,
     nexus_plugin      => $cisco_nexus_plugin
   }
