@@ -5,14 +5,14 @@ class quickstack::cinder_controller(
   $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
   $cinder_gluster_servers      = $quickstack::params::cinder_gluster_servers,
   $cinder_user_password        = $quickstack::params::cinder_user_password,
-  $controller_priv_ip          = $quickstack::params::controller_priv_ip,
+  $controller_priv_host        = $quickstack::params::controller_priv_host,
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
   cinder_config {
-    'DEFAULT/glance_host': value => $controller_priv_ip;
+    'DEFAULT/glance_host': value => $controller_priv_host;
     'DEFAULT/notification_driver': value => 'cinder.openstack.common.notifier.rpc_notifier'
   }
 
@@ -29,7 +29,7 @@ class quickstack::cinder_controller(
     keystone_password => $cinder_user_password,
     keystone_tenant => "services",
     keystone_user => "cinder",
-    keystone_auth_host => $controller_priv_ip,
+    keystone_auth_host => $controller_priv_host,
   }
 
   class {'cinder::scheduler': }

@@ -6,7 +6,7 @@ class quickstack::neutron::networker (
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nova_db_password              = $quickstack::params::nova_db_password,
   $nova_user_password            = $quickstack::params::nova_user_password,
-  $controller_priv_ip            = $quickstack::params::controller_priv_ip,
+  $controller_priv_host          = $quickstack::params::controller_priv_host,
   $ovs_tunnel_iface              = 'em1',
   $mysql_host                    = $quickstack::params::mysql_host,
   $qpid_host                     = $quickstack::params::qpid_host,
@@ -40,7 +40,7 @@ class quickstack::neutron::networker (
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
-    'keystone_authtoken/auth_host':         value => $controller_priv_ip;
+    'keystone_authtoken/auth_host':         value => $controller_priv_host;
   }
 
   class { '::neutron::plugins::ovs':
@@ -66,8 +66,8 @@ class quickstack::neutron::networker (
   class { 'neutron::agents::metadata':
     auth_password => $admin_password,
     shared_secret => $neutron_metadata_proxy_secret,
-    auth_url      => "http://${controller_priv_ip}:35357/v2.0",
-    metadata_ip   => $controller_priv_ip,
+    auth_url      => "http://${controller_priv_host}:35357/v2.0",
+    metadata_ip   => $controller_priv_host,
   }
 
   #class { 'neutron::agents::lbaas': }
