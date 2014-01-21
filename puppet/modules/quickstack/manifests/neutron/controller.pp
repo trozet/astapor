@@ -38,6 +38,15 @@ class quickstack::neutron::controller (
   $provider_vlan_auto_trunk      = $quickstack::params::provider_vlan_auto_trunk,
   $enable_tunneling              = $quickstack::params::enable_tunneling,
   $tunnel_id_ranges              = '1:1000',
+  $ml2_install_deps              = true,
+  $ml2_type_drivers              = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
+  $ml2_tenant_network_types      = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
+  $ml2_mechanism_drivers         = ['openvswitch'],
+  $ml2_flat_networks             = ['*'],
+  $ml2_network_vlan_ranges       = ['10:50'],
+  $ml2_tunnel_id_ranges          = ['20:100'],
+  $ml2_vxlan_group               = '224.0.0.1',
+  $ml2_vni_ranges                = ['10:100'],
   $qpid_host                     = $quickstack::params::qpid_host,
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
@@ -110,6 +119,50 @@ class quickstack::neutron::controller (
     sql_connection   => false,
   }
 
+  if $neutron_core_plugin == 'neutron.plugins.ml2.plugin.Ml2Plugin' {
+    # FIXME: This lovely workaround is because puppet-neutron doesn't
+    # install the ml2 package for us, which makes everything else fail.
+    # This has been fixed upstream, so we can remove this whole chunk once our
+    # puppet rpm deps catch up.
+    if str2bool_i("$ml2_install_deps") {
+      # test mechanism drivers
+      validate_array($ml2_mechanism_drivers)
+      if ! $ml2_mechanism_drivers {
+        warning('Without networking mechanism driver, ml2 will not communicate with L2 agents')
+      }
+      package { 'openstack-neutron-ml2':
+        ensure => 'installed',
+        before => Class['::neutron::plugins::ml2'],
+      }
+
+      # Specific plugin configuration
+      if ('openvswitch' in $ml2_mechanism_drivers) {
+        package { 'neutron-plugin-ovs':
+          ensure => present,
+          name   => $::neutron::params::ovs_server_package,
+          before => Class['::neutron::plugins::ml2'],
+        }
+      }
+      if ('linuxbridge' in $ml2_mechanism_drivers) {
+        package { 'neutron-plugin-linuxbridge':
+          ensure => present,
+          name   => $::neutron::params::linuxbridge_server_package,
+          before => Class['::neutron::plugins::ml2'],
+        }
+      }
+    }
+
+    class { '::neutron::plugins::ml2':
+      type_drivers         => $ml2_type_drivers,
+      tenant_network_types => $ml2_tenant_network_types,
+      mechanism_drivers    => $ml2_mechanism_drivers,
+      flat_networks        => $ml2_flat_networks,
+      network_vlan_ranges  => $ml2_network_vlan_ranges,
+      tunnel_id_ranges     => $ml2_tunnel_id_ranges,
+      vxlan_group          => $ml2_vxlan_group,
+      vni_ranges           => $ml2_vni_ranges,
+    }
+  }
 
   if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
     neutron_plugin_ovs {
