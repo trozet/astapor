@@ -1,11 +1,12 @@
 class quickstack::load_balancer (
-  $lb_private_vip,
-  $lb_public_vip,
-  $lb_member_names,
-  $lb_member_addrs,
-  $neutron         = $quickstack::params::neutron,
-  $heat_cfn        = $quickstack::params::heat_cfn,
-  $heat_cloudwatch = $quickstack::params::heat_cloudwatch,
+  $controller_admin_host,
+  $controller_priv_host,
+  $controller_pub_host,
+  $backend_server_names,
+  $backend_server_addrs,
+  $neutron,
+  $heat_cfn,
+  $heat_cloudwatch,
 ) inherits quickstack::params {
 
   class { 'haproxy':
@@ -37,7 +38,9 @@ class quickstack::load_balancer (
   }
 
   quickstack::load_balancer::proxy { 'horizon':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '80',
     mode => 'http',
     listen_options => {
@@ -48,14 +51,18 @@ class quickstack::load_balancer (
     define_cookies => true,
   }
   quickstack::load_balancer::proxy { 'keystone-public':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '5000',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'keystone-admin':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '35357',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -63,7 +70,9 @@ class quickstack::load_balancer (
   }
   if str2bool($heat_cfn) == true {
     quickstack::load_balancer::proxy { 'heat-cfn':
-      addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
       port => '8000',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
@@ -72,7 +81,9 @@ class quickstack::load_balancer (
   }
   if str2bool($heat_cloudwatch) == true {
     quickstack::load_balancer::proxy { 'heat-cloudwatch':
-      addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
       port => '8003',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
@@ -80,63 +91,81 @@ class quickstack::load_balancer (
     }
   }
   quickstack::load_balancer::proxy { 'heat-api':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '8004',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'swift-proxy':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '8080',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'nova-ec2':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '8773',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'nova-compute':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '8774',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'nova-metadata':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '8775',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'cinder-api':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '8776',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'ceilometer-api':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '8777',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'glance-registry':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '9191',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
   quickstack::load_balancer::proxy { 'glance-api':
-    addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
     port => '9292',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -144,7 +173,9 @@ class quickstack::load_balancer (
   }
   if str2bool($neutron) == true {
     quickstack::load_balancer::proxy { 'neutron-api':
-      addr => [ $lb_public_vip, $lb_private_vip ],
+    addr => [ $controller_pub_host,
+              $controller_priv_host,
+              $controller_admin_host ]
       port => '9696',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
@@ -176,8 +207,8 @@ define quickstack::load_balancer::proxy (
   haproxy::balancermember { $name:
     listening_service => $name,
     ports             => $port,
-    server_names      => split($quickstack::load_balancer::lb_member_names, ','),
-    ipaddresses       => split($quickstack::load_balancer::lb_member_addrs, ','),
+    server_names      => $quickstack::load_balancer::backend_server_names,
+    ipaddresses       => $quickstack::load_balancer::backend_server_addrs,
     options           => $member_options,
     define_cookies    => $define_cookies,
   }
