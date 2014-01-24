@@ -10,6 +10,7 @@ class quickstack::controller_common (
   $cinder_gluster_servers        = $quickstack::params::cinder_gluster_servers,
   $cinder_gluster_volume         = $quickstack::params::cinder_gluster_volume,
   $cinder_user_password          = $quickstack::params::cinder_user_password,
+  $controller_admin_host         = $quickstack::params::controller_admin_host,
   $controller_priv_host          = $quickstack::params::controller_priv_host,
   $controller_pub_host           = $quickstack::params::controller_pub_host,
   $glance_db_password            = $quickstack::params::glance_db_password,
@@ -71,23 +72,23 @@ class quickstack::controller_common (
     neutron_user_password   => $neutron_user_password,
 
     public_address          => $controller_pub_host,
-    admin_address           => $controller_priv_host,
+    admin_address           => $controller_admin_host,
     internal_address        => $controller_priv_host,
 
     glance_public_address   => $controller_pub_host,
-    glance_admin_address    => $controller_priv_host,
+    glance_admin_address    => $controller_admin_host,
     glance_internal_address => $controller_priv_host,
 
     nova_public_address     => $controller_pub_host,
-    nova_admin_address      => $controller_priv_host,
+    nova_admin_address      => $controller_admin_host,
     nova_internal_address   => $controller_priv_host,
 
     cinder_public_address   => $controller_pub_host,
-    cinder_admin_address    => $controller_priv_host,
+    cinder_admin_address    => $controller_admin_host,
     cinder_internal_address => $controller_priv_host,
 
     neutron_public_address   => $controller_pub_host,
-    neutron_admin_address    => $controller_priv_host,
+    neutron_admin_address    => $controller_admin_host,
     neutron_internal_address => $controller_priv_host,
 
     neutron                 => str2bool("$neutron"),
@@ -99,7 +100,7 @@ class quickstack::controller_common (
     password         => $swift_admin_password,
     public_address   => $controller_pub_host,
     internal_address => $controller_priv_host,
-    admin_address    => $controller_priv_host,
+    admin_address    => $controller_admin_host
   }
 
   class {'openstack::glance':
@@ -146,6 +147,7 @@ class quickstack::controller_common (
   class { 'quickstack::ceilometer_controller':
     ceilometer_metering_secret  => $ceilometer_metering_secret,
     ceilometer_user_password    => $ceilometer_user_password,
+    controller_admin_host       => $controller_admin_host,
     controller_priv_host        => $controller_priv_host,
     controller_pub_host         => $controller_pub_host,
     qpid_host                   => $qpid_host,
@@ -176,6 +178,7 @@ class quickstack::controller_common (
     heat_cloudwatch             => $heat_cloudwatch,
     heat_user_password          => $heat_user_password,
     heat_db_password            => $heat_db_password,
+    controller_admin_host       => $controller_admin_host,
     controller_priv_host        => $controller_priv_host,
     controller_pub_host         => $controller_pub_host,
     mysql_host                  => $mysql_host,

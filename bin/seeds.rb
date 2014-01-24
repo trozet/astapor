@@ -266,6 +266,7 @@ params = {
   "swift_ring_server"             => '172.16.0.1',
   "fixed_network_range"           => '10.0.0.0/24',
   "floating_network_range"        => '10.0.1.0/24',
+  "controller_admin_host"         => '172.16.0.1',
   "controller_priv_host"          => '172.16.0.1',
   "controller_pub_host"           => '172.16.1.1',
   "mysql_host"                    => '172.16.0.1',
