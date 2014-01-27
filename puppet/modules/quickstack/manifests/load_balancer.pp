@@ -61,7 +61,7 @@ class quickstack::load_balancer (
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
-  if str2bool($heat_cfn) == true {
+  if str2bool_i("$heat_cfn") {
     quickstack::load_balancer::proxy { 'heat-cfn':
       addr => [ $lb_public_vip, $lb_private_vip ],
       port => '8000',
@@ -70,7 +70,7 @@ class quickstack::load_balancer (
       member_options => [ 'check' ],
     }
   }
-  if str2bool($heat_cloudwatch) == true {
+  if str2bool_i("$heat_cloudwatch") {
     quickstack::load_balancer::proxy { 'heat-cloudwatch':
       addr => [ $lb_public_vip, $lb_private_vip ],
       port => '8003',
@@ -142,7 +142,7 @@ class quickstack::load_balancer (
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
   }
-  if str2bool($neutron) == true {
+  if str2bool_i("$neutron") {
     quickstack::load_balancer::proxy { 'neutron-api':
       addr => [ $lb_public_vip, $lb_private_vip ],
       port => '9696',
