@@ -1,5 +1,6 @@
 # quickstack storage class.  *experimental*
 class quickstack::storage_backend::gluster(
+  $gluster_open_port_count      = $quickstack::params::gluster_open_port_count,
   $cinder_gluster_path          = $quickstack::params::cinder_gluster_path,
   $cinder_gluster_peers         = $quickstack::params::cinder_gluster_peers,
   $cinder_gluster_replica_count = $quickstack::params::cinder_gluster_replica_count,
@@ -50,8 +51,7 @@ class quickstack::storage_backend::gluster(
   # 1 port per brick
   firewall { '002 gluster bricks incoming':
     proto  => 'tcp',
-    #dport  => port_range('49152', '6'),
-    dport    => [ '49152', '49153', '49154', '49155', '49156', '49157' ],
+    dport  => port_range(49152, $gluster_open_port_count),
     action => 'accept',
   }
 }
