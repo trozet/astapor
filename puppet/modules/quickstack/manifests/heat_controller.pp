@@ -31,11 +31,11 @@ class quickstack::heat_controller(
   }
 
   class { 'heat::api_cfn':
-      enabled => str2bool($heat_cfn),
+      enabled => str2bool_i("$heat_cfn"),
   }
 
   class { 'heat::api_cloudwatch':
-      enabled => str2bool($heat_cloudwatch),
+      enabled => str2bool_i("$heat_cloudwatch"),
   }
 
   class { 'heat::engine':

@@ -41,7 +41,7 @@ class quickstack::swift::storage (
       }
   }
 
-  if str2bool($swift_loopback) {
+  if str2bool_i("$swift_loopback") {
     swift::storage::loopback { ['device1']:
       base_dir     => '/srv/loopback-device',
       mnt_base_dir => '/srv/node',

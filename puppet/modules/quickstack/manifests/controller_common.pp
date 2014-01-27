@@ -53,7 +53,7 @@ class quickstack::controller_common (
     enabled                => true,
 
     # Networking
-    neutron                => str2bool("$neutron"),
+    neutron                => str2bool_i("$neutron"),
   }
 
   class {'qpid::server':
@@ -91,7 +91,7 @@ class quickstack::controller_common (
     neutron_admin_address    => $controller_admin_host,
     neutron_internal_address => $controller_priv_host,
 
-    neutron                 => str2bool("$neutron"),
+    neutron                 => str2bool_i("$neutron"),
     enabled                 => true,
     require                 => Class['openstack::db::mysql'],
   }
@@ -120,7 +120,7 @@ class quickstack::controller_common (
     require            => Class['openstack::db::mysql', 'qpid::server'],
   }
 
-  if str2bool("$neutron") {
+  if str2bool_i("$neutron") {
     class { 'nova::api':
       enabled           => true,
       admin_password    => $nova_user_password,

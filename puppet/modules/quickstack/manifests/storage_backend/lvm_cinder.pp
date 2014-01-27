@@ -21,7 +21,7 @@ class quickstack::storage_backend::lvm_cinder(
 
   class { 'cinder::volume': }
 
-  if str2bool($cinder_backend_gluster) {
+  if str2bool_i("$cinder_backend_gluster") {
     class { 'gluster::client': }
 
     if ($::selinux != "false") {
@@ -37,7 +37,7 @@ class quickstack::storage_backend::lvm_cinder(
     }
   }
 
-  if str2bool($cinder_backend_iscsi) {
+  if str2bool_i("$cinder_backend_iscsi") {
     class { 'cinder::volume::iscsi':
       iscsi_ip_address => getvar("ipaddress_${cinder_iscsi_iface}"),
     }
