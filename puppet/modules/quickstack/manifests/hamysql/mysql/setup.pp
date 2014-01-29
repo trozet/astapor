@@ -4,6 +4,7 @@ class quickstack::hamysql::mysql::setup (
   $nova_db_password,
   $cinder_db_password,
   $heat_db_password,
+  $neutron_db_password,
   # Keystone
   $keystone_db_user       = 'keystone',
   $keystone_db_dbname     = 'keystone',
@@ -26,7 +27,7 @@ class quickstack::hamysql::mysql::setup (
   $neutron_db_dbname      = 'neutron',
 ) {
 
-  if str2bool("$hamysql_active_node") {
+  if str2bool_i("$hamysql_active_node") {
     class { 'quickstack::hamysql::mysql::account_security': }
 
     database { $keystone_db_dbname:
@@ -108,6 +109,24 @@ class quickstack::hamysql::mysql::setup (
       privileges => 'all',
       provider   => 'mysql',
       require    => Database_user["$heat_db_user@%"]
+    }
+
+    if str2bool_i("$neutron") {
+      database { $neutron_db_dbname:
+        ensure => 'present',
+        provider => 'mysql',
+      }
+      database_user { "$neutron_db_user@%":
+        ensure => 'present',
+        password_hash => mysql_password($neutron_db_password),
+        provider      => 'mysql',
+        require => Database[$neutron_db_dbname],
+      }
+      database_grant { "$neutron_db_user@%/$neutron_db_dbname":
+        privileges => 'all',
+        provider   => 'mysql',
+        require    => Database_user["$neutron_db_user@%"]
+      }
     }
   }
 }
