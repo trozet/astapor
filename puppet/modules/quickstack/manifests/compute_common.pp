@@ -13,7 +13,7 @@ class quickstack::compute_common (
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
 
-  if str2bool($cinder_backend_gluster) == true {
+  if str2bool_i("$cinder_backend_gluster") {
     class { 'gluster::client': }
 
     if ($::selinux != "false") {
