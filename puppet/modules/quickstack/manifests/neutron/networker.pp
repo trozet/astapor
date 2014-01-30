@@ -56,7 +56,7 @@ class quickstack::neutron::networker (
   }
 
   class { 'neutron::agents::metadata':
-    auth_password => $admin_password,
+    auth_password => $neutron_user_password,
     shared_secret => $neutron_metadata_proxy_secret,
     auth_url      => "http://${controller_priv_host}:35357/v2.0",
     metadata_ip   => $controller_priv_host,
