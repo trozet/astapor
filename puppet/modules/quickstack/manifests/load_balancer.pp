@@ -154,31 +154,3 @@ class quickstack::load_balancer (
 
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
 }
-
-define quickstack::load_balancer::proxy (
-  $addr,
-  $port,
-  $mode,
-  $listen_options,
-  $member_options,
-  $define_cookies = false,
-) {
-  include quickstack::load_balancer
-
-  haproxy::listen { $name:
-    ipaddress => $addr,
-    ports     => $port,
-    mode      => $mode,
-    options   => $listen_options,
-    collect_exported => false,
-  }
-
-  haproxy::balancermember { $name:
-    listening_service => $name,
-    ports             => $port,
-    server_names      => split($quickstack::load_balancer::lb_member_names, ','),
-    ipaddresses       => split($quickstack::load_balancer::lb_member_addrs, ','),
-    options           => $member_options,
-    define_cookies    => $define_cookies,
-  }
-}
