@@ -40,7 +40,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'horizon':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '80',
     mode => 'http',
     listen_options => {
@@ -53,7 +53,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'keystone-public':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '5000',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -62,7 +62,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'keystone-admin':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '35357',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -72,7 +72,7 @@ class quickstack::load_balancer (
     quickstack::load_balancer::proxy { 'heat-cfn':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
       port => '8000',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
@@ -83,7 +83,7 @@ class quickstack::load_balancer (
     quickstack::load_balancer::proxy { 'heat-cloudwatch':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
       port => '8003',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
@@ -93,7 +93,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'heat-api':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '8004',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -102,7 +102,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'swift-proxy':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '8080',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -111,7 +111,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'nova-ec2':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '8773',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -120,7 +120,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'nova-compute':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '8774',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -129,7 +129,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'nova-metadata':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '8775',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -138,7 +138,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'cinder-api':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '8776',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -147,7 +147,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'ceilometer-api':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '8777',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -156,7 +156,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'glance-registry':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '9191',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -165,7 +165,7 @@ class quickstack::load_balancer (
   quickstack::load_balancer::proxy { 'glance-api':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
     port => '9292',
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
@@ -175,7 +175,7 @@ class quickstack::load_balancer (
     quickstack::load_balancer::proxy { 'neutron-api':
     addr => [ $controller_pub_host,
               $controller_priv_host,
-              $controller_admin_host ]
+              $controller_admin_host ],
       port => '9696',
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
