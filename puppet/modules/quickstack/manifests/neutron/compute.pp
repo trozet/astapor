@@ -65,7 +65,7 @@ class quickstack::neutron::compute (
   class { '::neutron::agents::ovs':
     bridge_uplinks      => $ovs_bridge_uplinks,
     bridge_mappings     => $ovs_bridge_mappings,
-    local_ip            => getvar(regsubst("ipaddress_${ovs_tunnel_iface}", '\.', '_', 'G')),
+    local_ip            => getvar(regsubst("ipaddress_${ovs_tunnel_iface}", '[.-]', '_', 'G')),
     enable_tunneling    => str2bool_i("$enable_tunneling"),
     tunnel_types     => $ovs_tunnel_types,
     vxlan_udp_port   => $ovs_vxlan_udp_port,
