@@ -50,6 +50,9 @@ class quickstack::neutron::controller (
   $qpid_host                     = $quickstack::params::qpid_host,
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
+  $swift_ringserver_ip           = '192.168.203.1',
+  $swift_storage_ips             = ['192.168.203.2', '192.168.203.3', '192.168.203.4'],
+  $swift_storage_device          = 'device1',
   $tenant_network_type           = $quickstack::params::tenant_network_type,
   $verbose                       = $quickstack::params::verbose,
 ) inherits quickstack::params {
@@ -88,6 +91,9 @@ class quickstack::neutron::controller (
     qpid_host                     => $qpid_host,
     swift_shared_secret           => $swift_shared_secret,
     swift_admin_password          => $swift_admin_password,
+    swift_ringserver_ip           => $swift_ringserver_ip,
+    swift_storage_ips             => $swift_storage_ips,
+    swift_storage_device          => $swift_storage_device,
     verbose                       => $verbose,
   }
   ->
