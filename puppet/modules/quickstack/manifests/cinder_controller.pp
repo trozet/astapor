@@ -51,4 +51,18 @@ class quickstack::cinder_controller(
       glusterfs_shares           => suffix($cinder_gluster_servers, ":/${cinder_gluster_volume}")
     }
   }
+
+  if !str2bool_i("$cinder_backend_gluster") and !str2bool_i("$cinder_backend_iscsi") {
+    class { 'cinder::volume': }
+
+    class { 'cinder::volume::iscsi':
+      iscsi_ip_address => $controller_priv_host,
+    }
+
+    firewall { '010 cinder iscsi':
+      proto  => 'tcp',
+      dport  => ['3260'],
+      action => 'accept',
+    }
+  }
 }
