@@ -75,6 +75,8 @@ class quickstack::compute_common (
     enabled => true,
   }
 
+  include quickstack::tuned::virtual_host
+
   firewall { '001 nova compute incoming':
     proto  => 'tcp',
     dport  => '5900-5999',
