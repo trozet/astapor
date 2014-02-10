@@ -205,6 +205,7 @@ class quickstack::controller_common (
   class {'horizon':
     secret_key    => $horizon_secret_key,
     keystone_host => $controller_priv_host,
+    fqdn          => ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost'],
   }
 
   class {'memcached':}
