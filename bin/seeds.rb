@@ -242,6 +242,7 @@ params = {
   "cinder_gluster_peers"          => [],
   "cinder_gluster_volume"         => "cinder",
   "cinder_gluster_replica_count"  => '3',
+  "cinder_gluster_servers"        => [ '192.168.0.4', '192.168.0.5', '192.168.0.6' ],
   "glance_db_password"            => SecureRandom.hex,
   "glance_user_password"          => SecureRandom.hex,
   "glance_gluster_peers"          => [],
