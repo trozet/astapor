@@ -33,6 +33,9 @@ class quickstack::controller_common (
   $nova_user_password            = $quickstack::params::nova_user_password,
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
+  $swift_ringserver_ip           = '192.168.203.1',
+  $swift_storage_ips             = ["192.168.203.2","192.168.203.3","192.168.203.4"],
+  $swift_storage_device          = 'device1',
   $qpid_host                     = $quickstack::params::qpid_host,
   $verbose                       = $quickstack::params::verbose,
 ) inherits quickstack::params {
@@ -159,6 +162,10 @@ class quickstack::controller_common (
     controller_pub_host        => $controller_pub_host,
     swift_admin_password       => $swift_admin_password,
     swift_shared_secret        => $swift_shared_secret,
+    swift_storage_ips          => $swift_storage_ips,
+    swift_storage_device       => $swift_storage_device,
+    swift_ringserver_ip        => $swift_ringserver_ip,
+    swift_is_ringserver        => true,
   }
 
   class { 'quickstack::cinder_controller':
