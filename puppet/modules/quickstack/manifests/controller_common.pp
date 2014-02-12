@@ -21,6 +21,7 @@ class quickstack::controller_common (
   $horizon_secret_key            = $quickstack::params::horizon_secret_key,
   $keystone_admin_token          = $quickstack::params::keystone_admin_token,
   $keystone_db_password          = $quickstack::params::keystone_db_password,
+  $keystonerc                    = false,
   $neutron_metadata_proxy_secret = $quickstack::params::neutron_metadata_proxy_secret,
   $mysql_host                    = $quickstack::params::mysql_host,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
@@ -333,4 +334,12 @@ class quickstack::controller_common (
       persistent => true,
     }
   }
+
+  if str2bool_i("$keystonerc") {
+    class { 'quickstack::admin_client':
+      admin_password        => $admin_password,
+      controller_admin_host => $controller_admin_host,
+    }
+  }
+
 }
