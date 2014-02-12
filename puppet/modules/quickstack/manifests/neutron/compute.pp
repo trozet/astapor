@@ -80,6 +80,6 @@ class quickstack::neutron::compute (
   }
 
   class {'quickstack::neutron::firewall::vxlan':
-    port => $vxlan_udp_port,
+    port => $ovs_vxlan_udp_port,
   }
 }
