@@ -116,4 +116,9 @@ class quickstack::params {
   $horizon_cert                  = undef
   $horizon_key                   = undef
   $qpid_nssdb_password           = 'CHANGEME'
+
+  # Pacemaker
+  $pacemaker_cluster_name        = 'openstack'
+  $pacemaker_cluster_members     = ''
+  $pacemaker_disable_stonith     = true
 }
