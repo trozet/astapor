@@ -315,6 +315,9 @@ params = {
   "horizon_cert"                  => "/etc/pki/tls/certs/PUB_HOST-horizon.crt",
   "horizon_key"                   => "/etc/pki/tls/private/PUB_HOST-horizon.key",
   "qpid_nssdb_password"           => SecureRandom.hex,
+  "pacemaker_cluster_name"        => "openstack",
+  "pacemaker_cluster_members"     => "192.168.200.10 192.168.200.11 192.168.200.12",
+  "pacemaker_disable_stonith"     => false,
 }
 
 hostgroups = [
