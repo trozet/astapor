@@ -51,6 +51,7 @@ class quickstack::params {
   $neutron                       = 'false'
   $controller_priv_host          = '172.16.0.1'
   $controller_pub_host           = '172.16.1.1'
+  $nova_default_floating_pool    = 'nova'
 
   # Nova-network specific
   $fixed_network_range           = '10.0.0.0/24'
