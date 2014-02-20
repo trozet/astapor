@@ -320,6 +320,9 @@ params = {
   "pacemaker_cluster_name"        => "openstack",
   "pacemaker_cluster_members"     => "192.168.200.10 192.168.200.11 192.168.200.12",
   "pacemaker_disable_stonith"     => false,
+  "ha_loadbalancer_public_vip"    => "192.168.200.50",
+  "ha_loadbalancer_private_vip"   => "192.168.201.50",
+  "ha_loadbalancer_group"         => "load_balancer",
 }
 
 hostgroups = [
@@ -341,6 +344,13 @@ hostgroups = [
      :class=>"quickstack::hamysql::node"},
     {:name=>"Swift Storage Node",
      :class=>"quickstack::swift::storage"},
+    {:name=>"HA All In One Controller",
+     :class=>["quickstack::pacemaker::common",
+              "quickstack::pacemaker::load_balancer",
+              "quickstack::pacemaker::qpid",
+              "quickstack::load_balancer",
+              "qpid::server",
+             ]},
 ]
 
 def get_key_type(value)

@@ -7,7 +7,7 @@ class quickstack::pacemaker::common (
     cluster_name    => $pacemaker_cluster_name,
     cluster_members => $pacemaker_cluster_members,
   }
-
+  ->
   class {'pacemaker::stonith':
     disable => str2bool_i("$pacemaker_disable_stonith"),
   }

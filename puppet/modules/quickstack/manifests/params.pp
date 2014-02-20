@@ -121,4 +121,7 @@ class quickstack::params {
   $pacemaker_cluster_name        = 'openstack'
   $pacemaker_cluster_members     = ''
   $pacemaker_disable_stonith     = true
+  $ha_loadbalancer_public_vip    = '172.16.1.10'
+  $ha_loadbalancer_private_vip   = '172.16.2.10'
+  $ha_loadbalancer_group         = 'load_balancer'
 }
