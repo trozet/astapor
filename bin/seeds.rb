@@ -353,14 +353,17 @@ def get_key_type(value)
 end
 
 hostgroups.each do |hg|
-  pclass = Puppetclass.find_by_name hg[:class]
-  pclass.class_params.each do |p|
-    if params.include?(p.key)
-      p.key_type = get_key_type(params[p.key])
-      p.default_value = params[p.key]
+  pclassnames = hg[:class].kind_of?(Array) ? hg[:class] : [ hg[:class] ]
+  pclassnames.each do |pclassname|
+    pclass = Puppetclass.find_by_name pclassname
+    pclass.class_params.each do |p|
+      if params.include?(p.key)
+        p.key_type = get_key_type(params[p.key])
+        p.default_value = params[p.key]
+      end
+      p.override = true
+      p.save
     end
-    p.override = true
-    p.save
   end
 end
 
@@ -368,7 +371,15 @@ end
 hostgroups.each do |hg|
   h=Hostgroup.find_or_create_by_name hg[:name]
   h.environment = Environment.find_by_name('production')
-  h.puppetclasses = [ Puppetclass.find_by_name(hg[:class])]
+  if hg[:class].kind_of?(Array) then
+    pclass_ary = Array.new
+    hg[:class].each do |pclassname| 
+      pclass_ary.push (Puppetclass.find_by_name(pclassname)) 
+    end
+    h.puppetclasses = pclass_ary
+  else
+    h.puppetclasses = [ Puppetclass.find_by_name(hg[:class])]
+  end
   h.save!
 end
 
