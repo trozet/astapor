@@ -32,6 +32,7 @@ class quickstack::controller_common (
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nova_db_password              = $quickstack::params::nova_db_password,
   $nova_user_password            = $quickstack::params::nova_user_password,
+  $nova_default_floating_pool    = $quickstack::params::nova_default_floating_pool,
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
   $swift_ringserver_ip           = '192.168.203.1',
@@ -192,6 +193,10 @@ class quickstack::controller_common (
     qpid_port          => $qpid_port,
     qpid_hostname      => $qpid_host,
     require            => Class['openstack::db::mysql', 'qpid::server'],
+  }
+
+  nova_config {
+    'DEFAULT/default_floating_pool':   value => $nova_default_floating_pool;
   }
 
   if str2bool_i("$neutron") {
