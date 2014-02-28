@@ -11,7 +11,7 @@ require 'facter'
 require 'securerandom'
 
 # for the sub-network foreman owns
-secondary_int = 'SECONDARY_INT'
+secondary_int = 'PROVISIONING_INTERFACE'
 
 # Changes from upstream:
 #  - EPEL removed
