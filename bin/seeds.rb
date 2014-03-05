@@ -385,7 +385,6 @@ hostgroups.each do |hg|
         p.key_type = get_key_type(params[p.key])
         p.default_value = params[p.key]
       end
-      p.override = true
       p.save
     end
   end
