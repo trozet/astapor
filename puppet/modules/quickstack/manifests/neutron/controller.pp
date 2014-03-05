@@ -48,6 +48,7 @@ class quickstack::neutron::controller (
   $ml2_tunnel_id_ranges          = ['20:100'],
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
+  $ml2_security_group            = 'dummy',
   $qpid_host                     = $quickstack::params::qpid_host,
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
@@ -174,37 +175,45 @@ class quickstack::neutron::controller (
       if ! $ml2_mechanism_drivers {
         warning('Without networking mechanism driver, ml2 will not communicate with L2 agents')
       }
-      package { 'openstack-neutron-ml2':
-        ensure => 'installed',
-        before => Class['::neutron::plugins::ml2'],
-      }
 
       # Specific plugin configuration
+      # We need this before https://review.openstack.org/#/c/67004/ is
+      # merged
       if ('openvswitch' in $ml2_mechanism_drivers) {
-        package { 'neutron-plugin-ovs':
-          ensure => present,
-          name   => $::neutron::params::ovs_server_package,
-          before => Class['::neutron::plugins::ml2'],
+        if (!defined(Package['neutron-plugin-ovs'])) {
+          package { 'neutron-plugin-ovs':
+            ensure => present,
+            name   => $::neutron::params::ovs_server_package,
+            before => Class['::neutron::plugins::ml2'],
+          }
         }
       }
       if ('linuxbridge' in $ml2_mechanism_drivers) {
-        package { 'neutron-plugin-linuxbridge':
-          ensure => present,
-          name   => $::neutron::params::linuxbridge_server_package,
-          before => Class['::neutron::plugins::ml2'],
+        if (!defined(Package['neutron-plugin-linuxbridge'])) {
+          package { 'neutron-plugin-linuxbridge':
+            ensure => present,
+            name   => $::neutron::params::linuxbridge_server_package,
+            before => Class['::neutron::plugins::ml2'],
+          }
         }
       }
     }
 
+    neutron_config {
+      'DEFAULT/service_plugins':
+        value => join(['neutron.services.l3_router.l3_router_plugin.L3RouterPlugin',]),
+    }
+    ->
     class { '::neutron::plugins::ml2':
-      type_drivers         => $ml2_type_drivers,
-      tenant_network_types => $ml2_tenant_network_types,
-      mechanism_drivers    => $ml2_mechanism_drivers,
-      flat_networks        => $ml2_flat_networks,
-      network_vlan_ranges  => $ml2_network_vlan_ranges,
-      tunnel_id_ranges     => $ml2_tunnel_id_ranges,
-      vxlan_group          => $ml2_vxlan_group,
-      vni_ranges           => $ml2_vni_ranges,
+      type_drivers          => $ml2_type_drivers,
+      tenant_network_types  => $ml2_tenant_network_types,
+      mechanism_drivers     => $ml2_mechanism_drivers,
+      flat_networks         => $ml2_flat_networks,
+      network_vlan_ranges   => $ml2_network_vlan_ranges,
+      tunnel_id_ranges      => $ml2_tunnel_id_ranges,
+      vxlan_group           => $ml2_vxlan_group,
+      vni_ranges            => $ml2_vni_ranges,
+      enable_security_group => $ml2_security_group,
     }
   }
 
