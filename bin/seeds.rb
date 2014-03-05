@@ -350,6 +350,18 @@ def get_key_type(value)
   # If we need to handle actual number classes like Fixnum, add those here
 end
 
+def set_all_params_override
+  pclasses = Puppetclass.find :all
+  pclasses.each do |pclass|
+    pclass.class_params.each do |p|
+      p.override = true
+      p.save
+    end
+  end
+end
+
+set_all_params_override
+
 hostgroups.each do |hg|
   pclass = Puppetclass.find_by_name hg[:class]
   pclass.class_params.each do |p|
