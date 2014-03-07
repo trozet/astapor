@@ -319,6 +319,9 @@ params = {
   "pacemaker_cluster_name"        => "openstack",
   "pacemaker_cluster_members"     => "192.168.200.10 192.168.200.11 192.168.200.12",
   "pacemaker_disable_stonith"     => false,
+  "ha_loadbalancer_public_vip"    => "192.168.200.50",
+  "ha_loadbalancer_private_vip"   => "192.168.201.50",
+  "ha_loadbalancer_group"         => "load_balancer",
 }
 
 hostgroups = [
@@ -340,6 +343,13 @@ hostgroups = [
      :class=>"quickstack::hamysql::node"},
     {:name=>"Swift Storage Node",
      :class=>"quickstack::swift::storage"},
+    {:name=>"HA All In One Controller",
+     :class=>["quickstack::pacemaker::common",
+              "quickstack::pacemaker::load_balancer",
+              "quickstack::pacemaker::qpid",
+              "quickstack::load_balancer",
+              "qpid::server",
+             ]},
 ]
 
 def get_key_type(value)
@@ -353,6 +363,18 @@ def get_key_type(value)
   # If we need to handle actual number classes like Fixnum, add those here
 end
 
+def set_all_params_override
+  pclasses = Puppetclass.find :all
+  pclasses.each do |pclass|
+    pclass.class_params.each do |p|
+      p.override = true
+      p.save
+    end
+  end
+end
+
+set_all_params_override
+
 hostgroups.each do |hg|
   pclassnames = hg[:class].kind_of?(Array) ? hg[:class] : [ hg[:class] ]
   pclassnames.each do |pclassname|
@@ -362,7 +384,6 @@ hostgroups.each do |hg|
         p.key_type = get_key_type(params[p.key])
         p.default_value = params[p.key]
       end
-      p.override = true
       p.save
     end
   end
