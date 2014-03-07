@@ -120,8 +120,15 @@ class quickstack::params {
   # Pacemaker
   $pacemaker_cluster_name        = 'openstack'
   $pacemaker_cluster_members     = ''
-  $pacemaker_disable_stonith     = true
   $ha_loadbalancer_public_vip    = '172.16.1.10'
   $ha_loadbalancer_private_vip   = '172.16.2.10'
   $ha_loadbalancer_group         = 'load_balancer'
+  $fencing_type                  = 'disabled'
+  $fence_xvm_clu_iface           = 'eth2'
+  $fence_xvm_manage_key_file     = false
+  $fence_xvm_key_file_password   = '12345678isTheSecret'
+  $fence_ipmilan_address         = '10.10.10.1'
+  $fence_ipmilan_username        = ''
+  $fence_ipmilan_password        = ''
+  $fence_ipmilan_interval        = '60s'
 }
