@@ -354,6 +354,7 @@ hostgroups = [
     {:name=>"HA All In One Controller",
      :class=>["quickstack::pacemaker::common",
               "quickstack::pacemaker::load_balancer",
+              "quickstack::pacemaker::memcached",
               "quickstack::pacemaker::qpid",
               "quickstack::load_balancer",
               "qpid::server",
