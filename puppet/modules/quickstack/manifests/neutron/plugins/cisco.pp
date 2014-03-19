@@ -41,6 +41,10 @@ class quickstack::neutron::plugins::cisco (
 
   if $cisco_vswitch_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
     # vswitch plugin is ovs, setup the ovs plugin
+    neutron_plugin_ovs {
+      'SECURITYGROUP/firewall_driver':
+      value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
+    }
 
     class { '::neutron::plugins::ovs':
       sql_connection      => $sql_connection,
