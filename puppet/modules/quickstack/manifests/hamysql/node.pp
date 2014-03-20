@@ -15,7 +15,7 @@ class quickstack::hamysql::node (
   $mysql_virt_ip_nic           = $quickstack::params::mysql_virt_ip_nic,
   $mysql_virt_ip_cidr_mask     = $quickstack::params::mysql_virt_ip_cidr_mask,
   # e.g. "192.168.200.200:/mnt/mysql"
-  $mysql_shared_storage_device = $quickstack::params::mysql_shared_storage_device,  
+  $mysql_shared_storage_device = $quickstack::params::mysql_shared_storage_device,
   # e.g. "nfs"
   $mysql_shared_storage_type   = $quickstack::params::mysql_shared_storage_type,
   $mysql_resource_group_name   = $quickstack::params::mysql_resource_group_name,
@@ -26,59 +26,70 @@ class quickstack::hamysql::node (
     package { 'mysql-server':
       ensure => installed,
     }
-
+    ->
     package { 'MySQL-python':
       ensure => installed,
     }
-
-    package { 'ccs' :
-      ensure => installed,
-    }
-
+    ->
     class {'quickstack::hamysql::mysql::config':
       bind_address =>  $mysql_bind_address,
-      require => [Package['mysql-server'],Package['MySQL-python']]
     }
-
+    ->
+    # TODO: use quickstack::pacemaker::common instead
     class {'pacemaker::corosync':
       cluster_name => "hamysql",
       cluster_members => $mysql_clu_member_addrs,
-      require => [Package['mysql-server'],
-                  Package['MySQL-python'],Package['ccs'],
-                  Class['quickstack::hamysql::mysql::config']],
     }
-
-    class {"pacemaker::resource::ip":
+    ->
+    # TODO: use quickstack::pacemaker::common instead
+    class {"pacemaker::stonith":
+      disable => true,
+    }
+    ->
+    pacemaker::resource::ip { 'mysql-clu-vip' :
       ip_address => $mysql_virtual_ip,
       group => $mysql_resource_group_name,
       cidr_netmask => $mysql_virt_ip_cidr_mask,
       nic => $mysql_virt_ip_nic,
     }
-
-    class {"pacemaker::stonith":
-      disable => true,
-    }
-
-    class {"pacemaker::resource::filesystem":
+    ->
+    pacemaker::resource::filesystem { 'mysql-clu-fs' :
        device => "$mysql_shared_storage_device",
        directory => "/var/lib/mysql",
        fstype => $mysql_shared_storage_type,
        group => $mysql_resource_group_name,
-       require => Class['pacemaker::resource::ip'],
     }
-
-    class {"pacemaker::resource::mysql":
+    ->
+    exec { "let-mysql-fs-get-mounted":
+      command => "/bin/sleep 15"
+    }
+    ->
+    pacemaker::resource::mysql { 'mysql-clu-mysql' :
       name => "ostk-mysql",
       group => $mysql_resource_group_name,
-      require => Class['pacemaker::resource::filesystem'],
     }
-
+    ->
+    pacemaker::constraint::base { 'ip-mysql-constr' :
+      constraint_type => "order",
+      first_resource  => "ip-${mysql_virtual_ip}",
+      second_resource => "mysql-ostk-mysql",
+      first_action    => "start",
+      second_action   => "start",
+    }
+    ->
+    pacemaker::constraint::base { 'fs-mysql-constr' :
+      constraint_type => "order",
+      first_resource  => "fs-varlibmysql",
+      second_resource => "mysql-ostk-mysql",
+      first_action    => "start",
+      second_action   => "start",
+    }
+    ->
     exec {"wait-for-mysql-to-start":
       timeout => 3600,
       tries => 360,
       try_sleep => 10,
       command => "/usr/sbin/pcs status  | grep -q 'mysql-ostk-mysql.*Started' > /dev/null 2>&1",
-      require => Class['pacemaker::resource::mysql'],
     }
 
     class {'quickstack::hamysql::mysql::rootpw':
@@ -92,7 +103,7 @@ class quickstack::hamysql::node (
      owner => root,
      group => root,
      mode  => 777,
-     content => "#!/bin/bash\n a=`/usr/sbin/pcs status | grep mysql-ostk-mysql | perl -p -e 's/^.*Started (\S*).*$/\$1/'`; b=`/usr/sbin/crm_node -n`; echo \$a; echo \$b; \ntest \$a = \$b;",
+     content => "#!/bin/bash\n a=`/usr/sbin/pcs status | grep -P 'mysql-ostk-mysql\\s.*Started' | perl -p -e 's/^.*Started (\S*).*$/\$1/'`; b=`/usr/sbin/crm_node -n`; echo \$a; echo \$b; \ntest \$a = \$b;\n",
      require => Exec['wait-for-mysql-to-start'],
     }
 
