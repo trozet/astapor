@@ -47,8 +47,10 @@ class quickstack::load_balancer (
       'option' => [ 'httplog' ],
       'cookie' => 'SERVERID insert indirect nocache',
     },
-    member_options => [ 'check' ],
-    define_cookies => true,
+    member_options       => [ 'check' ],
+    define_cookies       => true,
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'keystone-public':
     addr => [ $controller_pub_host,
@@ -58,6 +60,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'keystone-admin':
     addr => [ $controller_pub_host,
@@ -67,6 +71,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   if str2bool_i("$heat_cfn") {
     quickstack::load_balancer::proxy { 'heat-cfn':
@@ -77,6 +83,8 @@ class quickstack::load_balancer (
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
       member_options => [ 'check' ],
+      backend_server_addrs => $backend_server_addrs,
+      backend_server_names => $backend_server_names,
     }
   }
   if str2bool_i("$heat_cloudwatch") {
@@ -88,6 +96,8 @@ class quickstack::load_balancer (
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
       member_options => [ 'check' ],
+      backend_server_addrs => $backend_server_addrs,
+      backend_server_names => $backend_server_names,
     }
   }
   quickstack::load_balancer::proxy { 'heat-api':
@@ -98,6 +108,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'swift-proxy':
     addr => [ $controller_pub_host,
@@ -107,6 +119,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'nova-ec2':
     addr => [ $controller_pub_host,
@@ -116,6 +130,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'nova-compute':
     addr => [ $controller_pub_host,
@@ -125,6 +141,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'nova-metadata':
     addr => [ $controller_pub_host,
@@ -134,6 +152,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'cinder-api':
     addr => [ $controller_pub_host,
@@ -152,6 +172,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'glance-registry':
     addr => [ $controller_pub_host,
@@ -161,6 +183,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'glance-api':
     addr => [ $controller_pub_host,
@@ -170,6 +194,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   if str2bool_i("$neutron") {
     quickstack::load_balancer::proxy { 'neutron-api':
@@ -180,6 +206,8 @@ class quickstack::load_balancer (
       mode => 'http',
       listen_options => { 'option' => [ 'httplog' ] },
       member_options => [ 'check' ],
+      backend_server_addrs => $backend_server_addrs,
+      backend_server_names => $backend_server_names,
     }
   }
 
