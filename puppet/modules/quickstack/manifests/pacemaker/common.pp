@@ -1,18 +1,47 @@
-class quickstack::pacemaker::common (
-  $pacemaker_cluster_name         = $quickstack::params::pacemaker_cluster_name,
-  $pacemaker_cluster_members      = $quickstack::params::pacemaker_cluster_members,
-  # fencing_type should be either "disabled", "fence_xvm", or "". ""
-  #   means do not disable stonith, but also don't add any fencing
-  $fencing_type                   = $quickstack::params::fencing_type,
-  $fence_ipmilan_address          = $quickstack::params::fence_ipmilan_address,
-  $fence_ipmilan_username         = $quickstack::params::fence_ipmilan_username,
-  $fence_ipmilan_password         = $quickstack::params::fence_ipmilan_password,
-  $fence_ipmilan_interval         = $quickstack::params::fence_ipmilan_interval,
-  $fence_xvm_clu_iface            = $quickstack::params::fence_xvm_clu_iface,
-  $fence_xvm_manage_key_file      = $quickstack::params::fence_xvm_manage_key_file,
-  $fence_xvm_key_file_password    = $quickstack::params::fence_xvm_key_file_password,
+# == Class: quickstack::pacemaker::common
+#
+# A base class to configure your pacemaker cluster
+#
+# === Parameters
+#
+# [*pacemaker_cluster_name*]
+#   The name of your openstack cluster
+# [*pacemaker_cluster_members*]
+#   An array of IPs for the nodes in your cluster
+# [*fencing_type*]
+#   Should be either "disabled", "fence_xvm", "ipmilan", or "". ""
+#   means do not disable stonith, but also don't add any fencing
+# [*fence_ipmilan_address*]
+#
+# [*fence_ipmilan_username*]
+#
+# [*fence_ipmilan_password*]
+#
+# [*fence_ipmilan_interval*]
+#
+# [*fence_xvm_clu_iface*]
+#
+# [*fence_xvm_manage_key_file*]
+#
+# [*fence_xvm_key_file_password*]
+#
 
-) inherits quickstack::params {
+class quickstack::pacemaker::common (
+  $pacemaker_cluster_name         = "openstack",
+  $pacemaker_cluster_members      = "192.168.200.10 192.168.200.11 192.168.200.12",
+  $fencing_type                   = "disabled",
+  $fence_ipmilan_address          = "",
+  $fence_ipmilan_username         = "",
+  $fence_ipmilan_password         = "",
+  $fence_ipmilan_interval         = "60s",
+  $fence_xvm_clu_iface            = "eth2",
+  $fence_xvm_manage_key_file      = "false",
+  $fence_xvm_key_file_password    = "",
+
+) {
+
+  include quickstack::pacemaker::params
+
   class {'pacemaker::corosync':
     cluster_name    => $pacemaker_cluster_name,
     cluster_members => $pacemaker_cluster_members,
@@ -20,12 +49,14 @@ class quickstack::pacemaker::common (
 
   if $fencing_type =~ /(?i-mx:^disabled$)/ {
     class {'pacemaker::stonith':
-      disable => true }
+      disable => true,
+    }
     Class['pacemaker::corosync'] -> Class['pacemaker::stonith']
   }
-  elsif $fencing_type =~ /(?i-mx:^ipmilan$)/ {
+  elsif $fencing_type =~ /(?i-mx:^fence_ipmilan$)/ {
     class {'pacemaker::stonith':
-      disable => false }
+      disable => false,
+    }
     class {'pacemaker::stonith::ipmilan':
       address        => $fence_ipmilan_address,
       username       => $fence_ipmilan_username,
@@ -39,7 +70,8 @@ class quickstack::pacemaker::common (
   elsif $fencing_type =~ /(?i-mx:^fence_xvm$)/ {
     $clu_ip_address = getvar(regsubst("ipaddress_$fence_xvm_clu_iface", '[.-]', '_', 'G'))
     class {'pacemaker::stonith':
-      disable => false }
+      disable => false,
+    }
     class {'pacemaker::stonith::fence_xvm':
       name              => "$::hostname",
       manage_key_file   => str2bool_i("$fence_xvm_manage_key_file"),
