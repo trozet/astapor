@@ -323,6 +323,12 @@ class quickstack::controller_common (
     action   => 'accept',
   }
 
+  firewall { '001 controller incoming pt2':
+    proto    => 'tcp',
+    dport    => ['8000', '8003', '8004'],
+    action   => 'accept',
+  }
+
   if $ssl {
     firewall { '002 ssl controller incoming':
       proto    => 'tcp',
