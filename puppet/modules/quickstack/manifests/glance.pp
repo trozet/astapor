@@ -6,6 +6,7 @@
 #    UI (because a param is either a boolean or a string from
 #    Foreman's perspective, not dynamically decided based on whatever
 #    the users feels like passing in).
+# - expose qpid_ vars
 
 class quickstack::glance (
   $user_password            = 'glance',
@@ -31,6 +32,8 @@ class quickstack::glance (
   $log_facility             = 'LOG_USER',
   $enabled                  = true,
   $filesystem_store_datadir = '/var/lib/glance/images/',
+  $qpid_host                = '127.0.0.1',
+  $qpid_port                = '5672',
 ) {
 
   # Configure the db string
@@ -75,6 +78,15 @@ class quickstack::glance (
     use_syslog        => $use_syslog,
     log_facility      => $log_facility,
     enabled           => $enabled,
+  }
+
+  class { 'glance::notify::qpid':
+    # TODO qpid auth
+    qpid_password => 'guest',
+    qpid_username => 'guest',
+    qpid_hostname => map_params("qpid_vip"),
+    qpid_port     => map_params("qpid_port"),
+    qpid_protocol => 'tcp',
   }
 
   # Configure file storage backend

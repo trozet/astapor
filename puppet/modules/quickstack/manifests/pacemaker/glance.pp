@@ -35,6 +35,7 @@ class quickstack::pacemaker::glance (
   include quickstack::pacemaker::common
 
   if (map_params('include_glance') == 'true') {
+    $glance_private_vip = map_params("glance_private_vip")
 
     if($backend == 'swift') {
       # TODO move to params.pp once swift is added
@@ -56,7 +57,24 @@ class quickstack::pacemaker::glance (
         Class['::quickstack::glance']
       }
     }
-  
+
+    Class['::quickstack::pacemaker::common']
+    ->
+    # assuming openstack-glance-api and openstack-glance-registry
+    # always have same vip's for now
+    quickstack::pacemaker::vips { "$pcmk_glance_group":
+      public_vip  => map_params("glance_public_vip"),
+      private_vip => map_params("glance_private_vip"),
+      admin_vip   => map_params("glance_admin_vip"),
+    }
+    ->
+    exec {"i-am-glance-vip-OR-glance-is-up-on-vip":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash i_am_vip $glance_private_vip || /tmp/ha-all-in-one-util.bash property_exists glance",
+      unless   => "/tmp/ha-all-in-one-util.bash i_am_vip $glance_private_vip || /tmp/ha-all-in-one-util.bash property_exists glance",
+    } ->
     class { 'quickstack::glance':
       user_password            => $glance_user_password,
       db_password              => $db_password,
@@ -81,18 +99,10 @@ class quickstack::pacemaker::glance (
       log_facility             => $log_facility,
       enabled                  => $enabled,
       filesystem_store_datadir => $filesystem_store_datadir,
+      qpid_host                => map_params("qpid_vip"),
+      qpid_port                => map_params("qpid_port"),
     }
-  
-    Class['::quickstack::pacemaker::common']
-    ->
-    # assuming openstack-glance-api and openstack-glance-registry
-    # always have same vip's for now
-    quickstack::pacemaker::vips { "$pcmk_glance_group":
-      public_vip  => map_params("glance_public_vip"),
-      private_vip => map_params("glance_private_vip"),
-      admin_vip   => map_params("glance_admin_vip"),
-    }
-    ->
+
     Class['::quickstack::glance']
     ->
     class {"::quickstack::load_balancer::glance":
@@ -101,8 +111,10 @@ class quickstack::pacemaker::glance (
       frontend_admin_host  => map_params("glance_admin_vip"),
       backend_server_names => map_params("lb_backend_server_names"),
       backend_server_addrs => map_params("lb_backend_server_addrs"),
-    }
-    ->
+    } ->
+    exec {"pcs-glance-server-set-up":
+      command => "/usr/sbin/pcs property set glance=running --force",
+    } ->
     pacemaker::resource::lsb {'openstack-glance-api':
       group => "$pcmk_glance_group",
       clone => true,
