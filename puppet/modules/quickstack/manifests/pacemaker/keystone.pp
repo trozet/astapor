@@ -34,6 +34,8 @@ class quickstack::pacemaker::keystone (
 
   if (map_params('include_keystone') == 'true') {
     $keystone_group = map_params("keystone_group")
+    $keystone_private_vip = map_params("keystone_private_vip")
+
     # because the dep on openstack::keystone is not enough for some reason...
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Service['keystone']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage db_sync']
@@ -51,8 +53,8 @@ class quickstack::pacemaker::keystone (
       timeout   => 3600,
       tries     => 360,
       try_sleep => 10,
-      command   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
-      unless   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
+      command   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
+      unless   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
     } ->
     class {"::openstack::keystone":
       admin_email                 => "$admin_email",
@@ -156,7 +158,7 @@ class quickstack::pacemaker::keystone (
     } ->
     exec {"pcs-keystone-server-set-up":
       command => "/usr/sbin/pcs property set keystone=running --force",
-    } -> 
+    } ->
     #~> Service['keystone'] ->
     # TODO: Consider if we should pre-emptively purge any directories keystone has
     # created in /tmp

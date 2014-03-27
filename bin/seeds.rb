@@ -373,7 +373,6 @@ hostgroups = [
               "quickstack::pacemaker::memcached",
               "quickstack::pacemaker::qpid",
               "quickstack::pacemaker::glance",
-              "qpid::server",
              ]},
 ]
 
@@ -420,8 +419,8 @@ hostgroups.each do |hg|
   h.environment = Environment.find_by_name('production')
   if hg[:class].kind_of?(Array) then
     pclass_ary = Array.new
-    hg[:class].each do |pclassname| 
-      pclass_ary.push (Puppetclass.find_by_name(pclassname)) 
+    hg[:class].each do |pclassname|
+      pclass_ary.push (Puppetclass.find_by_name(pclassname))
     end
     h.puppetclasses = pclass_ary
   else
