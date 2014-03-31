@@ -54,6 +54,8 @@ class quickstack::controller_common (
   $qpid_nssdb_password           = $quickstack::params::qpid_nssdb_password,
 ) inherits quickstack::params {
 
+  class {'quickstack::openstack_common': }
+
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
     $qpid_port = '5671'

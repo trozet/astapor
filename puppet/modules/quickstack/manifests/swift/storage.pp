@@ -8,6 +8,8 @@ class quickstack::swift::storage (
   $swift_shared_secret            = '',
 ) inherits quickstack::params {
 
+  class {'quickstack::openstack_common': }
+
   class { '::swift::storage::all':
     storage_local_net_ip => getvar(regsubst("ipaddress_${swift_local_interface}", '[.-]', '_', 'G')),
     require => Class['swift'],
