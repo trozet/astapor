@@ -15,6 +15,8 @@ class quickstack::compute_common (
   $mysql_ca                    = $quickstack::params::mysql_ca,
 ) inherits quickstack::params {
 
+  class {'quickstack::openstack_common': }
+
   if str2bool_i("$cinder_backend_gluster") {
     class { 'gluster::client': }
 

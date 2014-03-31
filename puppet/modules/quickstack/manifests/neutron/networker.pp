@@ -24,6 +24,8 @@ class quickstack::neutron::networker (
   $mysql_ca                      = $quickstack::params::mysql_ca,
 ) inherits quickstack::params {
 
+  class {'quickstack::openstack_common': }
+
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
     $qpid_port = '5671'
