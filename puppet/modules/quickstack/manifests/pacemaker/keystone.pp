@@ -133,7 +133,7 @@ class quickstack::pacemaker::keystone (
       clone => true,
     }
     ->
-    class { "::quickstack::pacemaker::rsync":
+    class { "::quickstack::pacemaker::rsync::keystone":
       keystone_private_vip => map_params("keystone_private_vip"),
       keystone_group       => map_params("keystone_group"),
     }
@@ -153,12 +153,12 @@ class quickstack::pacemaker::keystone (
     if "$keystonerc" == "true" {
       class { '::quickstack::admin_client':
         admin_password        => "$admin_password",
-        controller_admin_host => "$keystone_admin_vip",
+        controller_admin_host => map_params("keystone_admin_vip"),
       }
     }
 
     notify {"resource-created-report":
-      message => "Resource ip ip-$keystone_public_vip created",
+      message => "Resource ip for keystone created",
     }
   }
 }

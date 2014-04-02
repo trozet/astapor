@@ -1,4 +1,4 @@
-class quickstack::pacemaker::rsync (
+class quickstack::pacemaker::rsync::keystone (
   $keystone_private_vip,
   $keystone_group,
 ) {
@@ -70,11 +70,12 @@ class quickstack::pacemaker::rsync (
     notify    => Notify['not-a-match'],
   }
 
-  rsync::get { '/etc/keystone/ssl':
-    source  => "rsync://$keystone_private_vip/keystone/",
-    purge   => true,
-    require => [Exec['do-i-not-match'],Exec['watch-for-server']],
-    notify    => Notify['sync-attempted'],
+  quickstack::pacemaker::rsync::get { '/etc/keystone/ssl':
+    source           => "rsync://$keystone_private_vip/keystone/",
+    override_options => "aI",
+    purge            => true,
+    require          => [Exec['do-i-not-match'],Exec['watch-for-server']],
+    notify           => Notify['sync-attempted'],
   }
   # these next 3 are just test stuff, remove before commiting
 
