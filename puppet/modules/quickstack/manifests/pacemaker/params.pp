@@ -27,6 +27,7 @@ class quickstack::pacemaker::params (
   $heat_cfn_group            = 'heat_cfn',
   $heat_cfn_user_password,
   $include_keystone          = 'true',
+  $include_glance            = 'true',
   $lb_backend_server_names,
   $lb_backend_server_addrs,
   $keystone_public_vip,
@@ -76,5 +77,6 @@ class quickstack::pacemaker::params (
   Class['::quickstack::load_balancer::common'] ->
   Class['::quickstack::pacemaker::qpid'] ->
   Class['::quickstack::pacemaker::keystone'] ->
+  Class['::quickstack::pacemaker::glance'] ->
   Class['::quickstack::pacemaker::load_balancer']
 }

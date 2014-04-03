@@ -350,6 +350,7 @@ hostgroups = [
               "quickstack::pacemaker::keystone",
               "quickstack::pacemaker::load_balancer",
               "quickstack::pacemaker::qpid",
+              "quickstack::pacemaker::glance",
               "qpid::server",
              ]},
 ]
