@@ -2,7 +2,6 @@ class quickstack::load_balancer::common {
 
   class { 'haproxy':
     global_options => {
-      'log'        => '/dev/log local0',
       'pidfile'    => '/var/run/haproxy.pid',
       'user'       => 'haproxy',
       'group'      => 'haproxy',
@@ -10,8 +9,7 @@ class quickstack::load_balancer::common {
       'maxconn'    => '4000',
     },
     defaults_options => {
-      'mode'         => 'http',
-      'log'          => 'global',
+      'mode'         => 'tcp',
       'retries'      => '3',
       'option'       => [ 'httplog', 'redispatch' ],
       'timeout'      => [ 'connect 10s', 'client 1m', 'server 1m' ],

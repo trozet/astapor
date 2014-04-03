@@ -5,9 +5,9 @@ class quickstack::load_balancer::keystone (
   $backend_server_names,
   $backend_server_addrs,
   $public_port = '5000',
-  $public_mode = 'http',
+  $public_mode = 'tcp',
   $admin_port = '35357',
-  $admin_mode = 'http',
+  $admin_mode = 'tcp',
 ) {
 
   include quickstack::load_balancer::common
