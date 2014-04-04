@@ -30,7 +30,7 @@ class quickstack::pacemaker::glance (
   $log_facility             = 'LOG_USER',
   $enabled                  = true,
   $filesystem_store_datadir = '/var/lib/glance/images/',
-) inherits quickstack::params {
+) {
 
   include quickstack::pacemaker::common
 

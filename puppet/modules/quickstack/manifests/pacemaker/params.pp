@@ -26,11 +26,17 @@ class quickstack::pacemaker::params (
   $heat_cfn_admin_vip        = '',
   $heat_cfn_group            = 'heat_cfn',
   $heat_cfn_user_password    = '',
-  $include_keystone          = 'true',
   $include_glance            = 'true',
+  $include_keystone          = 'true',
+  $include_neutron           = 'true',
+  $include_nova              = 'true',
   $include_qpid              = 'true',
+  $loadbalancer_public_vip   = '',
+  $loadbalancer_private_vip  = '',
+  $loadbalancer_admin_vip    = '',
+  $loadbalancer_group        = 'loadbalancer',
   $lb_backend_server_names   = '',
-  $lb_backend_server_addrs   = '',
+  $lb_backend_server_addrs   = '', # should this and cluster_members be merged?
   $keystone_public_vip       = '',
   $keystone_private_vip      = '',
   $keystone_admin_vip        = '',
@@ -73,6 +79,8 @@ class quickstack::pacemaker::params (
   include quickstack::load_balancer::common
   include quickstack::pacemaker::qpid
   include quickstack::pacemaker::keystone
+  include quickstack::pacemaker::glance
+  include quickstack::pacemaker::nova
   include quickstack::pacemaker::load_balancer
 
   Class['::quickstack::pacemaker::common'] ->
@@ -80,5 +88,6 @@ class quickstack::pacemaker::params (
   Class['::quickstack::pacemaker::qpid'] ->
   Class['::quickstack::pacemaker::keystone'] ->
   Class['::quickstack::pacemaker::glance'] ->
+  Class['::quickstack::pacemaker::nova'] ->
   Class['::quickstack::pacemaker::load_balancer']
 }
