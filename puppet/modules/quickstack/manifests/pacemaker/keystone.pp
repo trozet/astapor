@@ -33,18 +33,27 @@ class quickstack::pacemaker::keystone (
   include quickstack::pacemaker::common
 
   if (map_params('include_keystone') == 'true') {
+    $keystone_group = map_params("keystone_group")
+    # because the dep on openstack::keystone is not enough for some reason...
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Service['keystone']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage db_sync']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup']
 
     Class['::quickstack::pacemaker::common'] ->
-    class { "::quickstack::pacemaker::vip::keystone":
-      keystone_public_vip  => map_params("keystone_public_vip"),
-      keystone_private_vip => map_params("keystone_private_vip"),
-      keystone_admin_vip   => map_params("keystone_admin_vip"),
-      keystone_group       => map_params("keystone_group"),
-      notify               => Notify["resource-created-report"],
-    }
-    ->
-    class {'::quickstack::firewall::keystone':}
-    ->
+
+    quickstack::pacemaker::vips { "$keystone_group":
+      public_vip  => map_params("keystone_public_vip"),
+      private_vip => map_params("keystone_private_vip"),
+      admin_vip   => map_params("keystone_admin_vip"),
+    } ->
+    class {'::quickstack::firewall::keystone':} ->
+    exec {"i-am-keystone-vip-OR-keystone-is-up-on-vip":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
+      unless   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
+    } ->
     class {"::openstack::keystone":
       admin_email                 => "$admin_email",
       admin_password              => "$admin_password",
@@ -112,11 +121,10 @@ class quickstack::pacemaker::keystone (
       #heat_cfn_public_address     => map_params("heat_cfn_public_vip"),
       #heat_cfn_internal_address   => map_params("heat_cfn_private_vip"),
       #heat_cfn_admin_address      => map_params("heat_cfn_admin_vip"),
+    } ->
 
-    }
     # TODO: get heat working (we may get this free if the heat puppet code
     # is updated in o-p-m
-    #->
     #class {"heat::keystone::auth":
     #  password              => map_params("heat_user_password"),
     #  heat_public_address   => map_params("heat_public_vip"),
@@ -126,39 +134,45 @@ class quickstack::pacemaker::keystone (
     #  cfn_internal_address  => map_params("heat_cfn_private_vip"),
     #  cfn_admin_address     => map_params("heat_cfn_admin_vip"),
 
-    #}
-    ->
-    pacemaker::resource::lsb {'openstack-keystone':
-      group => map_params("keystone_group"),
-      clone => true,
-    }
-    ->
-    class { "::quickstack::pacemaker::rsync::keystone":
-      keystone_private_vip => map_params("keystone_private_vip"),
-      keystone_group       => map_params("keystone_group"),
-    }
-    ->
+    #} ->
+
     class {"::quickstack::load_balancer::keystone":
       frontend_pub_host    => map_params("keystone_public_vip"),
       frontend_priv_host   => map_params("keystone_private_vip"),
       frontend_admin_host  => map_params("keystone_admin_vip"),
       backend_server_names => map_params("lb_backend_server_names"),
       backend_server_addrs => map_params("lb_backend_server_addrs"),
-    }
-    ~>
-    Service['keystone']
+      require              => quickstack::pacemaker::vips["$keystone_group"],
+    } ->
+    class { "::quickstack::pacemaker::rsync::keystone":
+      keystone_private_vip => map_params("keystone_private_vip"),
+      keystone_group       => map_params("keystone_group"),
+      require              => quickstack::pacemaker::vips["$keystone_group"],
+    } ->
+    # resorting to exec below because ~> Service['xinetd'] doesn't
+    # force a restart
+    exec { "restart-xinetd":
+      command     => "/sbin/service xinetd restart",
+    } ->
+    exec {"pcs-keystone-server-set-up":
+      command => "/usr/sbin/pcs property set keystone=running --force",
+    } -> 
+    #~> Service['keystone'] ->
     # TODO: Consider if we should pre-emptively purge any directories keystone has
     # created in /tmp
+
+    # TODO -- verify keystone has started on all nodes before below
+    # gets executed.
+    pacemaker::resource::lsb {'openstack-keystone':
+      group => map_params("keystone_group"),
+      clone => true,
+    }
 
     if "$keystonerc" == "true" {
       class { '::quickstack::admin_client':
         admin_password        => "$admin_password",
         controller_admin_host => map_params("keystone_admin_vip"),
       }
-    }
-
-    notify {"resource-created-report":
-      message => "Resource ip for keystone created",
     }
   }
 }
