@@ -138,11 +138,26 @@ m.save!
 
 # OS parameters for RHN(S) registration, see redhat_register snippet
 {
+  # use Subscription Manager, not Satellite
+  "subscription_manager" => "true",
+
+  "subscription_manager_username" => "username",
+  "subscription_manager_password" => "password",
+  # for load balancer also enable "rhel-lb-for-rhel-6-server-rpms"
+  "subscription_manager_repos" => "rhel-6-server-rpms,rhel-6-server-openstack-4.0-rpms",
+
+  # if using SAM/Katello
+  # "subscription_manager_host" => "katello.example.com",
+  # "subscription_manager_org" => "organization",
+
+  # if using Satellite
   # "site" for local Satellite, "hosted" for RHN
-  "satellite_type" => "site",
-  "satellite_host" => "satellite.example.com",
+  # "satellite_type" => "site",
+  # "satellite_host" => "satellite.example.com",
+
+  # if using Satellite or SAM/Katello
   # Activation key must have OpenStack child channel
-  "activation_key" => "1-example",
+  # "activation_key" => "1-example",
 }.each do |k,v|
   p=OsParameter.find_or_create_by_name(k)
   p.value = v
