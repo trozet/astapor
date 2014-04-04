@@ -82,4 +82,12 @@ class quickstack::pacemaker::common (
     Class['pacemaker::corosync'] -> Class['pacemaker::stonith'] ->
     Class['pacemaker::stonith::fence_xvm']
   }
+
+  file { "ha-all-in-one-util-bash-tests":
+    path    => "/tmp/ha-all-in-one-util.bash",
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('quickstack/ha-all-in-one-util.erb'),
+  }
 }

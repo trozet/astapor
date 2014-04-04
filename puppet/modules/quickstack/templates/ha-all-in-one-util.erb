@@ -1,0 +1,52 @@
+#!/bin/bash
+
+keystone_private_vip=<%= scope.lookupvar("::quickstack::pacemaker::params::keystone_private_vip") %>
+
+# These functions adapted from similar logic in jayg's rysnc.pp variables
+get_resource_ip_output() {
+  echo $(pcs status | grep ip-$1)
+}
+which_cluster_ip() {
+  line=$(get_resource_ip_output $keystone_private_vip)
+  echo $line | sed -n -e 's/^.*Started //p'
+}
+my_cluster_ip() {
+  crm_node -n
+}
+get_property() {
+  pcs property show $1
+}
+property_exists() {
+  echo $(get_property $1) | grep -q $1
+}
+
+i_am_keystone_vip () {
+  clu_ip=$(which_cluster_ip $keystone_private_vip)
+  # if vip isn't Started, return false
+  if [ "x${clu_ip}" = "x" ]; then return 1; fi
+  my_clu_ip=$(my_cluster_ip)
+  test "$clu_ip" == "$my_clu_ip"
+}
+
+info() {
+  $(i_am_keystone_vip) ; echo i_am_keystone_vip is $?
+  echo get_property rsync_server is $(get_property rsync_server)
+  $(property_exists rsync_server); echo property_exists rsync_server is $?
+  $(property_exists keystone); echo property_exists keystone is $?
+  $(property_exists bogus_property); echo property_exists bogus_property is $?
+}
+
+[[ "$#" -lt 1 ]] && echo "Need to pass in a test" && exit 1
+case "$1" in
+  "i_am_keystone_vip")
+     i_am_keystone_vip
+     ;;
+  "property_exists")
+     property_exists $2
+     ;;
+  "info")
+     info
+     ;;
+  *) echo 'unrecognized test' && exit 1
+     ;;
+esac
