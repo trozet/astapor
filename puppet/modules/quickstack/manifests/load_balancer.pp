@@ -163,6 +163,8 @@ class quickstack::load_balancer (
     mode => 'http',
     listen_options => { 'option' => [ 'httplog' ] },
     member_options => [ 'check' ],
+    backend_server_addrs => $backend_server_addrs,
+    backend_server_names => $backend_server_names,
   }
   quickstack::load_balancer::proxy { 'ceilometer-api':
     addr => [ $controller_pub_host,
