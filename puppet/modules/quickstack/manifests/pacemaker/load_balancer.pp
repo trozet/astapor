@@ -1,8 +1,4 @@
-class quickstack::pacemaker::load_balancer (
-  $ha_loadbalancer_public_vip,
-  $ha_loadbalancer_private_vip,
-  $ha_loadbalancer_group,
-) {
+class quickstack::pacemaker::load_balancer {
 
   $loadbalancer_group = map_params("loadbalancer_group")
 
@@ -13,7 +9,7 @@ class quickstack::pacemaker::load_balancer (
   }
   ->
   pacemaker::resource::lsb {'haproxy':
-    group => "$ha_loadbalancer_group",
+    group => "$loadbalancer_group",
     clone => true,
   }
 }
