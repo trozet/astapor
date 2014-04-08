@@ -6,13 +6,13 @@ class quickstack::load_balancer::common {
       'user'       => 'haproxy',
       'group'      => 'haproxy',
       'daemon'     => '',
-      'maxconn'    => '4000',
+      'maxconn'    => '10000',
     },
     defaults_options => {
       'mode'         => 'tcp',
       'retries'      => '3',
       'option'       => [ 'httplog', 'redispatch' ],
-      'timeout'      => [ 'connect 10s', 'client 1m', 'server 1m' ],
+      'timeout'      => [ 'connect 5s', 'client 30s', 'server 30s' ],
     },
   }
 
