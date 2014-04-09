@@ -126,7 +126,7 @@ class quickstack::controller_common (
     ssl_ca   => $qpid_ca,
     ssl_cert => $qpid_cert,
     ssl_key  => $qpid_key,
-    ssl_database_password => $qpid_nssdb_password
+    ssl_database_password => $qpid_nssdb_password,
     config_file => $::operatingsystem ? {
         'Fedora' => '/etc/qpid/qpidd.conf',
         default  => '/etc/qpidd.conf',
@@ -216,7 +216,6 @@ class quickstack::controller_common (
     verbose            => $verbose,
     qpid_protocol      => $qpid_protocol,
     qpid_port          => $qpid_port,
-    qpid_hostname      => $qpid_host,
     require            => Class['openstack::db::mysql', 'qpid::server'],
   }
 
