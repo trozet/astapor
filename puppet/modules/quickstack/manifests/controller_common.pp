@@ -324,13 +324,14 @@ class quickstack::controller_common (
   }
 
   class {'horizon':
-    secret_key    => $horizon_secret_key,
-    keystone_host => $controller_priv_host,
-    fqdn          => ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost'],
-    listen_ssl    => str2bool_i("$ssl"),
-    horizon_cert  => $horizon_cert,
-    horizon_key   => $horizon_key,
-    horizon_ca    => $horizon_ca,
+    secret_key            => $horizon_secret_key,
+    keystone_default_role => '_member_',
+    keystone_host         => $controller_priv_host,
+    fqdn                  => ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost'],
+    listen_ssl            => str2bool_i("$ssl"),
+    horizon_cert          => $horizon_cert,
+    horizon_key           => $horizon_key,
+    horizon_ca            => $horizon_ca,
   }
   # patch our horizon/apache config to avoid duplicate port 80
   # directive.  TODO: remove this once puppet-horizon/apache can
