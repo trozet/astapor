@@ -84,8 +84,8 @@ class quickstack::glance (
     # TODO qpid auth
     qpid_password => 'guest',
     qpid_username => 'guest',
-    qpid_hostname => map_params("qpid_vip"),
-    qpid_port     => map_params("qpid_port"),
+    qpid_hostname => $qpid_host,
+    qpid_port     => $qpid_port,
     qpid_protocol => 'tcp',
   }
 
