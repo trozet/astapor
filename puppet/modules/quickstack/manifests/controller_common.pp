@@ -128,7 +128,7 @@ class quickstack::controller_common (
     ssl_cert => $qpid_cert,
     ssl_key  => $qpid_key,
     ssl_database_password => $qpid_nssdb_password
-    config_file => $::operatingsystem? {
+    config_file => $::operatingsystem ? {
         'Fedora' => '/etc/qpid/qpidd.conf',
         default  => '/etc/qpidd.conf',
         },
