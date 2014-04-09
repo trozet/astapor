@@ -34,7 +34,7 @@ class quickstack::cinder_controller(
     $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder"
   }
 
-  class {'cinder':
+  class {'::cinder':
     rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
     qpid_hostname  => $qpid_host,
     qpid_protocol  => $qpid_protocol,
@@ -46,17 +46,17 @@ class quickstack::cinder_controller(
     require        => Class['openstack::db::mysql', 'qpid::server'],
   }
 
-  class {'cinder::api':
+  class {'::cinder::api':
     keystone_password => $cinder_user_password,
     keystone_tenant => "services",
     keystone_user => "cinder",
     keystone_auth_host => $controller_priv_host,
   }
 
-  class {'cinder::scheduler': }
+  class {'::cinder::scheduler': }
 
   if str2bool_i("$cinder_backend_gluster") {
-    class { 'cinder::volume': }
+    class { '::cinder::volume': }
 
     class { 'gluster::client': }
 
@@ -67,16 +67,16 @@ class quickstack::cinder_controller(
       }
     }
 
-    class { 'cinder::volume::glusterfs':
+    class { '::cinder::volume::glusterfs':
       glusterfs_mount_point_base => '/var/lib/cinder/volumes',
       glusterfs_shares           => suffix($cinder_gluster_servers, ":/${cinder_gluster_volume}")
     }
   }
 
   if !str2bool_i("$cinder_backend_gluster") and !str2bool_i("$cinder_backend_iscsi") {
-    class { 'cinder::volume': }
+    class { '::cinder::volume': }
 
-    class { 'cinder::volume::iscsi':
+    class { '::cinder::volume::iscsi':
       iscsi_ip_address => $controller_priv_host,
     }
 
