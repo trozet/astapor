@@ -338,9 +338,6 @@ params = {
   "horizon_cert"                  => "/etc/pki/tls/certs/PUB_HOST-horizon.crt",
   "horizon_key"                   => "/etc/pki/tls/private/PUB_HOST-horizon.key",
   "qpid_nssdb_password"           => SecureRandom.hex,
-  "ha_loadbalancer_public_vip"    => "192.168.200.50",
-  "ha_loadbalancer_private_vip"   => "192.168.201.50",
-  "ha_loadbalancer_group"         => "load_balancer",
   "fence_xvm_key_file_password"   => SecureRandom.hex,
 }
 
@@ -372,6 +369,7 @@ hostgroups = [
               "quickstack::pacemaker::memcached",
               "quickstack::pacemaker::qpid",
               "quickstack::pacemaker::glance",
+              "quickstack::pacemaker::nova",
              ]},
 ]
 
