@@ -197,6 +197,7 @@ class quickstack::controller_common (
     admin_address    => $controller_admin_host
   }
 
+  # TODO, replace below two stanzas with quickstack::glance
   class {'openstack::glance':
     db_host        => $mysql_host,
     db_ssl         => str2bool_i("$ssl"),
@@ -205,6 +206,14 @@ class quickstack::controller_common (
     db_password    => $glance_db_password,
     require        => Class['openstack::db::mysql'],
   }
+  class { 'glance::notify::qpid':
+    qpid_password => $qpid_password,
+    qpid_username => $qpid_username,
+    qpid_hostname => $qpid_host,
+    qpid_port     => $qpid_port,
+    qpid_protocol => 'tcp',
+  }
+
 
   # Configure Nova
   class { '::nova':
