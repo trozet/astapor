@@ -10,16 +10,18 @@ class quickstack::hamysql::node (
 
   # these two variables are distinct because you may want to bind on
   # '0.0.0.0' rather than just the floating ip
-  $mysql_bind_address          = $quickstack::params::mysql_host,
-  $mysql_virtual_ip            = $quickstack::params::mysql_host,
-  $mysql_virt_ip_nic           = $quickstack::params::mysql_virt_ip_nic,
-  $mysql_virt_ip_cidr_mask     = $quickstack::params::mysql_virt_ip_cidr_mask,
+  $mysql_bind_address           = $quickstack::params::mysql_host,
+  $mysql_virtual_ip             = $quickstack::params::mysql_host,
+  $mysql_virt_ip_nic            = $quickstack::params::mysql_virt_ip_nic,
+  $mysql_virt_ip_cidr_mask      = $quickstack::params::mysql_virt_ip_cidr_mask,
   # e.g. "192.168.200.200:/mnt/mysql"
-  $mysql_shared_storage_device = $quickstack::params::mysql_shared_storage_device,
+  $mysql_shared_storage_device  = $quickstack::params::mysql_shared_storage_device,
   # e.g. "nfs"
-  $mysql_shared_storage_type   = $quickstack::params::mysql_shared_storage_type,
-  $mysql_resource_group_name   = $quickstack::params::mysql_resource_group_name,
-  $mysql_clu_member_addrs      = $quickstack::params::mysql_clu_member_addrs,
+  $mysql_shared_storage_type    = $quickstack::params::mysql_shared_storage_type,
+  #
+  $mysql_shared_storage_options = $quickstack::params::mysql_shared_storage_options,
+  $mysql_resource_group_name    = $quickstack::params::mysql_resource_group_name,
+  $mysql_clu_member_addrs       = $quickstack::params::mysql_clu_member_addrs,
 
 ) inherits quickstack::params {
 
@@ -57,6 +59,7 @@ class quickstack::hamysql::node (
        device => "$mysql_shared_storage_device",
        directory => "/var/lib/mysql",
        fstype => $mysql_shared_storage_type,
+       fsoptions => $mysql_shared_storage_options,
        group => $mysql_resource_group_name,
     }
     ->

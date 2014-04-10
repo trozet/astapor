@@ -297,6 +297,7 @@ params = {
   "mysql_virt_ip_cidr_mask"       =>  '24',
   "mysql_shared_storage_device"   => '192.168.203.200:/mnt/mysql',
   "mysql_shared_storage_type"     => 'nfs',
+  "mysql_shared_storage_options"  => '',
   "mysql_resource_group_name"     => 'mysqlgrp',
   "mysql_clu_member_addrs"        => '192.168.203.11 192.168.203.12 192.168.203.13',
   "qpid_host"                     => '172.16.0.1',
