@@ -207,7 +207,7 @@ class quickstack::controller_common (
   }
 
   # Configure Nova
-  class { 'nova':
+  class { '::nova':
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${controller_priv_host}:9292/v1",
@@ -226,25 +226,25 @@ class quickstack::controller_common (
   }
 
   if str2bool_i("$neutron") {
-    class { 'nova::api':
+    class { '::nova::api':
       enabled           => true,
       admin_password    => $nova_user_password,
       auth_host         => $controller_priv_host,
       neutron_metadata_proxy_shared_secret => $neutron_metadata_proxy_secret,
     }
   } else {
-    class { 'nova::api':
+    class { '::nova::api':
       enabled           => true,
       admin_password    => $nova_user_password,
       auth_host         => $controller_priv_host,
     }
   }
 
-  class { [ 'nova::scheduler', 'nova::cert', 'nova::consoleauth', 'nova::conductor' ]:
+  class { [ '::nova::scheduler', '::nova::cert', '::nova::consoleauth', '::nova::conductor' ]:
     enabled => true,
   }
 
-  class { 'nova::vncproxy':
+  class { '::nova::vncproxy':
     host    => '0.0.0.0',
     enabled => true,
   }

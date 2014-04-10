@@ -45,7 +45,7 @@ class quickstack::compute_common (
       $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
     }
 
-  class { 'nova':
+  class { '::nova':
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${controller_priv_host}:9292/v1",
@@ -69,12 +69,12 @@ class quickstack::compute_common (
   #  "libvirt_cpu_mode": value => "none";
   #}
 
-  class { 'nova::compute::libvirt':
+  class { '::nova::compute::libvirt':
     #libvirt_type    => "qemu",  # uncomment if on a vm
     vncserver_listen => $::ipaddress,
   }
 
-  class { 'nova::compute':
+  class { '::nova::compute':
     enabled => true,
     vncproxy_host => $controller_pub_host,
     vncserver_proxyclient_address => $::ipaddress,
