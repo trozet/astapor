@@ -44,7 +44,7 @@ class quickstack::nova_network::compute (
     service_name   => 'openstack-nova-metadata-api',
   }
 
-  class { 'nova::network':
+  class { '::nova::network':
     private_interface => "$network_private_iface",
     public_interface  => "$network_public_iface",
     fixed_range       => "$network_fixed_range",
