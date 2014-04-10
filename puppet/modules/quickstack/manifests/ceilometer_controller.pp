@@ -59,11 +59,4 @@ class quickstack::ceilometer_controller(
         keystone_password => $ceilometer_user_password,
         require           => Class['mongodb'],
     }
-
-    class { 'glance::notify::qpid':
-        qpid_password => 'guest',
-        qpid_hostname => $qpid_host,
-        qpid_port     => $qpid_port,
-        qpid_protocol => $qpid_protocol
-    }
 }
