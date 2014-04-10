@@ -39,6 +39,8 @@ class quickstack::controller_common (
   $swift_storage_ips             = ["192.168.203.2","192.168.203.3","192.168.203.4"],
   $swift_storage_device          = 'device1',
   $qpid_host                     = $quickstack::params::qpid_host,
+  $qpid_username                 = $quickstack::params::qpid_username,
+  $qpid_password                 = $quickstack::params::qpid_password,
   $verbose                       = $quickstack::params::verbose,
   $ssl                           = $quickstack::params::ssl,
   $freeipa                       = $quickstack::params::freeipa,
@@ -121,13 +123,33 @@ class quickstack::controller_common (
   }
 
   class {'qpid::server':
-    auth => "no",
     ssl      => str2bool_i("$ssl"),
     freeipa  => str2bool_i("$freeipa"),
     ssl_ca   => $qpid_ca,
     ssl_cert => $qpid_cert,
     ssl_key  => $qpid_key,
-    ssl_database_password => $qpid_nssdb_password
+    ssl_database_password => $qpid_nssdb_password,
+    config_file => $::operatingsystem ? {
+        'Fedora' => '/etc/qpid/qpidd.conf',
+        default  => '/etc/qpidd.conf',
+        },
+    auth => $qpid_username ? {
+      ''      => 'no',
+      default => 'yes',
+    },
+    clustered => false,
+  }
+
+  # quoth the puppet language reference,
+  # "Empty strings are false; all other strings are true."
+  if $qpid_username {
+    qpid_user { $qpid_username:
+      password  => $qpid_password,
+      file      => '/var/lib/qpidd/qpidd.sasldb',
+      realm     => 'QPID',
+      provider  => 'saslpasswd2',
+      require   => Class['qpid::server'],
+    }
   }
 
   class {'openstack::keystone':
@@ -190,10 +212,12 @@ class quickstack::controller_common (
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${controller_priv_host}:9292/v1",
     rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
+    qpid_hostname      => $qpid_host,
+    qpid_username      => $qpid_username,
+    qpid_password      => $qpid_password,
     verbose            => $verbose,
     qpid_protocol      => $qpid_protocol,
     qpid_port          => $qpid_port,
-    qpid_hostname      => $qpid_host,
     require            => Class['openstack::db::mysql', 'qpid::server'],
   }
 
@@ -234,6 +258,8 @@ class quickstack::controller_common (
     qpid_host                   => $qpid_host,
     qpid_protocol               => $qpid_protocol,
     qpid_port                   => $qpid_port,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
   }
 
@@ -261,6 +287,8 @@ class quickstack::controller_common (
     qpid_host                   => $qpid_host,
     qpid_port                   => $qpid_port,
     qpid_protocol               => $qpid_protocol,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
   }
 
@@ -278,6 +306,8 @@ class quickstack::controller_common (
     qpid_host                   => $qpid_host,
     qpid_port                   => $qpid_port,
     qpid_protocol               => $qpid_protocol,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
   }
 

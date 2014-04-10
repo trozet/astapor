@@ -18,6 +18,8 @@ class quickstack::neutron::compute (
   $ovs_vlan_ranges             = $quickstack::params::ovs_vlan_ranges,
   $ovs_tunnel_iface            = 'em1',
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_username               = $quickstack::params::qpid_username,
+  $qpid_password               = $quickstack::params::qpid_password,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
   $tunnel_id_ranges            = '1:1000',
   $ovs_vxlan_udp_port          = $quickstack::params::ovs_vxlan_udp_port,
@@ -43,6 +45,8 @@ class quickstack::neutron::compute (
     qpid_hostname         => $qpid_host,
     qpid_port             => $qpid_port,
     qpid_protocol         => $qpid_protocol,
+    qpid_username         => $qpid_username,
+    qpid_password         => $qpid_password,
     core_plugin           => $neutron_core_plugin
   }
 
@@ -88,6 +92,8 @@ class quickstack::neutron::compute (
     nova_db_password            => $nova_db_password,
     nova_user_password          => $nova_user_password,
     qpid_host                   => $qpid_host,
+    qpid_username               => $qpid_username,
+    qpid_password               => $qpid_password,
     verbose                     => $verbose,
     ssl                         => $ssl,
     mysql_ca                    => $mysql_ca,

@@ -7,6 +7,8 @@ class quickstack::ceilometer_controller(
   $qpid_host,
   $qpid_port = '5672',
   $qpid_protocol = 'tcp',
+  $qpid_username,
+  $qpid_password,
   $verbose,
 ) {
 
@@ -27,6 +29,8 @@ class quickstack::ceilometer_controller(
         qpid_hostname   => $qpid_host,
         qpid_port       => $qpid_port,
         qpid_protocol   => $qpid_protocol,
+        qpid_username   => $qpid_username,
+        qpid_password   => $qpid_password,
         rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
         verbose         => $verbose,
     }

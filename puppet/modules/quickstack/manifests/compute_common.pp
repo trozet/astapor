@@ -10,6 +10,8 @@ class quickstack::compute_common (
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_username               = $quickstack::params::qpid_username,
+  $qpid_password               = $quickstack::params::qpid_password,
   $verbose                     = $quickstack::params::verbose,
   $ssl                         = $quickstack::params::ssl,
   $mysql_ca                    = $quickstack::params::mysql_ca,
@@ -51,6 +53,8 @@ class quickstack::compute_common (
     qpid_hostname      => $qpid_host,
     qpid_protocol      => $qpid_protocol,
     qpid_port          => $qpid_port,
+    qpid_username      => $qpid_username,
+    qpid_password      => $qpid_password,
     verbose            => $verbose,
   }
 
@@ -81,6 +85,8 @@ class quickstack::compute_common (
     qpid_hostname   => $qpid_host,
     qpid_port       => $qpid_port,
     qpid_protocol   => $qpid_protocol,
+    qpid_username   => $qpid_username,
+    qpid_password   => $qpid_password,
     rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
     verbose         => $verbose,
   }

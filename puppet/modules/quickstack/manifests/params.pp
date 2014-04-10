@@ -67,6 +67,8 @@ class quickstack::params {
 
   $mysql_host                    = '172.16.0.1'
   $qpid_host                     = '172.16.0.1'
+  $qpid_username                 = 'openstack'
+  $qpid_password                 = 'CHANGEME'
   $enable_ovs_agent              = 'true'
   $tenant_network_type           = 'gre'
   $ovs_vlan_ranges               = undef

@@ -12,8 +12,16 @@ class quickstack::cinder_controller(
   $qpid_host                   = $quickstack::params::qpid_host,
   $qpid_port                   = "5672",
   $qpid_protocol               = "tcp",
+  $qpid_username               = $quickstack::params::qpid_username,
+  $qpid_password               = $quickstack::params::qpid_password,
   $verbose                     = $quickstack::params::verbose,
 ) inherits quickstack::params {
+
+  $qpid_password_safe_for_cinder = $qpid_password ? {
+     ''      => 'guest',
+     false   => 'guest',
+     default => $qpid_password,
+  }
 
   cinder_config {
     'DEFAULT/glance_host': value => $controller_priv_host;
@@ -31,7 +39,8 @@ class quickstack::cinder_controller(
     qpid_hostname  => $qpid_host,
     qpid_protocol  => $qpid_protocol,
     qpid_port      => $qpid_port,
-    qpid_password  => 'guest',
+    qpid_username  => $qpid_username,
+    qpid_password  => $qpid_password_safe_for_cinder,
     sql_connection => $sql_connection,
     verbose        => $verbose,
     require        => Class['openstack::db::mysql', 'qpid::server'],
