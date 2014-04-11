@@ -7,7 +7,11 @@ class quickstack::glance_storage (
 ) inherits quickstack::params {
 
   if $glance_backend_gluster == true {
-    class { 'gluster::client': }
+    if defined('gluster::client') {
+      class { 'gluster::client': }
+    } else {
+      class { 'gluster::mount::base': repo => false }
+    }
 
     if ($::selinux != "false") {
       selboolean{'virt_use_fusefs':
