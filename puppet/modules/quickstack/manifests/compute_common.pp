@@ -39,6 +39,10 @@ class quickstack::compute_common (
           persistent => true,
       }
     }
+
+    nova_config {
+      'DEFAULT/qemu_allowed_storage_drivers': value => 'gluster';
+    }
   }
   if str2bool_i("$cinder_backend_nfs") {
     if ($::selinux != "false") {
