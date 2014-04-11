@@ -23,9 +23,6 @@ class quickstack::hamysql::singlenodetest (
       mysql_bind_address     => '0.0.0.0',
       mysql_account_security => true,
 
-      # Cinder
-      cinder                 => false,
-
       # neutron
       neutron                => false,
 

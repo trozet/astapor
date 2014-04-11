@@ -26,7 +26,7 @@ class quickstack::storage_backend::lvm_cinder(
     $qpid_port = '5672'
     $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder"
   }
-  class { 'cinder':
+  class { '::cinder':
     rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
     qpid_hostname  => $qpid_host,
     qpid_port      => $qpid_port,
@@ -37,7 +37,7 @@ class quickstack::storage_backend::lvm_cinder(
     verbose        => $verbose,
   }
 
-  class { 'cinder::volume': }
+  class { '::cinder::volume': }
 
   if str2bool_i("$cinder_backend_gluster") {
     class { 'gluster::client': }
@@ -49,14 +49,14 @@ class quickstack::storage_backend::lvm_cinder(
       }
     }
 
-    class { 'cinder::volume::glusterfs':
+    class { '::cinder::volume::glusterfs':
       glusterfs_mount_point_base => '/var/lib/cinder/volumes',
       glusterfs_shares           => suffix($cinder_gluster_peers, ":/${cinder_gluster_volume}")
     }
   }
 
   if str2bool_i("$cinder_backend_iscsi") {
-    class { 'cinder::volume::iscsi':
+    class { '::cinder::volume::iscsi':
       iscsi_ip_address => getvar(regsubst("ipaddress_${cinder_iscsi_iface}", '[.-]', '_', 'G')),
     }
 

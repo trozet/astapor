@@ -370,6 +370,7 @@ hostgroups = [
               "quickstack::pacemaker::qpid",
               "quickstack::pacemaker::glance",
               "quickstack::pacemaker::nova",
+              "quickstack::pacemaker::cinder",
              ]},
 ]
 

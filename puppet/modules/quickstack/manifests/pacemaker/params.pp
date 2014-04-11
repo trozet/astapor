@@ -26,6 +26,7 @@ class quickstack::pacemaker::params (
   $heat_cfn_admin_vip        = '',
   $heat_cfn_group            = 'heat_cfn',
   $heat_cfn_user_password    = '',
+  $include_cinder            = 'true',
   $include_glance            = 'true',
   $include_keystone          = 'true',
   $include_neutron           = 'true',
@@ -89,5 +90,6 @@ class quickstack::pacemaker::params (
   Class['::quickstack::pacemaker::keystone'] ->
   Class['::quickstack::pacemaker::glance'] ->
   Class['::quickstack::pacemaker::nova'] ->
+  Class['::quickstack::pacemaker::cinder'] ->
   Class['::quickstack::pacemaker::load_balancer']
 }

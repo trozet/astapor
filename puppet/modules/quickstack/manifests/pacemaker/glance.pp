@@ -1,5 +1,4 @@
 class quickstack::pacemaker::glance (
-  $glance_user_password,   # the keystone password for the keystone user, 'glance'
   $db_password,
   $sql_idle_timeout         = '3600',
   $db_ssl                   = false,
@@ -76,7 +75,7 @@ class quickstack::pacemaker::glance (
       unless   => "/tmp/ha-all-in-one-util.bash i_am_vip $glance_private_vip || /tmp/ha-all-in-one-util.bash property_exists glance",
     } ->
     class { 'quickstack::glance':
-      user_password            => $glance_user_password,
+      user_password            => map_params("glance_user_password"),
       db_password              => $db_password,
       db_host                  => map_params("db_vip"),
       keystone_host            => map_params("keystone_admin_vip"),
