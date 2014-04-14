@@ -1,5 +1,6 @@
 class quickstack::swift::proxy (
-  $controller_pub_host, # a better param name might be $swift_proxy_ip
+  $swift_proxy_host,
+  $keystone_host,
   $swift_admin_password,
   $swift_shared_secret,
   $swift_ringserver_ip,   # for swift-only traffic
@@ -10,11 +11,14 @@ class quickstack::swift::proxy (
   $swift_storage_device,
 ) inherits quickstack::params {
 
-    #### Swift ####
+    # Todo for standalone case, enable openstack-swift-object-expirer,
+    # expose param for concurrency (possibly in this class, possibly
+    # a new class)
+
     package { 'curl': ensure => present }
 
     class { '::swift::proxy':
-      proxy_local_net_ip => $controller_pub_host,
+      proxy_local_net_ip => $swift_proxy_host,
       # it is not a mistake that proxy-logging is listed twice below.
       # for more on that, see
       # /usr/share/doc/openstack-swift-proxy-1.9.1/proxy-server.conf-sample
@@ -60,7 +64,7 @@ class quickstack::swift::proxy (
         admin_tenant_name => 'services',
         admin_password    => $swift_admin_password,
         # assume that the controller host is the swift api server
-        auth_host         => $controller_pub_host,
+        auth_host         => $keystone_host,
     }
 
     class {'quickstack::swift::common':
@@ -91,27 +95,15 @@ class quickstack::swift::proxy (
         ensure => "present",
         swift_storage_ips => $swift_storage_ips,
 	swift_storage_device => $swift_storage_device,
-      }
+      } ->
 
-      # the following two rsync:: declarations are practically the
-      # entire contents of swift::ringserver, but trying to use it
-      # will give you dependency woes.  the short answer as to why is
-      # because we need to use our own swift_ring_build_helper rather
-      # than declare swift::ringbuilder which is required by
-      # swift::ringserver.
-      class { 'rsync::server':
-          use_xinetd => true,
-          address => $swift_ringserver_ip,
-          use_chroot => 'no',
-        }
-
-      rsync::server::module { 'swift_server':
-        path => '/etc/swift',
-        lock_file => '/var/lock/swift_server.lock',
+      # "swift_server" since that is the module storage nodes look for
+      quickstack::rsync::simple { "swift_server":
+        path         => '/etc/swift',
+        bind_addr    => "$swift_ringserver_ip",
         uid => 'swift',
         gid => 'swift',
-        max_connections => 5,
-        read_only => true,
+        max_connections => 10,
       }
     } else {
 

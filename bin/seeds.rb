@@ -365,6 +365,7 @@ hostgroups = [
               "quickstack::pacemaker::common",
               "quickstack::pacemaker::params",
               "quickstack::pacemaker::keystone",
+              "quickstack::pacemaker::swift",
               "quickstack::pacemaker::load_balancer",
               "quickstack::pacemaker::memcached",
               "quickstack::pacemaker::qpid",

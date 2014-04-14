@@ -56,6 +56,9 @@ class quickstack::pacemaker::keystone (
       command   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
       unless   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
     } ->
+    class { "::quickstack::pacemaker::rsync::keystone":
+      keystone_private_vip => map_params("keystone_private_vip"),
+    } ->
     class {"::openstack::keystone":
       admin_email                 => "$admin_email",
       admin_password              => "$admin_password",
@@ -146,29 +149,24 @@ class quickstack::pacemaker::keystone (
       backend_server_addrs => map_params("lb_backend_server_addrs"),
       require              => quickstack::pacemaker::vips["$keystone_group"],
     } ->
-    class { "::quickstack::pacemaker::rsync::keystone":
-      keystone_private_vip => map_params("keystone_private_vip"),
-      keystone_group       => map_params("keystone_group"),
-      require              => quickstack::pacemaker::vips["$keystone_group"],
-    } ->
-    # resorting to exec below because ~> Service['xinetd'] doesn't
-    # force a restart
-    exec { "restart-xinetd":
-      command     => "/sbin/service xinetd restart",
-    } ->
     exec {"pcs-keystone-server-set-up":
       command => "/usr/sbin/pcs property set keystone=running --force",
     } ->
-    #~> Service['keystone'] ->
-    # TODO: Consider if we should pre-emptively purge any directories keystone has
-    # created in /tmp
-
-    # TODO -- verify keystone has started on all nodes before below
-    # gets executed.
+    exec {"pcs-keystone-server-set-up-on-this-node":
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property keystone"
+    } ->
+    exec {"all-keystone-nodes-are-up":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash all_members_include keystone",
+    } ->
     pacemaker::resource::lsb {'openstack-keystone':
       group => map_params("keystone_group"),
       clone => true,
     }
+    # TODO: Consider if we should pre-emptively purge any directories keystone has
+    # created in /tmp
 
     if "$keystonerc" == "true" {
       class { '::quickstack::admin_client':

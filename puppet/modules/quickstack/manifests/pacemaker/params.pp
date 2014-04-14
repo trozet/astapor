@@ -32,6 +32,7 @@ class quickstack::pacemaker::params (
   $include_neutron           = 'true',
   $include_nova              = 'true',
   $include_qpid              = 'true',
+  $include_swift             = 'true',
   $loadbalancer_public_vip   = '',
   $loadbalancer_private_vip  = '',
   $loadbalancer_admin_vip    = '',
@@ -59,8 +60,6 @@ class quickstack::pacemaker::params (
   $qpid_vip                  = '',
   $qpid_group                = 'qpid',
   $swift_public_vip          = '',
-  $swift_private_vip         = '',
-  $swift_admin_vip           = '',
   $swift_user_password       = '',
   $swift_group               = 'swift',
 ) {
@@ -80,6 +79,7 @@ class quickstack::pacemaker::params (
   include quickstack::load_balancer::common
   include quickstack::pacemaker::qpid
   include quickstack::pacemaker::keystone
+  include quickstack::pacemaker::swift
   include quickstack::pacemaker::glance
   include quickstack::pacemaker::nova
   include quickstack::pacemaker::load_balancer
@@ -88,6 +88,7 @@ class quickstack::pacemaker::params (
   Class['::quickstack::load_balancer::common'] ->
   Class['::quickstack::pacemaker::qpid'] ->
   Class['::quickstack::pacemaker::keystone'] ->
+  Class['::quickstack::pacemaker::swift'] ->
   Class['::quickstack::pacemaker::glance'] ->
   Class['::quickstack::pacemaker::nova'] ->
   Class['::quickstack::pacemaker::cinder'] ->
