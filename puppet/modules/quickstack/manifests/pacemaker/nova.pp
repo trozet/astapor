@@ -58,7 +58,7 @@ class quickstack::pacemaker::nova (
       memcached_servers             => $memcached_servers,
       multi_host                    => $multi_host,
       neutron                       => str2bool_i(map_params("neutron")),
-      neutron_metadata_proxy_secret => $neutron_metadata_proxy_secret,
+      neutron_metadata_proxy_secret => map_params("neutron_metadata_proxy_secret"),
       qpid_heartbeat                => $qpid_heartbeat,
       qpid_hostname                 => map_params("qpid_vip"),
       qpid_port                     => map_params("qpid_port"),

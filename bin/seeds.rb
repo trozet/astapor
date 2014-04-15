@@ -376,6 +376,7 @@ hostgroups = [
               "quickstack::pacemaker::cinder",
               "quickstack::pacemaker::horizon",
               "quickstack::pacemaker::mysql",
+              "quickstack::pacemaker::neutron",
              ]},
 ]
 
