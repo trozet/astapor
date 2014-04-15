@@ -8,6 +8,7 @@ class quickstack::load_balancer::keystone (
   $public_mode = 'tcp',
   $admin_port = '35357',
   $admin_mode = 'tcp',
+  $log = 'tcplog',
 ) {
 
   include quickstack::load_balancer::common
@@ -18,7 +19,7 @@ class quickstack::load_balancer::keystone (
                               $frontend_admin_host ],
     port                 => "$public_port",
     mode                 => "$public_mode",
-    listen_options       => { 'option' => [ 'httplog' ] },
+    listen_options       => { 'option' => [ "$log" ] },
     member_options       => [ 'check' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
@@ -30,7 +31,7 @@ class quickstack::load_balancer::keystone (
                               $frontend_admin_host ],
     port                 => "$admin_port",
     mode                 => "$admin_mode",
-    listen_options       => { 'option' => [ 'httplog' ] },
+    listen_options       => { 'option' => [ "$log" ] },
     member_options       => [ 'check' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,

@@ -6,6 +6,7 @@ class quickstack::load_balancer::cinder (
   $backend_server_addrs,
   $api_port = '8776',
   $api_mode = 'tcp',
+  $log = 'tcplog',
 ) {
 
   include quickstack::load_balancer::common
@@ -16,7 +17,7 @@ class quickstack::load_balancer::cinder (
                               $frontend_admin_host ],
     port                 => "$api_port",
     mode                 => "$api_mode",
-    listen_options       => { 'option' => [ 'httplog' ] },
+    listen_options       => { 'option' => [ "$log" ] },
     member_options       => [ 'check' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
