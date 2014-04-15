@@ -10,16 +10,18 @@ class quickstack::hamysql::node (
 
   # these two variables are distinct because you may want to bind on
   # '0.0.0.0' rather than just the floating ip
-  $mysql_bind_address          = $quickstack::params::mysql_host,
-  $mysql_virtual_ip            = $quickstack::params::mysql_host,
-  $mysql_virt_ip_nic           = $quickstack::params::mysql_virt_ip_nic,
-  $mysql_virt_ip_cidr_mask     = $quickstack::params::mysql_virt_ip_cidr_mask,
+  $mysql_bind_address           = $quickstack::params::mysql_host,
+  $mysql_virtual_ip             = $quickstack::params::mysql_host,
+  $mysql_virt_ip_nic            = $quickstack::params::mysql_virt_ip_nic,
+  $mysql_virt_ip_cidr_mask      = $quickstack::params::mysql_virt_ip_cidr_mask,
   # e.g. "192.168.200.200:/mnt/mysql"
-  $mysql_shared_storage_device = $quickstack::params::mysql_shared_storage_device,
+  $mysql_shared_storage_device  = $quickstack::params::mysql_shared_storage_device,
   # e.g. "nfs"
-  $mysql_shared_storage_type   = $quickstack::params::mysql_shared_storage_type,
-  $mysql_resource_group_name   = $quickstack::params::mysql_resource_group_name,
-  $mysql_clu_member_addrs      = $quickstack::params::mysql_clu_member_addrs,
+  $mysql_shared_storage_type    = $quickstack::params::mysql_shared_storage_type,
+  #
+  $mysql_shared_storage_options = $quickstack::params::mysql_shared_storage_options,
+  $mysql_resource_group_name    = $quickstack::params::mysql_resource_group_name,
+  $mysql_clu_member_addrs       = $quickstack::params::mysql_clu_member_addrs,
 
 ) inherits quickstack::params {
 
@@ -33,6 +35,7 @@ class quickstack::hamysql::node (
     ->
     class {'quickstack::hamysql::mysql::config':
       bind_address =>  $mysql_bind_address,
+      socket => '/var/run/mysqld/mysql.sock',
     }
     ->
     # TODO: use quickstack::pacemaker::common instead
@@ -57,16 +60,34 @@ class quickstack::hamysql::node (
        device => "$mysql_shared_storage_device",
        directory => "/var/lib/mysql",
        fstype => $mysql_shared_storage_type,
+       fsoptions => $mysql_shared_storage_options,
        group => $mysql_resource_group_name,
     }
     ->
-    exec { "let-mysql-fs-get-mounted":
-      command => "/bin/sleep 15"
+    exec {"wait-for-fs-to-be-active":
+      timeout => 3600,
+      tries => 360,
+      try_sleep => 10,
+      command => "/usr/sbin/pcs status  | grep -q 'fs-varlibmysql.*Started' > /dev/null 2>&1",
+    }
+    ->
+    exec { "sleep-so-really-sure-fs-is-mounted":
+      command => "/bin/sleep 15",
+    }
+    ->
+    # this needs to be an exec rather than puppet's file type because
+    # the link must *only* be attempted to be created on the node that has
+    # shared storage mounted.  /var/lib/mysql must not contain
+    # any files on the other nodes so it can be used as a mount point.
+    exec { "create-socket-symlink-if-we-own-the-mount":
+      command => "/bin/ln -sf /var/run/mysqld/mysql.sock /var/lib/mysql/mysql.sock",
+      onlyif => "/bin/mount | grep -q '/var/lib/mysql'",
     }
     ->
     pacemaker::resource::mysql { 'mysql-clu-mysql' :
       name => "ostk-mysql",
       group => $mysql_resource_group_name,
+      additional_params => "socket=/var/run/mysqld/mysql.sock",
     }
     ->
     pacemaker::constraint::base { 'ip-mysql-constr' :

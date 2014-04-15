@@ -101,6 +101,7 @@ class quickstack::params {
   $mysql_virt_ip_nic             = '172.16.0.1'
   $mysql_virt_ip_cidr_mask       = 'MYSQL_CIDR_MASK'
   $mysql_shared_storage_device   = 'MYSQL_SHARED_STORAGE_DEVICE'
+  $mysql_shared_storage_options  = ''
   # e.g. "nfs"
   $mysql_shared_storage_type     = 'MYSQL_SHARED_STORAGE_TYPE'
   $mysql_clu_member_addrs        = 'SPACE_SEPARATED_IP_ADDRS'
