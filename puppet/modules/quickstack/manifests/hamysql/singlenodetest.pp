@@ -5,6 +5,7 @@ class quickstack::hamysql::singlenodetest (
   $keystone_db_password        = $quickstack::params::keystone_db_password,
   $glance_db_password          = $quickstack::params::glance_db_password,
   $nova_db_password            = $quickstack::params::nova_db_password,
+  $neutron_db_password         = '',
   $cinder_db_password          = $quickstack::params::cinder_db_password,
   $keystone_db_user            = 'keystone',
   $keystone_db_dbname          = 'keystone',
@@ -17,14 +18,14 @@ class quickstack::hamysql::singlenodetest (
       glance_db_password   => $glance_db_password,
       nova_db_password     => $nova_db_password,
       cinder_db_password   => $cinder_db_password,
-      neutron_db_password  => '',
+      neutron_db_password  => $neutron_db_password,
 
       # MySQL
       mysql_bind_address     => '0.0.0.0',
       mysql_account_security => true,
 
       # neutron
-      neutron                => false,
+      neutron                => true,
 
       allowed_hosts          => '%',
       enabled                => true,
