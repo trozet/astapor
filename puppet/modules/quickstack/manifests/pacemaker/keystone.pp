@@ -22,8 +22,8 @@ class quickstack::pacemaker::keystone (
   $ceilometer       = "false",
   $cinder           = "true",
   $glance           = "true",
-  $heat             = "false",
-  $heat_cfn         = "false",
+  $heat             = "true",
+  $heat_cfn         = "true",
   $nova             = "true",
   $swift            = "false",
 ) {
@@ -118,32 +118,17 @@ class quickstack::pacemaker::keystone (
       swift_admin_address         => map_params("swift_admin_vip"),
       use_syslog                  => str2bool_i("$use_syslog"),
       log_facility                => "$log_facility",
-      # This will be correct once o-p-m gets a modern heat module
-      #heat                        => str2bool_i("$heat"),
-      #heat_user_password          => map_params("heat_user_password"),
-      #heat_public_address         => map_params("heat_public_vip"),
-      #heat_internal_address       => map_params("heat_private_vip"),
-      #heat_admin_address          => map_params("heat_admin_vip"),
-      #heat_cfn                    => str2bool_i("$heat_cfn"),
-      #heat_cfn_user_password      => map_params("heat_cfn_user_password"),
-      #heat_cfn_public_address     => map_params("heat_cfn_public_vip"),
-      #heat_cfn_internal_address   => map_params("heat_cfn_private_vip"),
-      #heat_cfn_admin_address      => map_params("heat_cfn_admin_vip"),
+      heat                        => str2bool_i("$heat"),
+      heat_user_password          => map_params("heat_user_password"),
+      heat_public_address         => map_params("heat_public_vip"),
+      heat_internal_address       => map_params("heat_private_vip"),
+      heat_admin_address          => map_params("heat_admin_vip"),
+      heat_cfn                    => str2bool_i("$heat_cfn"),
+      heat_cfn_user_password      => map_params("heat_cfn_user_password"),
+      heat_cfn_public_address     => map_params("heat_cfn_public_vip"),
+      heat_cfn_internal_address   => map_params("heat_cfn_private_vip"),
+      heat_cfn_admin_address      => map_params("heat_cfn_admin_vip"),
     } ->
-
-    # TODO: get heat working (we may get this free if the heat puppet code
-    # is updated in o-p-m
-    #class {"heat::keystone::auth":
-    #  password              => map_params("heat_user_password"),
-    #  heat_public_address   => map_params("heat_public_vip"),
-    #  heat_internal_address => map_params("heat_private_vip"),
-    #  heat_admin_address    => map_params("heat_admin_vip"),
-    #  cfn_public_address    => map_params("heat_cfn_public_vip"),
-    #  cfn_internal_address  => map_params("heat_cfn_private_vip"),
-    #  cfn_admin_address     => map_params("heat_cfn_admin_vip"),
-
-    #} ->
-
     class {"::quickstack::load_balancer::keystone":
       frontend_pub_host    => map_params("keystone_public_vip"),
       frontend_priv_host   => map_params("keystone_private_vip"),

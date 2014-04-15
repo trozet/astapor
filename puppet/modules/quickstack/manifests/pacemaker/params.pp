@@ -24,17 +24,21 @@ class quickstack::pacemaker::params (
   $heat_group                = 'heat',
   $heat_db_password          = '',
   $heat_user_password        = '',
+  $heat_auth_encryption_key  = '',
+  $heat_cfn_enabled          = 'true',
   $heat_cfn_public_vip       = '',
   $heat_cfn_private_vip      = '',
   $heat_cfn_admin_vip        = '',
   $heat_cfn_group            = 'heat_cfn',
   $heat_cfn_user_password    = '',
+  $heat_cloudwatch_enabled   = 'true',
   $horizon_public_vip        = '',
   $horizon_private_vip       = '',
   $horizon_admin_vip         = '',
   $horizon_group             = 'horizon',
   $include_cinder            = 'true',
   $include_glance            = 'true',
+  $include_heat              = 'true',
   $include_horizon           = 'true',
   $include_keystone          = 'true',
   $include_mysql             = 'true',
@@ -103,6 +107,8 @@ class quickstack::pacemaker::params (
   include quickstack::pacemaker::swift
   include quickstack::pacemaker::glance
   include quickstack::pacemaker::nova
+  include quickstack::pacemaker::cinder
+  include quickstack::pacemaker::heat
   include quickstack::pacemaker::load_balancer
 
   Class['::quickstack::pacemaker::common'] ->
@@ -114,5 +120,6 @@ class quickstack::pacemaker::params (
   Class['::quickstack::pacemaker::glance'] ->
   Class['::quickstack::pacemaker::nova'] ->
   Class['::quickstack::pacemaker::cinder'] ->
+  Class['::quickstack::pacemaker::heat'] ->
   Class['::quickstack::pacemaker::load_balancer']
 }
