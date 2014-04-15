@@ -12,6 +12,7 @@ class quickstack::load_balancer::nova (
   $novncproxy_mode  = 'tcp',
   $xvpvncproxy_port = '6081',
   $xvpvncproxy_mode = 'tcp',
+  $log = 'tcplog',
 ) {
 
   include quickstack::load_balancer::common
@@ -22,7 +23,7 @@ class quickstack::load_balancer::nova (
                               $frontend_admin_host ],
     port                 => "$api_port",
     mode                 => "$api_mode",
-    listen_options       => { 'option' => [ 'httplog' ] },
+    listen_options       => { 'option' => [ "$log" ] },
     member_options       => [ 'check' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
@@ -34,7 +35,7 @@ class quickstack::load_balancer::nova (
   #                            $frontend_admin_host ],
   #  port                 => "$metadata_port",
   #  mode                 => "$metadata_mode",
-  #  listen_options       => { 'option' => [ 'httplog' ] },
+  #  listen_options       => { 'option' => [ "$log" ] },
   #  member_options       => [ 'check' ],
   #  backend_server_addrs => $backend_server_addrs,
   #  backend_server_names => $backend_server_names,
@@ -46,7 +47,7 @@ class quickstack::load_balancer::nova (
                               $frontend_admin_host ],
     port                 => "$novncproxy_port",
     mode                 => "$novncproxy_mode",
-    listen_options       => { 'option' => [ 'httplog' ] },
+    listen_options       => { 'option' => [ "$log" ] },
     member_options       => [ 'check' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
@@ -58,7 +59,7 @@ class quickstack::load_balancer::nova (
                               $frontend_admin_host ],
     port                 => "$xvpvncproxy_port",
     mode                 => "$xvpvncproxy_mode",
-    listen_options       => { 'option' => [ 'httplog' ] },
+    listen_options       => { 'option' => [ "$log" ] },
     member_options       => [ 'check' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,

@@ -10,7 +10,7 @@ class quickstack::pacemaker::nova (
   $multi_host              = 'true',
   $neutron                 = 'false',
   $neutron_metadata_proxy_secret,
-  $qpid_heartbeat          = '30',
+  $qpid_heartbeat          = '60',
   $rpc_backend             = 'nova.openstack.common.rpc.impl_qpid',
   $verbose                 = 'false',
 ) {
@@ -84,7 +84,7 @@ class quickstack::pacemaker::nova (
                               'openstack-nova-api',
                               'openstack-nova-scheduler',
                               'openstack-nova-conductor' ]:
-      group => "$pcmk_glance_group",
+      group => "$pcmk_nova_group",
       clone => true,
     }
     ->
@@ -115,6 +115,7 @@ class quickstack::pacemaker::nova (
       target => "lsb-openstack-nova-novncproxy-clone",
       score => "INFINITY",
     }
+    ->
     pacemaker::constraint::base { 'nova-api-scheduler-constr' :
       constraint_type => "order",
       first_resource  => "lsb-openstack-nova-api-clone",

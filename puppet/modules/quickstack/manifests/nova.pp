@@ -48,7 +48,7 @@
 # [*neutron_metadata_proxy_secret*]
 # [*qpid_heartbeat*]
 #   (optional) Seconds between connection keepalive heartbeats
-#   Defaults to '30'.
+#   Defaults to '60'.
 # [*qpid_hostname*]
 #   (optional) Location of qpid server
 #   Defaults to 'localhost'
@@ -80,7 +80,7 @@ class quickstack::nova (
   $multi_host         = 'true',
   $neutron            = 'false',
   $neutron_metadata_proxy_secret,
-  $qpid_heartbeat     = '30',
+  $qpid_heartbeat     = '60',
   $qpid_hostname      = 'localhost',
   $qpid_port          = '5672',
   $rpc_backend        = 'nova.openstack.common.rpc.impl_qpid',
@@ -125,9 +125,10 @@ class quickstack::nova (
       }
 
       class { '::nova::api':
-        enabled        => true,
-        admin_password => $admin_password,
-        auth_host      => $auth_host,
+        enabled          => true,
+        admin_password   => $admin_password,
+        api_bind_address => $bind_address,
+        auth_host        => $auth_host,
       }
     }
     class {'::nova::scheduler':
