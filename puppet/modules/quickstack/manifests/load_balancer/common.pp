@@ -11,7 +11,8 @@ class quickstack::load_balancer::common {
     defaults_options => {
       'mode'         => 'tcp',
       'retries'      => '3',
-      'option'       => [ 'httplog', 'redispatch' ],
+      'option'       => [ 'tcplog', 'redispatch' ],
+      'log'          => '127.0.0.1 local2 warning',
       'timeout'      => [ 'connect 5s', 'client 30s', 'server 30s' ],
     },
   }
