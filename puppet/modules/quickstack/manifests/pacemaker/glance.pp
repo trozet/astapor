@@ -11,6 +11,7 @@ class quickstack::pacemaker::glance (
   $pcmk_fs_manage           = 'true',
   # if $backend is 'file' and $pcmk_fs_manage is true,
   # then make sure other pcmk_fs_ params are correct
+  $pcmk_fs_options          = '',
   $pcmk_fs_type             = 'nfs',
   $pcmk_fs_device           = '/shared/storage/device',
   $pcmk_fs_dir              = '/var/lib/glance/images/',
@@ -61,6 +62,7 @@ class quickstack::pacemaker::glance (
           device => $pcmk_fs_device,
           directory => $pcmk_fs_dir,
           fstype => $pcmk_fs_type,
+          fsoptions => $pcmk_fs_options,
           clone  => true,
         }
         ->
