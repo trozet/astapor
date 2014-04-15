@@ -1,5 +1,7 @@
 class quickstack::pacemaker::load_balancer {
 
+  include quickstack::pacemaker::common
+
   $loadbalancer_group = map_params("loadbalancer_group")
 
   quickstack::pacemaker::vips { "$loadbalancer_group":

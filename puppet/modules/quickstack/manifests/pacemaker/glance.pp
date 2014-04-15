@@ -36,6 +36,17 @@ class quickstack::pacemaker::glance (
   if (map_params('include_glance') == 'true') {
     $glance_private_vip = map_params("glance_private_vip")
 
+    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-api']
+    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-registry']
+    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec['glance-manage db_sync']
+
+    if (map_params('include_keystone') == 'true') {
+      Exec['all-keystone-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
+    }
+    if (map_params('include_swift') == 'true') {
+      Exec['all-swift-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
+    }
+
     if($backend == 'swift') {
       # TODO move to params.pp once swift is added
       if str2bool_i("$pcmk_swift_is_local") {

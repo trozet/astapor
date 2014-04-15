@@ -273,7 +273,8 @@ class quickstack::controller_common (
   }
 
   class {'quickstack::swift::proxy':
-    controller_pub_host        => $controller_pub_host,
+    swift_proxy_host           => $controller_pub_host,
+    keystone_host              => $controller_pub_host,
     swift_admin_password       => $swift_admin_password,
     swift_shared_secret        => $swift_shared_secret,
     swift_storage_ips          => $swift_storage_ips,

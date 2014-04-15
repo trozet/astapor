@@ -5,20 +5,56 @@ keystone_private_vip=<%= scope.lookupvar("::quickstack::pacemaker::params::keyst
 
 # These functions adapted from similar logic in jayg's rysnc.pp variables
 get_resource_ip_output() {
-  echo $(pcs status | grep ip-$1)
+  # trailing space is on purpose below to avoid matching Failed actions
+  echo $(/usr/sbin/pcs status | /bin/grep -P "ip-$1\s")
 }
 which_cluster_ip() {
   line=$(get_resource_ip_output $1)
   echo $line | sed -n -e 's/^.*Started //p'
 }
 my_cluster_ip() {
-  crm_node -n
+  /usr/sbin/crm_node -n
 }
 get_property() {
-  pcs property show $1
+  /usr/sbin/pcs property show $1
 }
 property_exists() {
-  echo $(get_property $1) | grep -q $1
+  echo $(get_property $1) | /bin/grep -q $1
+}
+get_property_value() {
+  echo $(get_property $1) | /bin/grep $1 | perl -p -e 's/^.*\: //'
+}
+
+property_includes() {
+  propval=$(get_property_value $1)
+  element=$2
+  #echo PROPVAL $propval
+  echo $propval | /bin/grep -q $element
+}
+
+all_members_include() {
+  element=$1
+  members=$(/usr/sbin/crm_node -l)
+  if [ "x${members}" = "x" ]; then return 1; fi
+  for member in $members; do
+    property_includes $member $element || return 1
+  done
+}
+
+# update a resource property with same name as my node
+# to include the argument in a list if it is not there already
+update_my_node_property() {
+   element=$1
+   mynode=$(my_cluster_ip)
+   if ! $(property_exists $mynode); then
+     $(/usr/sbin/pcs property set $mynode=$element --force)
+     return 0
+   fi
+   if $(property_includes $mynode $element); then
+     echo "INCLUDES!!!!!!!!!!!!!!!!!!!!!!"
+     return 0
+   fi
+   $(/usr/sbin/pcs property set $mynode=$(get_property_value $mynode),$element --force )
 }
 
 # obsolete, but here as an illustration of how i_am_vip works
@@ -47,6 +83,7 @@ info() {
   $(property_exists rsync_server); echo property_exists rsync_server is $?
   $(property_exists keystone); echo property_exists keystone is $?
   $(property_exists bogus_property); echo property_exists bogus_property is $?
+  $(all_members_include swift); echo all_members_include swift is $?
 }
 
 [[ "$#" -lt 1 ]] && echo "Need to pass in a test" && exit 1
@@ -59,6 +96,12 @@ case "$1" in
      ;;
   "property_exists")
      property_exists $2
+     ;;
+  "update_my_node_property")
+     update_my_node_property $2 $3
+     ;;
+  "all_members_include")
+     all_members_include $2
      ;;
   "info")
      info
