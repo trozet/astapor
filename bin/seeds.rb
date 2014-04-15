@@ -245,7 +245,7 @@ end
 
 params = {
   "verbose"                       => "true",
-  "heat_cfn"                      => "false",
+  "heat_cfn"                      => "true",
   "heat_cloudwatch"               => "false",
   "admin_password"                => SecureRandom.hex,
   "ceilometer_metering_secret"    => SecureRandom.hex,
@@ -264,6 +264,7 @@ params = {
   "glance_gluster_volume"         => "glance",
   "glance_gluster_replica_count"  => '3',
   "gluster_open_port_count"       => '10',
+  "heat_auth_encryption_key"      => SecureRandom.hex,
   "heat_db_password"              => SecureRandom.hex,
   "heat_user_password"            => SecureRandom.hex,
   "heat_cfn_user_password"        => SecureRandom.hex,
@@ -377,6 +378,7 @@ hostgroups = [
               "quickstack::pacemaker::qpid",
               "quickstack::pacemaker::glance",
               "quickstack::pacemaker::nova",
+              "quickstack::pacemaker::heat",
               "quickstack::pacemaker::cinder",
               "quickstack::pacemaker::horizon",
               "quickstack::pacemaker::mysql",
