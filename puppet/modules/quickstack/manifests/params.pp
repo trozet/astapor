@@ -135,4 +135,7 @@ class quickstack::params {
   $fence_ipmilan_username        = ''
   $fence_ipmilan_password        = ''
   $fence_ipmilan_interval        = '60s'
+
+  # Nova Compute
+  $use_qemu_for_poc              = 'false'
 }

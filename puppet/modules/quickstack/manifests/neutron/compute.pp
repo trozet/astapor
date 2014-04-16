@@ -27,6 +27,7 @@ class quickstack::neutron::compute (
   $verbose                     = $quickstack::params::verbose,
   $ssl                         = $quickstack::params::ssl,
   $mysql_ca                    = $quickstack::params::mysql_ca,
+  $use_qemu_for_poc            = $quickstack::params::use_qemu_for_poc,
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -97,6 +98,7 @@ class quickstack::neutron::compute (
     verbose                     => $verbose,
     ssl                         => $ssl,
     mysql_ca                    => $mysql_ca,
+    use_qemu_for_poc            => $use_qemu_for_poc,
   }
 
   class {'quickstack::neutron::firewall::vxlan':

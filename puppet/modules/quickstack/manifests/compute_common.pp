@@ -15,6 +15,7 @@ class quickstack::compute_common (
   $verbose                     = $quickstack::params::verbose,
   $ssl                         = $quickstack::params::ssl,
   $mysql_ca                    = $quickstack::params::mysql_ca,
+  $use_qemu_for_poc            = $quickstack::params::use_qemu_for_poc,
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -58,19 +59,14 @@ class quickstack::compute_common (
     verbose            => $verbose,
   }
 
-  # uncomment if on a vm
-  # GSutclif: Maybe wrap this in a Facter['is-virtual'] test ?
-  #file { "/usr/bin/qemu-system-x86_64":
-  #  ensure => link,
-  #  target => "/usr/libexec/qemu-kvm",
-  #  notify => Service["nova-compute"],
-  #}
-  #nova_config{
-  #  "libvirt_cpu_mode": value => "none";
-  #}
+  if str2bool_i("$use_qemu_for_poc") {
+    $libvirt_type = 'qemu'
+  } else {
+    $libvirt_type = 'kvm'
+  }
 
   class { '::nova::compute::libvirt':
-    #libvirt_type    => "qemu",  # uncomment if on a vm
+    libvirt_type => $libvirt_type,
     vncserver_listen => $::ipaddress,
   }
 
@@ -98,6 +94,10 @@ class quickstack::compute_common (
 
   class { 'ceilometer::agent::compute':
     enabled => true,
+  }
+
+  if str2bool_i("$use_qemu_for_poc")  {
+    include quickstack::compute::qemu
   }
 
   include quickstack::tuned::virtual_host
