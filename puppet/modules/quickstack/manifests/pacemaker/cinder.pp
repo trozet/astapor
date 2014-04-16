@@ -30,6 +30,7 @@ class quickstack::pacemaker::cinder(
     include ::quickstack::pacemaker::qpid
 
     $cinder_user_password = map_params("cinder_user_password")
+    $cinder_private_vip   = map_params("cinder_private_vip")
     $db_host              = map_params("db_vip")
     $glance_host          = map_params("glance_admin_vip")
     $keystone_host        = map_params("keystone_admin_vip")
