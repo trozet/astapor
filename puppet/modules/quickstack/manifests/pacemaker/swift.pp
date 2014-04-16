@@ -9,7 +9,7 @@ class quickstack::pacemaker::swift (
 ) {
   include quickstack::pacemaker::common
 
-  if (map_params('include_swift') == 'true') {
+  if (map_params('include_swift') == 'true' and map_params("db_is_ready")) {
     $swift_group = map_params("swift_group")
     $swift_public_vip = map_params("swift_public_vip")
     $memcached_ips =  map_params("lb_backend_server_addrs")

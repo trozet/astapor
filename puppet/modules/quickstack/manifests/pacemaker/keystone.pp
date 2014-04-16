@@ -4,7 +4,6 @@ class quickstack::pacemaker::keystone (
   $admin_tenant     = "admin",
   $admin_token,
   $db_name          = "keystone",
-  $db_password,
   $db_ssl           = "false",
   $db_ssl_ca        = undef,
   $db_type          = "mysql",
@@ -26,13 +25,12 @@ class quickstack::pacemaker::keystone (
   $heat             = "false",
   $heat_cfn         = "false",
   $nova             = "true",
-  $neutron          = "true",
   $swift            = "false",
 ) {
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_keystone') == 'true') {
+  if (map_params('include_keystone') == 'true' and map_params("db_is_ready")) {
     $keystone_group = map_params("keystone_group")
     $keystone_private_vip = map_params("keystone_private_vip")
 
@@ -67,7 +65,7 @@ class quickstack::pacemaker::keystone (
       bind_host                   => map_params("local_bind_addr"),
       db_host                     => map_params("db_vip"),
       db_name                     => "$db_name",
-      db_password                 => "$db_password",
+      db_password                 => map_params("keystone_db_password"),
       db_ssl                      => str2bool_i("$db_ssl"),
       db_ssl_ca                   => "$db_ssl_ca",
       db_type                     => "$db_type",
@@ -98,7 +96,7 @@ class quickstack::pacemaker::keystone (
       cinder_public_address       => map_params("cinder_public_vip"),
       cinder_internal_address     => map_params("cinder_private_vip"),
       cinder_admin_address        => map_params("cinder_admin_vip"),
-      neutron                     => str2bool_i("$neutron"),
+      neutron                     => str2bool_i(map_params("neutron")),
       neutron_user_password       => map_params("neutron_user_password"),
       neutron_public_address      => map_params("neutron_public_vip"),
       neutron_internal_address    => map_params("neutron_private_vip"),

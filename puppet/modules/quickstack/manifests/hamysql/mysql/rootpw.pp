@@ -10,7 +10,7 @@ class quickstack::hamysql::mysql::rootpw(
     exec { 'set_mysql_rootpw':
       command   => "mysqladmin -u root ${old_pw} password '${root_password}'",
       logoutput => true,
-      unless    => "mysqladmin -u root -p'${root_password}' status > /dev/null",
+      unless    => "mysqladmin -u root -p'${root_password}' status >/dev/null 2>&1",
       path      => '/usr/local/sbin:/usr/bin:/usr/local/bin:/bin',
       require   => File['/etc/mysql/conf.d'],
       onlyif    => "/tmp/are-we-running-mysql.bash",
@@ -20,6 +20,7 @@ class quickstack::hamysql::mysql::rootpw(
       require => Exec['set_mysql_rootpw'],
       mode => '0600',
     }
-
+    File["${root_home}/.my.cnf"] -> Database_user <| |>
+    File["${root_home}/.my.cnf"] -> Database <| |>
   }
 }

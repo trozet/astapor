@@ -22,14 +22,12 @@ class quickstack::hamysql::node (
   $mysql_shared_storage_options = $quickstack::params::mysql_shared_storage_options,
   $mysql_resource_group_name    = $quickstack::params::mysql_resource_group_name,
   $mysql_clu_member_addrs       = $quickstack::params::mysql_clu_member_addrs,
-
+  $corosync_setup               = true,
 ) inherits quickstack::params {
 
+    include mysql::python
+
     package { 'mysql-server':
-      ensure => installed,
-    }
-    ->
-    package { 'MySQL-python':
       ensure => installed,
     }
     ->
@@ -37,18 +35,21 @@ class quickstack::hamysql::node (
       bind_address =>  $mysql_bind_address,
       socket => '/var/run/mysqld/mysql.sock',
     }
-    ->
-    # TODO: use quickstack::pacemaker::common instead
-    class {'pacemaker::corosync':
-      cluster_name => "hamysql",
-      cluster_members => $mysql_clu_member_addrs,
+    -> Class['pacemaker::corosync']
+    -> Pacemaker::Resource::Ip['mysql-clu-vip']
+
+    if $corosync_setup {
+      class {'pacemaker::corosync':
+        cluster_name => "hamysql",
+        cluster_members => $mysql_clu_member_addrs,
+      }
+      ->
+      # TODO: use quickstack::pacemaker::common instead
+      class {"pacemaker::stonith":
+        disable => true,
+      }
+      -> Pacemaker::Resource::Ip['mysql-clu-vip']
     }
-    ->
-    # TODO: use quickstack::pacemaker::common instead
-    class {"pacemaker::stonith":
-      disable => true,
-    }
-    ->
     pacemaker::resource::ip { 'mysql-clu-vip' :
       ip_address => $mysql_virtual_ip,
       group => $mysql_resource_group_name,
@@ -72,7 +73,7 @@ class quickstack::hamysql::node (
     }
     ->
     exec { "sleep-so-really-sure-fs-is-mounted":
-      command => "/bin/sleep 15",
+      command => "/bin/sleep 5",
     }
     ->
     # this needs to be an exec rather than puppet's file type because
