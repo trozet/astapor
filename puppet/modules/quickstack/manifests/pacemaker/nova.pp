@@ -18,6 +18,7 @@ class quickstack::pacemaker::nova (
   include quickstack::pacemaker::common
 
   if (map_params('include_nova') == 'true') {
+    $nova_private_vip = map_params("nova_private_vip")
     $pcmk_nova_group = map_params("nova_group")
     $memcached_ips =  map_params("lb_backend_server_addrs")
     $memcached_servers = split(
