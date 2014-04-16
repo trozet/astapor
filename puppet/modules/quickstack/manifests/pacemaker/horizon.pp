@@ -10,7 +10,7 @@ class quickstack::pacemaker::horizon (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_horizon') == 'true') {
+  if (map_params('include_horizon') == 'true' and map_params("db_is_ready")) {
     $pcmk_horizon_group = map_params("horizon_group")
     $horizon_public_vip  = map_params("horizon_public_vip")
     $horizon_private_vip = map_params("horizon_private_vip")

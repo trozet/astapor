@@ -1,5 +1,4 @@
 class quickstack::pacemaker::glance (
-  $db_password,
   $sql_idle_timeout         = '3600',
   $db_ssl                   = false,
   $db_ssl_ca                = undef,
@@ -34,7 +33,7 @@ class quickstack::pacemaker::glance (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_glance') == 'true') {
+  if (map_params('include_glance') == 'true' and map_params("db_is_ready")) {
     $glance_private_vip = map_params("glance_private_vip")
 
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-api']
@@ -89,7 +88,7 @@ class quickstack::pacemaker::glance (
     } ->
     class { 'quickstack::glance':
       user_password            => map_params("glance_user_password"),
-      db_password              => $db_password,
+      db_password              => map_params("glance_db_password"),
       db_host                  => map_params("db_vip"),
       keystone_host            => map_params("keystone_admin_vip"),
       sql_idle_timeout         => $sql_idle_timeout,
