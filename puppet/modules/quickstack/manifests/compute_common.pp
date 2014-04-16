@@ -1,6 +1,8 @@
 # Quickstack compute node
 class quickstack::compute_common (
   $admin_password              = $quickstack::params::admin_password,
+  $ceilometer                  = 'true',
+  $ceilometer_host             = 'false',
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
@@ -76,24 +78,31 @@ class quickstack::compute_common (
     vncserver_proxyclient_address => $::ipaddress,
   }
 
-  class { 'ceilometer':
-    metering_secret => $ceilometer_metering_secret,
-    qpid_hostname   => $qpid_host,
-    qpid_port       => $qpid_port,
-    qpid_protocol   => $qpid_protocol,
-    qpid_username   => $qpid_username,
-    qpid_password   => $qpid_password,
-    rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
-    verbose         => $verbose,
-  }
+  if str2bool_i("$ceilometer") {
+    if "$ceilometer_host" == 'false' {
+      $auth_host = $controller_priv_host
+    } else {
+      $auth_host = $ceilometer_host
+    }
+    class { 'ceilometer':
+      metering_secret => $ceilometer_metering_secret,
+      qpid_hostname   => $qpid_host,
+      qpid_port       => $qpid_port,
+      qpid_protocol   => $qpid_protocol,
+      qpid_username   => $qpid_username,
+      qpid_password   => $qpid_password,
+      rpc_backend     => 'ceilometer.openstack.common.rpc.impl_qpid',
+      verbose         => $verbose,
+    }
 
-  class { 'ceilometer::agent::auth':
-    auth_url      => "http://${controller_priv_host}:35357/v2.0",
-    auth_password => $ceilometer_user_password,
-  }
+    class { 'ceilometer::agent::auth':
+      auth_url      => "http://${auth_host}:35357/v2.0",
+      auth_password => $ceilometer_user_password,
+    }
 
-  class { 'ceilometer::agent::compute':
-    enabled => true,
+    class { 'ceilometer::agent::compute':
+      enabled => true,
+    }
   }
 
   if str2bool_i("$use_qemu_for_poc")  {

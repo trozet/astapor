@@ -1,6 +1,8 @@
 # Quickstack compute node configuration for nova network
 class quickstack::nova_network::compute (
   $admin_password               = $quickstack::params::admin_password,
+  $ceilometer                   = 'true',
+  $ceilometer_host              = 'false',
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster       = $quickstack::params::cinder_backend_gluster,
@@ -64,21 +66,23 @@ class quickstack::nova_network::compute (
   }
 
   class { 'quickstack::compute_common':
-    admin_password              => $admin_password,
-    ceilometer_metering_secret  => $ceilometer_metering_secret,
-    ceilometer_user_password    => $ceilometer_user_password,
-    cinder_backend_gluster      => $cinder_backend_gluster,
-    controller_priv_host        => $controller_priv_host,
-    controller_pub_host         => $controller_pub_host,
-    mysql_host                  => $mysql_host,
-    nova_db_password            => $nova_db_password,
-    nova_user_password          => $nova_user_password,
-    qpid_host                   => $qpid_host,
-    qpid_username               => $qpid_username,
-    qpid_password               => $qpid_password,
-    verbose                     => $verbose,
-    ssl                         => $ssl,
-    mysql_ca                    => $mysql_ca,
-    use_qemu_for_poc            => $use_qemu_for_poc,
+    admin_password             => $admin_password,
+    ceilometer                 => $ceilometer,
+    ceilometer_host            => $ceilometer_host,
+    ceilometer_metering_secret => $ceilometer_metering_secret,
+    ceilometer_user_password   => $ceilometer_user_password,
+    cinder_backend_gluster     => $cinder_backend_gluster,
+    controller_priv_host       => $controller_priv_host,
+    controller_pub_host        => $controller_pub_host,
+    mysql_host                 => $mysql_host,
+    nova_db_password           => $nova_db_password,
+    nova_user_password         => $nova_user_password,
+    qpid_host                  => $qpid_host,
+    qpid_username              => $qpid_username,
+    qpid_password              => $qpid_password,
+    verbose                    => $verbose,
+    ssl                        => $ssl,
+    mysql_ca                   => $mysql_ca,
+    use_qemu_for_poc           => $use_qemu_for_poc,
   }
 }
