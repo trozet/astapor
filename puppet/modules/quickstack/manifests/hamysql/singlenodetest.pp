@@ -1,5 +1,5 @@
 class quickstack::hamysql::singlenodetest (
-  # just set up a single node (non-HA) openstack::db::mysql db
+  # just set up a single node (non-HA) quickstack::db::mysql db
   # these params aren't doing anything yet
   $mysql_root_password         = $quickstack::params::mysql_root_password,
   $keystone_db_password        = $quickstack::params::keystone_db_password,
@@ -12,7 +12,7 @@ class quickstack::hamysql::singlenodetest (
   $mysql_bind_address         = '0.0.0.0'
 ) inherits quickstack::params {
 
-  class {'openstack::db::mysql':
+  class {'quickstack::db::mysql':
       mysql_root_password  => $mysql_root_password,
       keystone_db_password => $keystone_db_password,
       glance_db_password   => $glance_db_password,

@@ -18,9 +18,9 @@ class quickstack::cinder_controller(
 ) inherits quickstack::params {
 
   $qpid_password_safe_for_cinder = $qpid_password ? {
-     ''      => 'guest',
-     false   => 'guest',
-     default => $qpid_password,
+    ''      => 'guest',
+    false   => 'guest',
+    default => $qpid_password,
   }
 
   cinder_config {
@@ -43,7 +43,7 @@ class quickstack::cinder_controller(
     qpid_password  => $qpid_password_safe_for_cinder,
     sql_connection => $sql_connection,
     verbose        => $verbose,
-    require        => Class['openstack::db::mysql', 'qpid::server'],
+    require        => Class['quickstack::db::mysql', 'qpid::server'],
   }
 
   class {'::cinder::api':
@@ -62,8 +62,8 @@ class quickstack::cinder_controller(
 
     if ($::selinux != "false") {
       selboolean{'virt_use_fusefs':
-          value => on,
-          persistent => true,
+        value => on,
+        persistent => true,
       }
     }
 
