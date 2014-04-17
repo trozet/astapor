@@ -50,7 +50,7 @@ class quickstack::hamysql::mysql::config(
   $ssl_cert          = $mysql::params::ssl_cert,
   $ssl_key           = $mysql::params::ssl_key,
   $log_error         = $mysql::params::log_error,
-  $default_engine    = 'UNSET',
+  $default_engine    = 'InnoDB',
   $root_group        = $mysql::params::root_group,
   #$restart           = $mysql::params::restart
 ) inherits mysql::params {
