@@ -128,5 +128,9 @@ class quickstack::hamysql::mysql::setup (
         require    => Database_user["$neutron_db_user@%"]
       }
     }
+    exec {"pcs-mysql-server-set-up":
+      command => "/usr/sbin/pcs property set mysql=running --force",
+    }
+    Database_grant <| |> -> Exec["pcs-mysql-server-set-up"]
   }
 }

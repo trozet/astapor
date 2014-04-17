@@ -139,7 +139,6 @@ class quickstack::hamysql::node (
       neutron              => str2bool_i("$neutron"),
       require              => Class['quickstack::hamysql::mysql::rootpw'],
     }
-
     firewall { '002 mysql incoming':
       proto => 'tcp',
       dport => ['3306'],

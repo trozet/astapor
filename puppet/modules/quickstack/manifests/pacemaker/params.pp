@@ -37,7 +37,7 @@ class quickstack::pacemaker::params (
   $include_glance            = 'true',
   $include_horizon           = 'true',
   $include_keystone          = 'true',
-  $include_mysql             = 'false',
+  $include_mysql             = 'true',
   $include_neutron           = 'true',
   $include_nova              = 'true',
   $include_qpid              = 'true',

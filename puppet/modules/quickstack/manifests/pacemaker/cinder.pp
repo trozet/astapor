@@ -37,6 +37,25 @@ class quickstack::pacemaker::cinder(
     $qpid_host            = map_params("qpid_vip")
     $qpid_port            = map_params("qpid_port")
 
+    Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec['cinder-manage db_sync']
+    if (map_params('include_mysql') == 'true') {
+       if str2bool_i("$hamysql_is_running") {
+         Exec['mysql-has-users'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
+       }
+    }
+    if (map_params('include_keystone') == 'true') {
+      Exec['all-keystone-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
+    }
+    if (map_params('include_swift') == 'true') {
+      Exec['all-swift-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
+    }
+    if (map_params('include_glance') == 'true') {
+      Exec['all-glance-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
+    }
+    if (map_params('include_nova') == 'true') {
+      Exec['all-nova-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
+    }
+
     Class['::quickstack::pacemaker::qpid']
     ->
     # assuming openstack-cinder-api and openstack-cinder-scheduler
@@ -88,6 +107,15 @@ class quickstack::pacemaker::cinder(
     ->
     exec {"pcs-cinder-server-set-up":
       command => "/usr/sbin/pcs property set cinder=running --force",
+    } ->
+    exec {"pcs-cinder-server-set-up-on-this-node":
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property cinder"
+    } ->
+    exec {"all-cinder-nodes-are-up":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash all_members_include cinder",
     }
     ->
     pacemaker::resource::lsb {'openstack-cinder-api':
