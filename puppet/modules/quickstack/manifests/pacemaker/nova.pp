@@ -1,14 +1,12 @@
 class quickstack::pacemaker::nova (
   $auto_assign_floating_ip = 'true',
   $db_name                 = 'nova',
-  $db_password,
   $db_user                 = 'nova',
   $default_floating_pool   = 'nova',
   $force_dhcp_release      = 'false',
   $image_service           = 'nova.image.glance.GlanceImageService',
   $memcached_port          = '11211',
   $multi_host              = 'true',
-  $neutron                 = 'false',
   $neutron_metadata_proxy_secret,
   $qpid_heartbeat          = '60',
   $rpc_backend             = 'nova.openstack.common.rpc.impl_qpid',
@@ -17,7 +15,8 @@ class quickstack::pacemaker::nova (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_nova') == 'true') {
+  if (map_params('include_nova') == 'true' and map_params("db_is_ready")) {
+    $nova_private_vip = map_params("nova_private_vip")
     $pcmk_nova_group = map_params("nova_group")
     $memcached_ips =  map_params("lb_backend_server_addrs")
     $memcached_servers = split(
@@ -49,7 +48,7 @@ class quickstack::pacemaker::nova (
       bind_address                  => map_params("local_bind_addr"),
       db_host                       => map_params("db_vip"),
       db_name                       => $db_name,
-      db_password                   => $db_password,
+      db_password                   => map_params("nova_db_password"),
       db_user                       => $db_user,
       default_floating_pool         => $default_floating_pool,
       force_dhcp_release            => $force_dhcp_release,
@@ -58,7 +57,7 @@ class quickstack::pacemaker::nova (
       image_service                 => $image_service,
       memcached_servers             => $memcached_servers,
       multi_host                    => $multi_host,
-      neutron                       => map_params("include_neutron"),
+      neutron                       => str2bool_i(map_params("neutron")),
       neutron_metadata_proxy_secret => $neutron_metadata_proxy_secret,
       qpid_heartbeat                => $qpid_heartbeat,
       qpid_hostname                 => map_params("qpid_vip"),

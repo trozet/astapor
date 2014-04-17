@@ -1,5 +1,4 @@
 class quickstack::pacemaker::cinder(
-  $db_password,
   $db_name           = 'cinder',
   $db_user           = 'cinder',
 
@@ -24,13 +23,15 @@ class quickstack::pacemaker::cinder(
   $verbose           = false,
 ) {
 
-  if (map_params('include_cinder') == 'true') {
+  if (map_params('include_cinder') == 'true' and map_params("db_is_ready")) {
 
     include ::quickstack::pacemaker::common
     include ::quickstack::pacemaker::qpid
 
     $cinder_user_password = map_params("cinder_user_password")
+    $cinder_private_vip   = map_params("cinder_private_vip")
     $db_host              = map_params("db_vip")
+    $db_password          = map_params("cinder_db_password")
     $glance_host          = map_params("glance_admin_vip")
     $keystone_host        = map_params("keystone_admin_vip")
     $qpid_host            = map_params("qpid_vip")
