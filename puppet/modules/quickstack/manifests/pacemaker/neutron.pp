@@ -17,6 +17,27 @@ class quickstack::pacemaker::neutron (
     $neutron_group = map_params("neutron_group")
     $neutron_public_vip = map_params("neutron_public_vip")
 
+    if (map_params('include_mysql') == 'true') {
+       if str2bool_i("$hamysql_is_running") {
+         Exec['mysql-has-users'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
+       }
+    }
+    if (map_params('include_keystone') == 'true') {
+      Exec['all-keystone-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
+    }
+    if (map_params('include_swift') == 'true') {
+      Exec['all-swift-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
+    }
+    if (map_params('include_cinder') == 'true') {
+      Exec['all-cinder-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
+    }
+    if (map_params('include_glance') == 'true') {
+      Exec['all-glance-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
+    }
+    if (map_params('include_nova') == 'true') {
+      Exec['all-nova-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
+    }
+
     Class['::quickstack::pacemaker::common']
     ->
     quickstack::pacemaker::vips { "$neutron_group":

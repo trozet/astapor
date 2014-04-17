@@ -24,6 +24,21 @@ class quickstack::pacemaker::nova (
         |x| x+":"+@memcached_port }.join(",") %>'),
         ','
     )
+    Exec['i-am-nova-vip-OR-nova-is-up-on-vip'] -> Exec['nova-db-sync']
+    if (map_params('include_mysql') == 'true') {
+       if str2bool_i("$hamysql_is_running") {
+         Exec['mysql-has-users'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
+       }
+    }
+    if (map_params('include_keystone') == 'true') {
+      Exec['all-keystone-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
+    }
+    if (map_params('include_swift') == 'true') {
+      Exec['all-swift-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
+    }
+    if (map_params('include_glance') == 'true') {
+      Exec['all-glance-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
+    }
 
     Class['::quickstack::pacemaker::common']
     ->
@@ -76,8 +91,17 @@ class quickstack::pacemaker::nova (
     ->
     exec {"pcs-nova-server-set-up":
       command => "/usr/sbin/pcs property set nova=running --force",
-    }
-    ->
+    } ->
+    exec {"pcs-nova-server-set-up-on-this-node":
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property nova"
+    } ->
+    exec {"all-nova-nodes-are-up":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash all_members_include nova",
+    } ->
+
     pacemaker::resource::lsb {['openstack-nova-consoleauth',
                               'openstack-nova-novncproxy',
                               'openstack-nova-api',

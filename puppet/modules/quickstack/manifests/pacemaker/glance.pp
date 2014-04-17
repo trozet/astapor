@@ -40,6 +40,11 @@ class quickstack::pacemaker::glance (
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-registry']
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec['glance-manage db_sync']
 
+    if (map_params('include_mysql') == 'true') {
+       if str2bool_i("$hamysql_is_running") {
+         Exec['mysql-has-users'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
+       }
+    }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
     }
@@ -125,6 +130,15 @@ class quickstack::pacemaker::glance (
     } ->
     exec {"pcs-glance-server-set-up":
       command => "/usr/sbin/pcs property set glance=running --force",
+    } ->
+    exec {"pcs-glance-server-set-up-on-this-node":
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property glance"
+    } ->
+    exec {"all-glance-nodes-are-up":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
     pacemaker::resource::lsb {'openstack-glance-api':
       group => "$pcmk_glance_group",
