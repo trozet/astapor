@@ -5,6 +5,7 @@ class quickstack::pacemaker::neutron (
   $ovs_bridge_mappings           = [],
   $ovs_bridge_uplinks            = [],
   $ovs_tunnel_iface              = '',
+  $ovs_tunnel_network            = '',
   $ovs_vlan_ranges               = '',
   $ovs_tunnel_types              = [],
   $tenant_network_type           = 'vlan',
@@ -16,11 +17,12 @@ class quickstack::pacemaker::neutron (
   if (map_params('include_neutron') == 'true') {
     $neutron_group = map_params("neutron_group")
     $neutron_public_vip = map_params("neutron_public_vip")
+    $ovs_nic = find_nic("$ovs_tunnel_network","$ovs_tunnel_iface","")
 
     if (map_params('include_mysql') == 'true') {
-       if str2bool_i("$hamysql_is_running") {
-         Exec['mysql-has-users'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
-       }
+      if str2bool_i("$hamysql_is_running") {
+        Exec['mysql-has-users'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
+      }
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
@@ -66,7 +68,7 @@ class quickstack::pacemaker::neutron (
       neutron_metadata_proxy_secret => map_params("neutron_metadata_proxy_secret"),
       ovs_bridge_mappings           => $ovs_bridge_mappings,
       ovs_bridge_uplinks            => $ovs_bridge_uplinks,
-      ovs_tunnel_iface              => $ovs_tunnel_iface,
+      ovs_tunnel_iface              => $ovs_nic,
       ovs_vlan_ranges               => $ovs_vlan_ranges,
       ovs_tunnel_types              => $ovs_tunnel_types,
       qpid_host                     => map_params("qpid_vip"),

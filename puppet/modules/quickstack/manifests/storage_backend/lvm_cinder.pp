@@ -5,7 +5,8 @@ class quickstack::storage_backend::lvm_cinder(
   $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
   $cinder_gluster_peers        = $quickstack::params::cinder_gluster_peers,
   $controller_priv_host        = $quickstack::params::controller_priv_host,
-  $cinder_iscsi_iface          = 'em1',
+  $cinder_iscsi_iface          = 'eth1',
+  $cinder_iscsi_network        = '',
   $mysql_host                  = $quickstack::params::mysql_host,
   $qpid_host                   = $quickstack::params::qpid_host,
   $qpid_username               = $quickstack::params::qpid_username,
@@ -56,8 +57,11 @@ class quickstack::storage_backend::lvm_cinder(
   }
 
   if str2bool_i("$cinder_backend_iscsi") {
+    $iscsi_ip_address = find_ip("$cinder_iscsi_network",
+                                "$cinder_iscsi_iface",
+                                "")
     class { '::cinder::volume::iscsi':
-      iscsi_ip_address => getvar(regsubst("ipaddress_${cinder_iscsi_iface}", '[.-]', '_', 'G')),
+      iscsi_ip_address => $iscsi_ip_address,
     }
 
     firewall { '010 cinder iscsi':
