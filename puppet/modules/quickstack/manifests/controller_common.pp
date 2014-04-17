@@ -99,7 +99,7 @@ class quickstack::controller_common (
       $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
   }
 
-  class {'openstack::db::mysql':
+  class {'quickstack::db::mysql':
     mysql_root_password  => $mysql_root_password,
     keystone_db_password => $keystone_db_password,
     glance_db_password   => $glance_db_password,
@@ -187,7 +187,7 @@ class quickstack::controller_common (
 
     neutron                 => str2bool_i("$neutron"),
     enabled                 => true,
-    require                 => Class['openstack::db::mysql'],
+    require                 => Class['quickstack::db::mysql'],
   }
 
   class { 'swift::keystone::auth':
@@ -204,7 +204,7 @@ class quickstack::controller_common (
     db_ssl_ca      => $mysql_ca,
     user_password  => $glance_user_password,
     db_password    => $glance_db_password,
-    require        => Class['openstack::db::mysql'],
+    require        => Class['quickstack::db::mysql'],
   }
   class { 'glance::notify::qpid':
     qpid_password => $qpid_password,
@@ -227,7 +227,7 @@ class quickstack::controller_common (
     verbose            => $verbose,
     qpid_protocol      => $qpid_protocol,
     qpid_port          => $qpid_port,
-    require            => Class['openstack::db::mysql', 'qpid::server'],
+    require            => Class['quickstack::db::mysql', 'qpid::server'],
   }
 
   nova_config {
