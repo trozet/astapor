@@ -1,11 +1,12 @@
 class quickstack::pacemaker::swift (
-  $swift_shared_secret  = '',
-  $swift_storage_ips    = [],
-  $swift_storage_device = '',
-  $swift_internal_ip    = '',
-  $swift_internal_iface = '',
-  $swift_internal_vip   = '',
-  $memcached_port       = '11211',  # maybe move to params.pp since also in nova.pp
+  $swift_shared_secret    = '',
+  $swift_storage_ips      = [],
+  $swift_storage_device   = '',
+  $swift_internal_ip      = '',
+  $swift_internal_iface   = '',
+  $swift_internal_network = '',
+  $swift_internal_vip     = '',
+  $memcached_port         = '11211',  # maybe move to params.pp since also in nova.pp
 ) {
   include quickstack::pacemaker::common
 
@@ -18,13 +19,9 @@ class quickstack::pacemaker::swift (
 
     # swift_bind_addr is for internal swift-proxy/swift-storage traffic only
     # must be same subnet as swift_internal_vip
-    if ($swift_internal_ip != '') {
-      $swift_bind_addr = "$swift_internal_ip"
-    } else {
-      #TODO: extract this out into a function, we use it all over:
-      $swift_bind_addr = getvar(regsubst("ipaddress_$swift_internal_iface", '[.-]', '_', 'G'))
-      notify {"------ OK, thanks for the nic, our IP is: $swift_internal_iface ----":}
-    }
+    $swift_bind_addr = find_ip("$swift_internal_network",
+                              "$swift_internal_iface",
+                              "$swift_internal_ip")
 
     Exec['i-am-swift-vip-OR-swift-is-up-on-vip'] -> Service['swift-proxy']
     if (map_params('include_keystone') == 'true') {

@@ -11,8 +11,10 @@ class quickstack::nova_network::compute (
   $nova_multi_host              = 'True',
   $nova_db_password             = $quickstack::params::nova_db_password,
   $nova_user_password           = $quickstack::params::nova_user_password,
-  $network_private_iface        = 'em1',
-  $network_public_iface         = 'em2',
+  $network_private_iface        = 'eth1',
+  $network_private_network      = '192.168.200.0',
+  $network_public_iface         = 'eth2',
+  $network_public_network       = '192.168.201.0',
   $network_manager              = 'FlatDHCPManager',
   $network_create_networks      = true,
   $network_num_networks         = 1,
@@ -44,9 +46,12 @@ class quickstack::nova_network::compute (
     service_name   => 'openstack-nova-metadata-api',
   }
 
+  $priv_nic = find_nic("$network_private_network","$network_private_iface","")
+  $pub_nic = find_nic("$network_public_network","$network_public_iface","")
+
   class { '::nova::network':
-    private_interface => "$network_private_iface",
-    public_interface  => "$network_public_iface",
+    private_interface => "$priv_nic",
+    public_interface  => "$pub_nic",
     fixed_range       => "$network_fixed_range",
     num_networks      => $network_num_networks,
     network_size      => $network_network_size,
