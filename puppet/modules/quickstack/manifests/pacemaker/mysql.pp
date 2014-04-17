@@ -28,5 +28,17 @@ class quickstack::pacemaker::mysql (
       mysql_virt_ip_nic            => '',
       mysql_virt_ip_cidr_mask      => '32',
     }
+    if str2bool_i("$hamysql_is_running") {
+      Class ['quickstack::hamysql::node'] ->
+      exec {"mysql-has-users":
+        timeout   => 3600,
+        tries     => 360,
+        try_sleep => 10,
+        command   => "/tmp/ha-all-in-one-util.bash property_exists mysql",
+      }
+      if str2bool_i("$hamysql_active_node") {
+        Exec["pcs-mysql-server-set-up"] -> Exec["mysql-has-users"]
+      }
+    }
   }
 }
