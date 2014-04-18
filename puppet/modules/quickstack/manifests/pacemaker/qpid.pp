@@ -77,6 +77,15 @@ class quickstack::pacemaker::qpid (
     } ->
     Class['::quickstack::load_balancer::qpid'] ->
 
+    exec {"pcs-qpid-server-set-up-on-this-node":
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property qpid"
+    } ->
+    exec {"all-qpid-nodes-are-up":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash all_members_include qpid",
+    } ->
     pacemaker::resource::lsb { 'qpidd':
       group   => 'openstack_qpid',
       clone   => true,
