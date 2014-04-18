@@ -19,6 +19,7 @@ class quickstack::controller_common (
   $heat_cloudwatch               = $quickstack::params::heat_cloudwatch,
   $heat_db_password              = $quickstack::params::heat_db_password,
   $heat_user_password            = $quickstack::params::heat_user_password,
+  $heat_auth_encrypt_key,
   $horizon_secret_key            = $quickstack::params::horizon_secret_key,
   $keystone_admin_token          = $quickstack::params::keystone_admin_token,
   $keystone_db_password          = $quickstack::params::keystone_db_password,
@@ -303,6 +304,7 @@ class quickstack::controller_common (
   }
 
   class { 'quickstack::heat_controller':
+    auth_encryption_key         => $heat_auth_encrypt_key,
     heat_cfn                    => $heat_cfn,
     heat_cloudwatch             => $heat_cloudwatch,
     heat_user_password          => $heat_user_password,

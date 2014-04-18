@@ -1,4 +1,5 @@
 class quickstack::heat_controller(
+  $auth_encryption_key,
   $heat_cfn,
   $heat_cloudwatch,
   $heat_user_password,
@@ -6,8 +7,8 @@ class quickstack::heat_controller(
   $controller_admin_host,
   $controller_priv_host,
   $controller_pub_host,
-  $mysql_host,
   $mysql_ca,
+  $mysql_host,
   $ssl,
   $qpid_host,
   $qpid_port,
@@ -17,6 +18,11 @@ class quickstack::heat_controller(
   $verbose,
 ) {
 
+  if str2bool_i("$ssl") {
+    $sql_connection = "mysql://heat:${heat_db_password}@${mysql_host}/heat?ssl_ca=${mysql_ca}"
+  } else {
+    $sql_connection = "mysql://heat:${heat_db_password}@${mysql_host}/heat"
+  }
   class {"::heat::keystone::auth":
       password         => $heat_user_password,
       public_address   => $controller_pub_host,
@@ -42,6 +48,7 @@ class quickstack::heat_controller(
       qpid_username     => $qpid_username,
       qpid_password     => $qpid_password,
       verbose           => $verbose,
+      sql_connection    => $sql_connection,
   }
 
   class { '::heat::api_cfn':
@@ -53,24 +60,17 @@ class quickstack::heat_controller(
   }
 
   class { '::heat::engine':
+      auth_encryption_key           => $auth_encryption_key,
       heat_metadata_server_url      => "http://${controller_priv_host}:8000",
       heat_waitcondition_server_url => "http://${controller_priv_host}:8000/v1/waitcondition",
       heat_watch_server_url         => "http://${controller_priv_host}:8003",
   }
 
-  class { '::heat::db::mysql':
-      password => $heat_db_password,
-      allowed_hosts => "%%",
-  }
-
-  if str2bool_i("$ssl") {
-    $sql_connection = "mysql://heat:${heat_db_password}@${mysql_host}/heat?ssl_ca=${mysql_ca}"
-  } else {
-    $sql_connection = "mysql://heat:${heat_db_password}@${mysql_host}/heat"
-  }
-
-  class { 'heat::db':
-      sql_connection => $sql_connection,
+  # TODO: this ain't no place to be creating a db locally as happens below
+  class { 'heat::db::mysql':
+    password      => $heat_db_password,
+    host          => $mysql_host,
+    allowed_hosts => "%%",
   }
 
   class { '::heat::api':
