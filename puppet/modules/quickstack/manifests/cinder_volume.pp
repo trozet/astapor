@@ -1,8 +1,6 @@
 class quickstack::cinder_volume(
   $volume_backend    = 'iscsi',
   $iscsi_bind_addr   = undef,
-  $gluster_volume    = undef,
-  $gluster_servers   = undef,
 ) {
   class { '::cinder::volume': }
 
