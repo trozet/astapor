@@ -21,6 +21,8 @@
 #
 # [*fence_xvm_clu_iface*]
 #
+# [*fence_xvm_clu_network*]
+#
 # [*fence_xvm_manage_key_file*]
 #
 # [*fence_xvm_key_file_password*]
@@ -35,6 +37,7 @@ class quickstack::pacemaker::common (
   $fence_ipmilan_password         = "",
   $fence_ipmilan_interval         = "60s",
   $fence_xvm_clu_iface            = "eth2",
+  $fence_xvm_clu_network          = "",
   $fence_xvm_manage_key_file      = "false",
   $fence_xvm_key_file_password    = "",
 
@@ -68,7 +71,9 @@ class quickstack::pacemaker::common (
     Class['pacemaker::stonith::ipmilan']
   }
   elsif $fencing_type =~ /(?i-mx:^fence_xvm$)/ {
-    $clu_ip_address = getvar(regsubst("ipaddress_$fence_xvm_clu_iface", '[.-]', '_', 'G'))
+    $clu_ip_address = find_ip("$fence_xvm_clu_network",
+                              "$fence_xvm_clu_iface",
+                              "")
     class {'pacemaker::stonith':
       disable => false,
     }

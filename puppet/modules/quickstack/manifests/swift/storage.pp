@@ -3,6 +3,7 @@ class quickstack::swift::storage (
   $swift_all_ips                  = ['192.168.203.1', '192.168.203.2', '192.168.203.3', '192.168.203.4'],
   $swift_ext4_device              = '/dev/sdc2',
   $swift_local_interface          = 'eth3',
+  $swift_local_network            = '',
   $swift_loopback                 = true,
   $swift_ring_server              = '192.168.203.1',  # an ip addr
   $swift_shared_secret            = '',
@@ -10,8 +11,12 @@ class quickstack::swift::storage (
 
   class {'quickstack::openstack_common': }
 
+  $storage_local_net_ip = find_ip("$swift_local_network",
+                                  "$swift_local_interface ",
+                                  "")
+
   class { '::swift::storage::all':
-    storage_local_net_ip => getvar(regsubst("ipaddress_${swift_local_interface}", '[.-]', '_', 'G')),
+    storage_local_net_ip => $storage_local_net_ip,
     require => Class['swift'],
     log_facility => 'LOG_LOCAL1',
   }
@@ -60,6 +65,8 @@ class quickstack::swift::storage (
 
   # Create firewall rules to allow only the hosts that need to connect
   # to swift storage and rsync
+  # FIXME: A define should be in it's own file, as we have done in load
+  # balancer.
   define add_allow_host_swift {
       firewall { "001 swift storage and rsync incoming ${title}":
           proto  => 'tcp',

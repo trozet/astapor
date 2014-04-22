@@ -74,6 +74,7 @@ class quickstack::pacemaker::params (
   $nova_user_password        = '',
   $private_ip                = '',
   $private_iface             = '',
+  $private_network           = '',
   $qpid_port                 = '5672',
   $qpid_vip                  = '',
   $qpid_group                = 'qpid',
@@ -81,17 +82,9 @@ class quickstack::pacemaker::params (
   $swift_user_password       = '',
   $swift_group               = 'swift',
 ) {
-  # If IP is specified per host, prefer that.
-  # If interface is specified, this should get pulled per host,
-  # or default to hostgroup level interface.
-  if ($private_ip != '') {
-    $local_bind_addr = "$private_ip"
-    notify {"++++++ Looks like we were given an IP: $local_bind_addr ++++++":}
-  } else {
-    #TODO: extract this out into a function, we use it all over:
-    $local_bind_addr = getvar(regsubst("ipaddress_$private_iface", '[.-]', '_', 'G'))
-    notify {"------ OK, thanks for the nic, our IP is: $local_bind_addr ----":}
-  }
+  $local_bind_addr = find_ip("$private_network",
+                            "$private_iface",
+                            "$private_ip")
 
   # Hackery explained: an external db is always ready.  Or, if hamysql
   # was running in the cluster at the start of the puppet run, we can

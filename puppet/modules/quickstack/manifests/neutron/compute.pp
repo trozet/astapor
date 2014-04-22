@@ -16,7 +16,8 @@ class quickstack::neutron::compute (
   $nova_user_password          = $quickstack::params::nova_user_password,
   $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
   $ovs_vlan_ranges             = $quickstack::params::ovs_vlan_ranges,
-  $ovs_tunnel_iface            = 'em1',
+  $ovs_tunnel_iface            = 'eth1',
+  $ovs_tunnel_network          = '',
   $qpid_host                   = $quickstack::params::qpid_host,
   $qpid_username               = $quickstack::params::qpid_username,
   $qpid_password               = $quickstack::params::qpid_password,
@@ -66,10 +67,10 @@ class quickstack::neutron::compute (
     tunnel_id_ranges    => $tunnel_id_ranges,
     vxlan_udp_port      => $ovs_vxlan_udp_port,
   }
-
+  $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
   class { '::neutron::agents::ovs':
     bridge_mappings     => $ovs_bridge_mappings,
-    local_ip            => getvar(regsubst("ipaddress_${ovs_tunnel_iface}", '[.-]', '_', 'G')),
+    local_ip            => $local_ip,
     enable_tunneling    => str2bool_i("$enable_tunneling"),
     tunnel_types     => $ovs_tunnel_types,
     vxlan_udp_port   => $ovs_vxlan_udp_port,
