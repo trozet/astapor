@@ -23,9 +23,10 @@ class quickstack::pacemaker::cinder(
   $verbose           = false,
 ) {
 
+  include ::quickstack::pacemaker::common
+
   if (map_params('include_cinder') == 'true' and map_params("db_is_ready")) {
 
-    include ::quickstack::pacemaker::common
     include ::quickstack::pacemaker::qpid
 
     $cinder_user_password = map_params("cinder_user_password")
