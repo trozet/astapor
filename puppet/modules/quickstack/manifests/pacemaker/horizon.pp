@@ -95,6 +95,17 @@ class quickstack::pacemaker::horizon (
       command => "/usr/sbin/pcs property set horizon=running --force",
     }
     ->
+    exec {"pcs-horizon-server-set-up-on-this-node":
+      command => "/tmp/ha-all-in-one-util.bash update_my_node_property horizon"
+    }
+    ->
+    exec {"all-horizon-nodes-are-up":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash all_members_include horizon",
+    }
+    ->
     pacemaker::resource::lsb {"$::horizon::params::http_service":
       group => "$::horizon::params::http_service",
       clone => true,
