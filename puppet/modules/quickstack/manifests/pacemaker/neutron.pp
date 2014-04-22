@@ -82,7 +82,7 @@ class quickstack::pacemaker::neutron (
       frontend_admin_host    => map_params("neutron_admin_vip"),
       backend_server_names => map_params("lb_backend_server_names"),
       backend_server_addrs => map_params("lb_backend_server_addrs"),
-      require              => quickstack::pacemaker::vips["$neutron_group"],
+      require              => Quickstack::Pacemaker::Vips["$neutron_group"],
     }
     ->
     exec {"pcs-neutron-server-set-up":

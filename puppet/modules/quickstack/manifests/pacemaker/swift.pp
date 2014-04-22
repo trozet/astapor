@@ -81,7 +81,7 @@ class quickstack::pacemaker::swift (
       frontend_pub_host    => map_params("swift_public_vip"),
       backend_server_names => map_params("lb_backend_server_names"),
       backend_server_addrs => map_params("lb_backend_server_addrs"),
-      require              => quickstack::pacemaker::vips["$swift_group"],
+      require              => Quickstack::Pacemaker::Vips["$swift_group"],
     }
     ->
     # no way to do this with puppet-swift, so exec for now
