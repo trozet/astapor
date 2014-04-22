@@ -125,7 +125,7 @@ class quickstack::hamysql::node (
      owner => root,
      group => root,
      mode  => 777,
-     content => "#!/bin/bash\n a=`/usr/sbin/pcs status | grep -P 'mysql-ostk-mysql\\s.*Started' | perl -p -e 's/^.*Started (\S*).*$/\$1/'`; b=`/usr/sbin/crm_node -n`; echo \$a; echo \$b; \ntest \$a = \$b;\n",
+     content => "#!/bin/bash\n a=`/usr/sbin/pcs status | grep -P 'mysql-ostk-mysql\\s.*Started' | perl -p -e 's/^.*Started (\\S*).*$/\$1/'`; b=`/usr/sbin/crm_node -n`; echo \$a; echo \$b; \ntest \$a = \$b;\n",
      require => Exec['wait-for-mysql-to-start'],
     }
 
