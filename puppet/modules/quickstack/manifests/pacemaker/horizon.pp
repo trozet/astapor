@@ -46,6 +46,9 @@ class quickstack::pacemaker::horizon (
     if (map_params('include_neutron') == 'true') {
       Exec['all-neutron-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
+    if (map_params('include_heat') == 'true') {
+      Exec['all-heat-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
+    }
 
     Class['::quickstack::pacemaker::common']
     ->

@@ -7,9 +7,10 @@ class quickstack::hamysql::singlenodetest (
   $nova_db_password            = $quickstack::params::nova_db_password,
   $neutron_db_password         = '',
   $cinder_db_password          = $quickstack::params::cinder_db_password,
+  $heat_db_password            = $quickstack::params::heat_db_password,
   $keystone_db_user            = 'keystone',
   $keystone_db_dbname          = 'keystone',
-  $mysql_bind_address         = '0.0.0.0'
+  $mysql_bind_address          = '0.0.0.0'
 ) inherits quickstack::params {
 
   class {'quickstack::db::mysql':
@@ -31,4 +32,14 @@ class quickstack::hamysql::singlenodetest (
       enabled                => true,
   }
 
+  class {'heat::db::mysql':
+    password => $heat_db_password,
+    allowed_hosts => "%%",
+  }
+
+  firewall {'020 mysql incoming':
+    proto  => 'tcp',
+    dport  => ["3306"],
+    action => 'accept',
+  }
 }
