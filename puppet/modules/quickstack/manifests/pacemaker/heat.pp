@@ -15,9 +15,10 @@ class quickstack::pacemaker::heat(
   $verbose             = false,
 ) {
 
+  include ::quickstack::pacemaker::common
+
   if (map_params('include_heat') == 'true' and map_params("db_is_ready")) {
 
-    include ::quickstack::pacemaker::common
     include ::quickstack::pacemaker::qpid
 
     $heat_db_password        = map_params("heat_db_password")
