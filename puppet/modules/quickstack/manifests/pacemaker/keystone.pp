@@ -135,7 +135,7 @@ class quickstack::pacemaker::keystone (
       frontend_admin_host  => map_params("keystone_admin_vip"),
       backend_server_names => map_params("lb_backend_server_names"),
       backend_server_addrs => map_params("lb_backend_server_addrs"),
-      require              => quickstack::pacemaker::vips["$keystone_group"],
+      require              => Quickstack::Pacemaker::Vips["$keystone_group"],
     } ->
     exec {"pcs-keystone-server-set-up":
       command => "/usr/sbin/pcs property set keystone=running --force",

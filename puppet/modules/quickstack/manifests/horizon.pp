@@ -63,7 +63,7 @@ class quickstack::horizon(
     notify  => Service[$::horizon::params::http_service],
   }
 
-  concat::fragment['Apache ports header'] ->
+  Concat::Fragment['Apache ports header'] ->
   File_line['ports_listen_on_bind_address_80']
   # TODO: add a file_line to set array of memcached servers
 
