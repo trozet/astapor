@@ -14,7 +14,7 @@ EOS
     our_nic = nil 
 
     ifaces.each do |interface|
-        cur_network = Facter::Util::IP.get_network_value(interface)
+        cur_network = lookupvar("network_#{interface}")
         if (cur_network == the_network)
             our_nic = interface 
             break
