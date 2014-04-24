@@ -12,7 +12,7 @@ class quickstack::swift::storage (
   class {'quickstack::openstack_common': }
 
   $storage_local_net_ip = find_ip("$swift_local_network",
-                                  "$swift_local_interface ",
+                                  "$swift_local_interface",
                                   "")
 
   class { '::swift::storage::all':
