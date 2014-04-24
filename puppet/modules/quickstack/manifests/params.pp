@@ -135,7 +135,6 @@ class quickstack::params (
 
   $n1kv_vsm_ip                   = '0.0.0.0',
   $n1kv_vsm_password             = undef,
-  $n1kv_supplemental_repo        = 'None',
   $neutron_conf_additional_params= { 'default_quota' => 'default',
                                      'quota_network' => 'default',
                                      'quota_subnet' => 'default',
