@@ -125,7 +125,7 @@ class { 'puppet':
     '$OPENSTACK_PUPPET_HOME/modules',
   ],
 }
-include passenger
+
 class { 'foreman':
   db_type => 'mysql',
   custom_repo => true
@@ -185,9 +185,17 @@ echo '*' >> /etc/puppet/autosign.conf
 # Import puppet class definitions into Foreman
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; RAILS_ENV=production rake puppet:import:puppet_classes[batch]"
 
+
+FOREMAN_VERSION_MAJOR=$(rpm -q foreman | cut -d'-' -f2 | cut -d'.' -f1)
+FOREMAN_VERSION_MINOR=$(rpm -q foreman | cut -d'-' -f2 | cut -d'.' -f2)
 # Set params, and run the db:seed file to set class parameter defaults
-cp ./seeds.rb $FOREMAN_DIR/db/.
-sed -i "s#PROVISIONING_INTERFACE#$PROVISIONING_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
+if [[ "$FOREMAN_VERSION_MAJOR" > 1 || "$FOREMAN_VERSION_MINOR" > 4 ]]; then
+  cp ./seeds.rb $FOREMAN_DIR/db/seeds.d/99-quickstack.rb
+  sed -i "s#PROVISIONING_INTERFACE#$PROVISIONING_INTERFACE#" $FOREMAN_DIR/db/seeds.d/99-quickstack.rb
+else
+  cp ./seeds.rb $FOREMAN_DIR/db/.
+  sed -i "s#PROVISIONING_INTERFACE#$PROVISIONING_INTERFACE#" $FOREMAN_DIR/db/seeds.rb
+fi
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
 
 if [ "$FOREMAN_PROVISIONING" = "true" ]; then
