@@ -45,6 +45,11 @@ class quickstack::pacemaker::common (
 
   include quickstack::pacemaker::params
 
+  package {'rpcbind': } ->
+  service {'rpcbind':
+    enable => true,
+    ensure => 'running',
+  } ->
   class {'pacemaker::corosync':
     cluster_name    => $pacemaker_cluster_name,
     cluster_members => $pacemaker_cluster_members,
