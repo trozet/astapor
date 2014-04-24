@@ -17,12 +17,6 @@ class quickstack::pacemaker::swift (
     $memcached_servers_str = inline_template('<%= @memcached_ips.map {
         |x| x+":"+@memcached_port }.join(",") %>')
 
-    # swift_bind_addr is for internal swift-proxy/swift-storage traffic only
-    # must be same subnet as swift_internal_vip
-    $swift_bind_addr = find_ip("$swift_internal_network",
-                              "$swift_internal_iface",
-                              "$swift_internal_ip")
-
     Exec['i-am-swift-vip-OR-swift-is-up-on-vip'] -> Service['swift-proxy']
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-swift-vip-OR-swift-is-up-on-vip']
@@ -48,6 +42,7 @@ class quickstack::pacemaker::swift (
       source           => "rsync://$swift_internal_vip/swift_server/",
       override_options => "aI",
       purge            => true,
+      exclude          => '*.conf',
       unless           => "/tmp/ha-all-in-one-util.bash i_am_vip $swift_internal_vip",
     }
     ->
