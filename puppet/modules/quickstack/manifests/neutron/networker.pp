@@ -1,5 +1,6 @@
 # Quickstack network node configuration for neutron (OpenStack Networking)
 class quickstack::neutron::networker (
+  $agent_type                    = 'ovs',
   $fixed_network_range           = $quickstack::params::fixed_network_range,
   $neutron_metadata_proxy_secret = $quickstack::params::neutron_metadata_proxy_secret,
   $neutron_db_password           = $quickstack::params::neutron_db_password,
@@ -63,25 +64,27 @@ class quickstack::neutron::networker (
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
   }
 
-  class { '::neutron::plugins::ovs':
-    sql_connection      => $sql_connection,
-    tenant_network_type => $tenant_network_type,
-    network_vlan_ranges => $ovs_vlan_ranges,
-    tunnel_id_ranges    => $tunnel_id_ranges,
-    vxlan_udp_port      => $ovs_vxlan_udp_port,
-  }
+  if downcase("$agent_type") == 'ovs' {
+    class { '::neutron::plugins::ovs':
+      sql_connection      => $sql_connection,
+      tenant_network_type => $tenant_network_type,
+      network_vlan_ranges => $ovs_vlan_ranges,
+      tunnel_id_ranges    => $tunnel_id_ranges,
+      vxlan_udp_port      => $ovs_vxlan_udp_port,
+    }
 
-  neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
+    neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
 
-  $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
+    $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
 
-  class { '::neutron::agents::ovs':
-    bridge_uplinks   => $ovs_bridge_uplinks,
-    local_ip         => $local_ip,
-    bridge_mappings  => $ovs_bridge_mappings,
-    enable_tunneling => str2bool_i("$enable_tunneling"),
-    tunnel_types     => $ovs_tunnel_types,
-    vxlan_udp_port   => $ovs_vxlan_udp_port,
+    class { '::neutron::agents::ovs':
+      bridge_uplinks   => $ovs_bridge_uplinks,
+      local_ip         => $local_ip,
+      bridge_mappings  => $ovs_bridge_mappings,
+      enable_tunneling => str2bool_i("$enable_tunneling"),
+      tunnel_types     => $ovs_tunnel_types,
+      vxlan_udp_port   => $ovs_vxlan_udp_port,
+    }
   }
 
   class { '::neutron::agents::dhcp': }

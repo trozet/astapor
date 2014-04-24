@@ -59,6 +59,32 @@ class quickstack::neutron::controller (
   $mysql_host                    = $quickstack::params::mysql_host,
   $mysql_root_password           = $quickstack::params::mysql_root_password,
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
+  $neutron_conf_additional_params = { default_quota => 'default',
+                                      quota_network => 'default',
+                                      quota_subnet => 'default',
+                                      quota_port => 'default',
+                                      quota_security_group => 'default',
+                                      quota_security_group_rule  => 'default',
+                                      network_auto_schedule => 'default',
+                                    },
+  $nova_conf_additional_params   = { quota_instances => 'default',
+                                     quota_cores => 'default',
+                                     quota_ram => 'default',
+                                     quota_floating_ips => 'default',
+                                     quota_fixed_ips => 'default',
+                                     quota_driver => 'default',
+                                     },
+  $n1kv_plugin_additional_params = { default_policy_profile => 'default-pp',
+                                     network_node_policy_profile => 'default-pp',
+                                     poll_duration => '10',
+                                     http_pool_size => '4',
+                                     http_timeout => '120',
+                                     firewall_driver => 'neutron.agent.firewall.NoopFirewallDriver',
+                                     enable_sync_on_start => 'True',
+                                     },
+  $n1kv_vsm_ip                   = '0.0.0.0',
+  $n1kv_vsm_password             = undef,
+  $n1kv_supplemental_repo        = 'None',
   $neutron_db_password           = $quickstack::params::neutron_db_password,
   $neutron_user_password         = $quickstack::params::neutron_user_password,
   $nexus_config                  = $quickstack::params::nexus_config,
@@ -85,6 +111,7 @@ class quickstack::neutron::controller (
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
   $amqp_password                 = $quickstack::params::amqp_password,
+  $security_group_api		 = 'neutron',
   $swift_shared_secret           = $quickstack::params::swift_shared_secret,
   $swift_admin_password          = $quickstack::params::swift_admin_password,
   $swift_ringserver_ip           = '192.168.203.1',
@@ -222,6 +249,7 @@ class quickstack::neutron::controller (
   ->
   class { '::nova::network::neutron':
     neutron_admin_password => $neutron_user_password,
+    security_group_api     => $security_group_api,
   }
   ->
   class { '::neutron::server::notifications':
@@ -281,19 +309,33 @@ class quickstack::neutron::controller (
     }
   }
 
+  class {'quickstack::neutron::plugins::neutron_config':
+    neutron_conf_additional_params => $neutron_conf_additional_params,
+  }
+ 
+  class {'quickstack::neutron::plugins::nova_config':
+    nova_conf_additional_params => $nova_conf_additional_params,
+  }
+
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     class { 'quickstack::neutron::plugins::cisco':
+      controller_priv_host         => $controller_priv_host,
+      cisco_vswitch_plugin         => $cisco_vswitch_plugin,
+      cisco_nexus_plugin           => $cisco_nexus_plugin,
+      controller_pub_host          => $controller_pub_host,
+      n1kv_vsm_ip                  => $n1kv_vsm_ip,
+      n1kv_vsm_password            => $n1kv_vsm_password,
+      n1kv_supplemental_repo       => $n1kv_supplemental_repo,
+      n1kv_plugin_additional_params => $n1kv_plugin_additional_params,
       neutron_db_password          => $neutron_db_password,
       neutron_user_password        => $neutron_user_password,
-      ovs_vlan_ranges              => $ovs_vlan_ranges,
-      cisco_vswitch_plugin         => $cisco_vswitch_plugin,
       nexus_config                 => $nexus_config,
-      cisco_nexus_plugin           => $cisco_nexus_plugin,
       nexus_credentials            => $nexus_credentials,
-      provider_vlan_auto_create    => $provider_vlan_auto_create,
-      provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
       mysql_host                   => $mysql_host,
       mysql_ca                     => $mysql_ca,
+      ovs_vlan_ranges              => $ovs_vlan_ranges,
+      provider_vlan_auto_create    => $provider_vlan_auto_create,
+      provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
       tenant_network_type          => $tenant_network_type,
     }
   }

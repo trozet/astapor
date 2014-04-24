@@ -122,6 +122,7 @@ class quickstack::params (
   $cisco_vswitch_plugin          = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
   # If using the Cisco plugin, Nexus hardware can be used for l2
   $cisco_nexus_plugin            = 'neutron.plugins.cisco.nexus.cisco_nexus_plugin_v2.NexusPlugin',
+  $agent_type			 = 'ovs',
 
   # If using the nexus sub plugin, specify the hardware layout by
   # using the following syntax:
@@ -131,6 +132,48 @@ class quickstack::params (
   # Set the nexus login credentials by creating a list
   # of switch_ip/username/password strings as per the example below:
   $nexus_credentials             = undef,
+
+  $n1kv_vsm_ip                   = '0.0.0.0',
+  $n1kv_vsm_password             = undef,
+  $n1kv_supplemental_repo        = 'None',
+  $neutron_conf_additional_params= { 'default_quota' => 'default',
+                                     'quota_network' => 'default',
+                                     'quota_subnet' => 'default',
+                                     'quota_port' => 'default',
+                                     'quota_security_group' => 'default',
+                                     'quota_security_group_rule' => 'default',
+                                     'network_auto_schedule' => 'default',
+                                   },
+  $nova_conf_additional_params   = { 'quota_instances' => 'default',
+                                     'quota_cores' => 'default',
+                                     'quota_ram' => 'default',
+                                     'quota_floating_ips' => 'default',
+                                     'quota_fixed_ips' => 'default',
+                                     'quota_driver' => 'default',
+                                     },
+  $n1kv_plugin_additional_params = { 'default_policy_profile' => 'default-pp',
+                                     'network_node_policy_profile' => 'default-pp',
+                                     'poll_duration' => '10',
+                                     'http_pool_size' => '4',
+                                     'http_timeout' => '30',
+                                     'firewall_driver' => 'neutron.agent.firewall.NoopFirewallDriver',
+                                     'enable_sync_on_start' => 'True',
+                                     },
+  $security_group_api            = 'neutron',
+  # Horizon
+
+  $django_debug                  = 'False',
+  $help_url                      = 'http://docs.openstack.org',
+  $cache_server_ip               = '127.0.0.1',
+  $cache_server_port             = '11211',
+  $keystone_port                 = '5000',
+  $keystone_scheme               = 'http',
+  $keystone_default_role         = 'Member',
+  $can_set_mount_point           = 'True',
+  $api_result_limit              = '1000',
+  $log_level                     = 'DEBUG',
+  $horizon_app_links             = 'False',
+  $support_profile               = 'None',
 
   # provider network settings
   $provider_vlan_auto_create     = 'false',
