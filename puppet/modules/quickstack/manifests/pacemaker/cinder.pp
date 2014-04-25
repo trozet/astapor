@@ -11,8 +11,6 @@ class quickstack::pacemaker::cinder(
   $db_ssl            = false,
   $db_ssl_ca         = undef,
 
-  $pcmk_cinder_group = 'cinder',
-
   $qpid_heartbeat    = '60',
 
   $use_syslog        = false,
@@ -31,6 +29,7 @@ class quickstack::pacemaker::cinder(
 
     $cinder_user_password = map_params("cinder_user_password")
     $cinder_private_vip   = map_params("cinder_private_vip")
+    $pcmk_cinder_group    = map_params("cinder_group")
     $db_host              = map_params("db_vip")
     $db_password          = map_params("cinder_db_password")
     $glance_host          = map_params("glance_admin_vip")
@@ -40,9 +39,9 @@ class quickstack::pacemaker::cinder(
 
     Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec['cinder-manage db_sync']
     if (map_params('include_mysql') == 'true') {
-       if str2bool_i("$hamysql_is_running") {
-         Exec['mysql-has-users'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
-       }
+      if str2bool_i("$hamysql_is_running") {
+        Exec['mysql-has-users'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
+      }
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
