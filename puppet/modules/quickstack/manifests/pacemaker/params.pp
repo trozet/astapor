@@ -46,9 +46,7 @@ class quickstack::pacemaker::params (
   $include_nova              = 'true',
   $include_qpid              = 'true',
   $include_swift             = 'true',
-  $loadbalancer_public_vip   = '',
-  $loadbalancer_private_vip  = '',
-  $loadbalancer_admin_vip    = '',
+  $loadbalancer_vip          = '',
   $loadbalancer_group        = 'loadbalancer',
   $lb_backend_server_names   = '',
   $lb_backend_server_addrs   = '', # should this and cluster_members be merged?

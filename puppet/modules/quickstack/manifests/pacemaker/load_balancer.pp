@@ -3,11 +3,12 @@ class quickstack::pacemaker::load_balancer {
   include quickstack::pacemaker::common
 
   $loadbalancer_group = map_params("loadbalancer_group")
+  $loadbalancer_vip   = map_params("loadbalancer_vip")
 
   quickstack::pacemaker::vips { "$loadbalancer_group":
-    public_vip  => map_params("loadbalancer_public_vip"),
-    private_vip => map_params("loadbalancer_private_vip"),
-    admin_vip   => map_params("loadbalancer_admin_vip"),
+    public_vip  => $loadbalancer_vip,
+    private_vip => $loadbalancer_vip,
+    admin_vip   => $loadbalancer_vip,
   } ->
 
   Service['haproxy'] ->
