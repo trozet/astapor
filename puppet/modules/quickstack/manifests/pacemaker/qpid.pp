@@ -87,7 +87,6 @@ class quickstack::pacemaker::qpid (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include qpid",
     } ->
     pacemaker::resource::lsb { 'qpidd':
-      group   => 'openstack_qpid',
       clone   => true,
     }
   }
