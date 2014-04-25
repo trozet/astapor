@@ -75,7 +75,7 @@ class quickstack::pacemaker::params (
   $private_ip                = '',
   $private_iface             = '',
   $private_network           = '',
-  $qpid_port                 = '5672',
+  $qpid_port                 = '15672',
   $qpid_vip                  = '',
   $qpid_group                = 'qpid',
   $swift_public_vip          = '',
