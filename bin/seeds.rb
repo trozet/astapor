@@ -118,7 +118,7 @@ autopart
 Setting[:manage_puppetca] = false
 
 # Set correct hostname
-Setting[:foreman_url] = Facter.fqdn
+Setting[:foreman_url] = Facter.value(:fqdn)
 
 # Create an OS to assign things to. We'll come back later to finish it's config
 os = Operatingsystem.where(:name => "RedHat", :major => "6", :minor => "4").first
@@ -167,7 +167,7 @@ end
 
 # Add Proxy
 # Figure out how to call this before the class import
-# SmartProxy.new(:name => "OpenStack Smart Proxy", :url => "https://#{Facter.fqdn}:8443"
+# SmartProxy.new(:name => "OpenStack Smart Proxy", :url => "https://#{Facter.value(:fqdn)}:8443"
 
 # Architectures
 a=Architecture.find_or_create_by_name "x86_64"
@@ -176,15 +176,15 @@ a.save!
 
 if ENV["FOREMAN_PROVISIONING"] == "true" then
   # Domains
-  d=Domain.find_or_create_by_name Facter.domain
-  d.fullname="OpenStack: #{Facter.domain}"
+  d=Domain.find_or_create_by_name Facter.value(:domain)
+  d.fullname="OpenStack: #{Facter.value(:domain)}"
   d.dns = Feature.find_by_name("DNS").smart_proxies.first
   d.save!
 
   # Subnets - use Import Subnet code
   s=Subnet.find_or_create_by_name "OpenStack"
-  s.network=Facter.send "network_#{secondary_int}"
-  s.mask=Facter.send "netmask_#{secondary_int}"
+  s.network=Facter.value("network_#{secondary_int}")
+  s.mask=Facter.value("netmask_#{secondary_int}")
   s.dhcp = Feature.find_by_name("DHCP").smart_proxies.first
   s.dns = Feature.find_by_name("DNS").smart_proxies.first
   s.tftp = Feature.find_by_name("TFTP").smart_proxies.first
@@ -237,7 +237,7 @@ if ENV["FOREMAN_PROVISIONING"] == "true" then
 
   # Override all the puppet class params for quickstack
   primary_int=`route|grep default|awk ' { print ( $(NF) ) }'`.chomp
-  primary_prefix=Facter.send("network_#{primary_int}").split('.')[0..2].join('.')
+  primary_prefix=Facter.value("network_#{primary_int}").split('.')[0..2].join('.')
   sec_int_hash=Facter.to_hash.reject { |k| k !~ /^ipaddress_/ }.reject { |k| k =~ /lo|#{primary_int}/ }.first
   secondary_int=sec_int_hash[0].split('_').last
   secondary_prefix=sec_int_hash[1].split('.')[0..2].join('.')
@@ -305,7 +305,7 @@ params = {
   "qpid_host"                     => '172.16.0.1',
   "qpid_username"                 => 'openstack',
   "qpid_password"                 => SecureRandom.hex,
-  "admin_email"                   => "admin@#{Facter.domain}",
+  "admin_email"                   => "admin@#{Facter.value(:domain)}",
   "neutron_metadata_proxy_secret" => SecureRandom.hex,
   "enable_ovs_agent"              => "true",
   "ovs_vlan_ranges"               => '',
