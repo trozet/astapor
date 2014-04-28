@@ -343,6 +343,8 @@ params = {
   "qpid_nssdb_password"           => SecureRandom.hex,
   "fence_xvm_key_file_password"   => SecureRandom.hex,
   "use_qemu_for_poc"              => "false",
+  "secret_key"                    => SecureRandom.hex,
+  "admin_token"                   => SecureRandom.hex,
 }
 
 hostgroups = [

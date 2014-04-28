@@ -5,7 +5,7 @@ class quickstack::pacemaker::heat(
   $db_ssl              = false,
   $db_ssl_ca           = undef,
 
-  $qpid_heartbeat      = '2',
+  $qpid_heartbeat      = '60',
 
   $use_syslog          = false,
   $log_facility        = 'LOG_USER',
@@ -30,9 +30,9 @@ class quickstack::pacemaker::heat(
 
     Exec['i-am-heat-vip-OR-heat-is-up-on-vip'] -> Exec<| title == 'heat-manage db_sync' |>
     if (map_params('include_mysql') == 'true') {
-       if str2bool_i("$hamysql_is_running") {
-         Exec['mysql-has-users'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']
-       }
+      if str2bool_i("$hamysql_is_running") {
+        Exec['mysql-has-users'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']
+      }
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']
