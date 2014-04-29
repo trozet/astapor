@@ -12,6 +12,8 @@ class quickstack::compute_common (
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_port                   = '5672',
+  $qpid_ssl_port               = '5671',
   $qpid_username               = $quickstack::params::qpid_username,
   $qpid_password               = $quickstack::params::qpid_password,
   $verbose                     = $quickstack::params::verbose,
@@ -39,12 +41,12 @@ class quickstack::compute_common (
 
     if str2bool_i("$ssl") {
       $qpid_protocol = 'ssl'
-      $qpid_port = '5671'
+      $real_qpid_port = $qpid_ssl_port
       $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
 
     } else {
       $qpid_protocol = 'tcp'
-      $qpid_port = '5672'
+      $real_qpid_port = $qpid_port
       $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
     }
 
@@ -55,7 +57,7 @@ class quickstack::compute_common (
     rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
     qpid_hostname      => $qpid_host,
     qpid_protocol      => $qpid_protocol,
-    qpid_port          => $qpid_port,
+    qpid_port          => $real_qpid_port,
     qpid_username      => $qpid_username,
     qpid_password      => $qpid_password,
     verbose            => $verbose,
@@ -87,7 +89,7 @@ class quickstack::compute_common (
     class { 'ceilometer':
       metering_secret => $ceilometer_metering_secret,
       qpid_hostname   => $qpid_host,
-      qpid_port       => $qpid_port,
+      qpid_port       => $real_qpid_port,
       qpid_protocol   => $qpid_protocol,
       qpid_username   => $qpid_username,
       qpid_password   => $qpid_password,
