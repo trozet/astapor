@@ -120,6 +120,8 @@ class quickstack::pacemaker::glance (
       filesystem_store_datadir => $filesystem_store_datadir,
       qpid_host                => map_params("qpid_vip"),
       qpid_port                => map_params("qpid_port"),
+      qpid_username            => map_params("qpid_username"),
+      qpid_password            => map_params("qpid_password"),
     }
 
     Class['::quickstack::glance']

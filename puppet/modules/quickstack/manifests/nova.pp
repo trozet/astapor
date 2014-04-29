@@ -55,6 +55,12 @@
 # [*qpid_port*]
 #   (optional) Port for qpid server
 #   Defaults to '5672'
+# [*qpid_username*]
+#   (optional) qpid username
+#   Defaults to '' for qpid no auth.
+# [*qpid_password*]
+#   (optional) qpid password
+#   Defaults to ''.
 # [*rpc_backend*]
 #   (optional) The rpc backend implementation to use.
 #   Defaults to 'nova.openstack.common.rpc.impl_qpid'.
@@ -83,6 +89,8 @@ class quickstack::nova (
   $qpid_heartbeat     = '60',
   $qpid_hostname      = 'localhost',
   $qpid_port          = '5672',
+  $qpid_username      = '',
+  $qpid_password      = '',
   $rpc_backend        = 'nova.openstack.common.rpc.impl_qpid',
   $verbose            = 'false',
 ) {
@@ -102,6 +110,8 @@ class quickstack::nova (
       qpid_port          => $qpid_port,
       qpid_hostname      => $qpid_hostname,
       qpid_heartbeat     => $qpid_heartbeat,
+      qpid_username      => $qpid_username,
+      qpid_password      => $qpid_password,
     }
 
     nova_config { 'DEFAULT/default_floating_pool':
