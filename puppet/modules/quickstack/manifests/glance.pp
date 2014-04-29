@@ -116,4 +116,5 @@ class quickstack::glance (
   } else {
     fail("Unsupported backend ${backend}")
   }
+  class {'::quickstack::firewall::glance':}
 }

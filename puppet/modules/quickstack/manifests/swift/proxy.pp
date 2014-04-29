@@ -71,11 +71,7 @@ class quickstack::swift::proxy (
       swift_shared_secret => $swift_shared_secret,
     }
 
-    firewall { '001 swift proxy incoming':
-        proto    => 'tcp',
-        dport    => ['8080'],
-        action   => 'accept',
-    }
+    class {'::quickstack::firewall::swift':}
 
     if str2bool_i("$swift_is_ringserver") {
 
@@ -88,13 +84,13 @@ class quickstack::swift::proxy (
         part_power     => '18',
         replicas       => '3',
         min_part_hours => '1',
-	require        => Class['quickstack::swift::common'],
+        require        => Class['quickstack::swift::common'],
       }
       ->
       swift_ring_build_helper { "build the swift rings":
-        ensure => "present",
-        swift_storage_ips => $swift_storage_ips,
-	swift_storage_device => $swift_storage_device,
+        ensure               => "present",
+        swift_storage_ips    => $swift_storage_ips,
+        swift_storage_device => $swift_storage_device,
       } ->
 
       # "swift_server" since that is the module storage nodes look for

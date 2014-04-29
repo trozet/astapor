@@ -28,4 +28,6 @@ class quickstack::load_balancer::common {
   }
 
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
+
+  class {'::quickstack::firewall::load_balancer':}
 }
