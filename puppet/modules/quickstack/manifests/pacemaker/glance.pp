@@ -17,7 +17,6 @@ class quickstack::pacemaker::glance (
   # if $backend is 'swift' *and* swift is run on the same local
   # pacemaker cluster (as opposed to swift proxies being remote)
   $pcmk_swift_is_local      = true,
-  $pcmk_glance_group        = 'glance',
   $rbd_store_user           = '',
   $rbd_store_pool           = 'images',
   $swift_store_user         = '',
@@ -35,15 +34,16 @@ class quickstack::pacemaker::glance (
 
   if (map_params('include_glance') == 'true' and map_params("db_is_ready")) {
     $glance_private_vip = map_params("glance_private_vip")
+    $pcmk_glance_group = map_params("glance_group")
 
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-api']
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-registry']
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec['glance-manage db_sync']
 
     if (map_params('include_mysql') == 'true') {
-       if str2bool_i("$hamysql_is_running") {
-         Exec['mysql-has-users'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
-       }
+      if str2bool_i("$hamysql_is_running") {
+        Exec['mysql-has-users'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
+      }
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']

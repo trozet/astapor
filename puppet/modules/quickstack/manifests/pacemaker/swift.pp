@@ -2,9 +2,6 @@ class quickstack::pacemaker::swift (
   $swift_shared_secret    = '',
   $swift_storage_ips      = [],
   $swift_storage_device   = '',
-  $swift_internal_ip      = '',
-  $swift_internal_iface   = '',
-  $swift_internal_network = '',
   $swift_internal_vip     = '',
   $memcached_port         = '11211',  # maybe move to params.pp since also in nova.pp
 ) {

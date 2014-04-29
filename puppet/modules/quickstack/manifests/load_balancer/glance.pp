@@ -4,9 +4,9 @@ class quickstack::load_balancer::glance (
   $frontend_admin_host,
   $backend_server_names,
   $backend_server_addrs,
-  $api_port = '9191',
+  $api_port = '9292',
   $api_mode = 'tcp',
-  $registry_port = '9292',
+  $registry_port = '9191',
   $registry_mode = 'tcp',
   $log = 'tcplog',
 ) {
