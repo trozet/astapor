@@ -205,9 +205,5 @@ class quickstack::neutron::all (
     port => $ovs_vxlan_udp_port,
   }
 
-  firewall { '001 neutron server (API)':
-    proto    => 'tcp',
-    dport    => ['9696'],
-    action   => 'accept',
-  }
+  class {'::quickstack::firewall::neutron':}
 }
