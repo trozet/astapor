@@ -7,6 +7,12 @@ class quickstack::pacemaker::mysql (
   include quickstack::pacemaker::common
 
   if (map_params('include_mysql') == 'true') {
+    quickstack::pacemaker::vips { "mysql":
+      public_vip  => map_params("db_vip"),
+      private_vip => map_params("db_vip"),
+      admin_vip   => map_params("db_vip"),
+    }
+
     class {'quickstack::hamysql::node':
       mysql_root_password          => $mysql_root_password,
       keystone_db_password         => map_params("keystone_db_password"),
@@ -16,8 +22,9 @@ class quickstack::pacemaker::mysql (
       heat_db_password             => map_params("heat_db_password"),
       neutron_db_password          => map_params("neutron_db_password"),
       neutron                      => str2bool_i(map_params("neutron")),
-      mysql_bind_address           => map_params("db_vip"),
+      mysql_bind_address           => map_params("local_bind_addr"),
       mysql_virtual_ip             => map_params("db_vip"),
+      mysql_virtual_ip_managed     => "false",
       mysql_shared_storage_device  => $storage_device,
       mysql_shared_storage_type    => $storage_type,
       mysql_shared_storage_options => $storage_options,
@@ -26,6 +33,13 @@ class quickstack::pacemaker::mysql (
       mysql_virt_ip_nic            => '',
       mysql_virt_ip_cidr_mask      => '32',
     }
+    ->
+    class {"::quickstack::load_balancer::mysql":
+      frontend_pub_host    => map_params("db_vip"),
+      backend_server_names => map_params("lb_backend_server_names"),
+      backend_server_addrs => map_params("lb_backend_server_addrs"),
+    }
+
     if str2bool_i("$hamysql_is_running") {
       Class ['quickstack::hamysql::node'] ->
       exec {"mysql-has-users":

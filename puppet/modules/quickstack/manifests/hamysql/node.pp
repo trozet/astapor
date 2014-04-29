@@ -12,6 +12,7 @@ class quickstack::hamysql::node (
   # '0.0.0.0' rather than just the floating ip
   $mysql_bind_address           = $quickstack::params::mysql_host,
   $mysql_virtual_ip             = $quickstack::params::mysql_host,
+  $mysql_virtual_ip_managed     = "true",
   $mysql_virt_ip_nic            = $quickstack::params::mysql_virt_ip_nic,
   $mysql_virt_ip_cidr_mask      = $quickstack::params::mysql_virt_ip_cidr_mask,
   # e.g. "192.168.200.200:/mnt/mysql"
@@ -27,6 +28,8 @@ class quickstack::hamysql::node (
 
     include mysql::python
 
+    $mysql_virtual_ip_managed_bool = str2bool_i("$mysql_virtual_ip_managed")
+
     package { 'mysql-server':
       ensure => installed,
     }
@@ -36,8 +39,10 @@ class quickstack::hamysql::node (
       socket => '/var/run/mysqld/mysql.sock',
     }
     -> Class['pacemaker::corosync']
-    -> Pacemaker::Resource::Ip['mysql-clu-vip']
-
+    if $mysql_virtual_ip_managed_bool {
+      Class['pacemaker::corosync']
+      -> Pacemaker::Resource::Ip['mysql-clu-vip']
+    }
     if $corosync_setup {
       class {'pacemaker::corosync':
         cluster_name => "hamysql",
@@ -48,21 +53,37 @@ class quickstack::hamysql::node (
       class {"pacemaker::stonith":
         disable => true,
       }
-      -> Pacemaker::Resource::Ip['mysql-clu-vip']
+      if $mysql_virtual_ip_managed_bool {
+        Class['pacemaker::corosync']
+        -> Pacemaker::Resource::Ip['mysql-clu-vip']
+      }
     }
-    pacemaker::resource::ip { 'mysql-clu-vip' :
-      ip_address => $mysql_virtual_ip,
-      group => $mysql_resource_group_name,
-      cidr_netmask => $mysql_virt_ip_cidr_mask,
-      nic => $mysql_virt_ip_nic,
+    if $mysql_virtual_ip_managed_bool {
+      pacemaker::resource::ip { 'mysql-clu-vip' :
+        ip_address => $mysql_virtual_ip,
+        group => $mysql_resource_group_name,
+        cidr_netmask => $mysql_virt_ip_cidr_mask,
+        nic => $mysql_virt_ip_nic,
+      }
+      pacemaker::constraint::base { 'ip-mysql-constr' :
+        constraint_type => "order",
+        first_resource  => "ip-${mysql_virtual_ip}",
+        second_resource => "mysql-ostk-mysql",
+        first_action    => "start",
+        second_action   => "start",
+      }
+      Pacemaker::Resource::Ip['mysql-clu-vip'] ->
+      Pacemaker::Resource::Filesystem['mysql-clu-fs']
+
+      Pacemaker::Constraint::Base['fs-mysql-constr'] ->
+      Pacemaker::Constraint::Base['ip-mysql-constr']
     }
-    ->
     pacemaker::resource::filesystem { 'mysql-clu-fs' :
-       device => "$mysql_shared_storage_device",
-       directory => "/var/lib/mysql",
-       fstype => $mysql_shared_storage_type,
-       fsoptions => $mysql_shared_storage_options,
-       group => $mysql_resource_group_name,
+      device => "$mysql_shared_storage_device",
+      directory => "/var/lib/mysql",
+      fstype => $mysql_shared_storage_type,
+      fsoptions => $mysql_shared_storage_options,
+      group => $mysql_resource_group_name,
     }
     ->
     exec {"wait-for-fs-to-be-active":
@@ -91,14 +112,6 @@ class quickstack::hamysql::node (
       additional_params => "socket=/var/run/mysqld/mysql.sock",
     }
     ->
-    pacemaker::constraint::base { 'ip-mysql-constr' :
-      constraint_type => "order",
-      first_resource  => "ip-${mysql_virtual_ip}",
-      second_resource => "mysql-ostk-mysql",
-      first_action    => "start",
-      second_action   => "start",
-    }
-    ->
     pacemaker::constraint::base { 'fs-mysql-constr' :
       constraint_type => "order",
       first_resource  => "fs-varlibmysql",
@@ -119,14 +132,14 @@ class quickstack::hamysql::node (
       root_password => $mysql_root_password,
     }
 
-   file {"are-we-running-mysql-script":
-     name => "/tmp/are-we-running-mysql.bash",
-     ensure => present,
-     owner => root,
-     group => root,
-     mode  => 777,
-     content => "#!/bin/bash\n a=`/usr/sbin/pcs status | grep -P 'mysql-ostk-mysql\\s.*Started' | perl -p -e 's/^.*Started (\\S*).*$/\$1/'`; b=`/usr/sbin/crm_node -n`; echo \$a; echo \$b; \ntest \$a = \$b;\n",
-     require => Exec['wait-for-mysql-to-start'],
+    file {"are-we-running-mysql-script":
+      name => "/tmp/are-we-running-mysql.bash",
+      ensure => present,
+      owner => root,
+      group => root,
+      mode  => 777,
+      content => "#!/bin/bash\n a=`/usr/sbin/pcs status | grep -P 'mysql-ostk-mysql\\s.*Started' | perl -p -e 's/^.*Started (\\S*).*$/\$1/'`; b=`/usr/sbin/crm_node -n`; echo \$a; echo \$b; \ntest \$a = \$b;\n",
+      require => Exec['wait-for-mysql-to-start'],
     }
 
     class {'quickstack::hamysql::mysql::setup':
