@@ -84,6 +84,8 @@ class quickstack::pacemaker::heat(
       qpid_heartbeat          => $qpid_heartbeat,
       qpid_host               => map_params("qpid_vip"),
       qpid_port               => map_params("qpid_port"),
+      qpid_username           => map_params("qpid_username"),
+      qpid_password           => map_params("qpid_password"),
       cfn_host                => map_params("heat_cfn_admin_vip"),
       cloudwatch_host         => map_params("heat_admin_vip"),
       use_syslog              => $use_syslog,

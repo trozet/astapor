@@ -78,6 +78,8 @@ class quickstack::pacemaker::params (
   $qpid_port                 = '15672',
   $qpid_vip                  = '',
   $qpid_group                = 'qpid',
+  $qpid_username             = '',
+  $qpid_password             = '',
   $swift_public_vip          = '',
   $swift_user_password       = '',
   $swift_group               = 'swift',

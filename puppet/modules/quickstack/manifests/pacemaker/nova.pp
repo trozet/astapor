@@ -77,6 +77,8 @@ class quickstack::pacemaker::nova (
       qpid_heartbeat                => $qpid_heartbeat,
       qpid_hostname                 => map_params("qpid_vip"),
       qpid_port                     => map_params("qpid_port"),
+      qpid_username                 => map_params("qpid_username"),
+      qpid_password                 => map_params("qpid_password"),
       rpc_backend                   => $rpc_backend,
       verbose                       => $verbose,
     }
