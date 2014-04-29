@@ -32,6 +32,8 @@ class quickstack::pacemaker::qpid (
 
   if (map_params('include_qpid') == 'true') {
     $qpid_group = map_params("qpid_group")
+    $qpid_username = map_params("qpid_username")
+    $qpid_password = map_params("qpid_password")
 
     class {'::quickstack::firewall::qpid':
       ports => [ $backend_port, map_params("qpid_port") ]
@@ -49,11 +51,26 @@ class quickstack::pacemaker::qpid (
       max_connections       => $max_connections,
       worker_threads        => $worker_threads,
       connection_backlog    => $connection_backlog,
-      auth                  => 'no',
+      auth => $qpid_username ? {
+        ''      => 'no',
+        default => 'yes',
+      },
       realm                 => 'QPID',
       log_to_file           => $log_to_file,
       clustered             => false,
       ssl                   => false,
+    }
+
+    # quoth the puppet language reference,
+    # "Empty strings are false; all other strings are true."
+    if $qpid_username {
+      qpid_user { $qpid_username:
+        password  => $qpid_password,
+        file      => '/var/lib/qpidd/qpidd.sasldb',
+        realm     => 'QPID',
+        provider  => 'saslpasswd2',
+        require   => Class['qpid::server'],
+      }
     }
 
     class {'::quickstack::load_balancer::qpid':

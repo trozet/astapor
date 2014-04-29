@@ -13,6 +13,8 @@ class quickstack::heat(
   $qpid_heartbeat          = '60',
   $qpid_host               = '127.0.0.1',
   $qpid_port               = '5672',
+  $qpid_username           = '',
+  $qpid_password           = '',
 
   $cfn_host                = '127.0.0.1',
   $cloudwatch_host         = '127.0.0.1',
@@ -51,6 +53,8 @@ class quickstack::heat(
     qpid_heartbeat    => $qpid_heartbeat,
     qpid_hostname     => $qpid_host,
     qpid_port         => $qpid_port,
+    qpid_username     => $qpid_username,
+    qpid_password     => $qpid_password,
     use_syslog        => str2bool_i("$use_syslog"),
     log_facility      => $log_facility,
     verbose           => $verbose,

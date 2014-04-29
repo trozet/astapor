@@ -12,7 +12,8 @@ class quickstack::cinder(
   $qpid_heartbeat = '60',
   $qpid_host      = '127.0.0.1',
   $qpid_port      = '5672',
-
+  $qpid_username  = '',
+  $qpid_password  = '',
   $use_syslog     = false,
   $log_facility   = 'LOG_USER',
 
@@ -21,6 +22,12 @@ class quickstack::cinder(
   $verbose        = false,
 ) {
   include ::quickstack::firewall::cinder
+
+  $qpid_password_safe_for_cinder = $qpid_password ? {
+    ''      => 'guest',
+    false   => 'guest',
+    default => $qpid_password,
+  }
 
   cinder_config {
     'DEFAULT/glance_host': value => $glance_host;
@@ -37,7 +44,8 @@ class quickstack::cinder(
     rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
     qpid_hostname  => $qpid_host,
     qpid_port      => $qpid_port,
-    qpid_password  => 'guest',
+    qpid_username  => $qpid_username,
+    qpid_password  => $qpid_password_safe_for_cinder,
     qpid_heartbeat => $qpid_heartbeat,
     sql_connection => $sql_connection,
     verbose        => str2bool_i("$verbose"),

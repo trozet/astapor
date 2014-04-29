@@ -72,6 +72,8 @@ class quickstack::pacemaker::neutron (
       ovs_vlan_ranges               => $ovs_vlan_ranges,
       ovs_tunnel_types              => $ovs_tunnel_types,
       qpid_host                     => map_params("qpid_vip"),
+      qpid_username                 => map_params("qpid_username"),
+      qpid_password                 => map_params("qpid_password"),
       tenant_network_type           => $tenant_network_type,
       tunnel_id_ranges              => $tunnel_id_ranges,
       verbose                       => $verbose,

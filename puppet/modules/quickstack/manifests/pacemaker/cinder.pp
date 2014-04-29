@@ -37,6 +37,8 @@ class quickstack::pacemaker::cinder(
     $keystone_host        = map_params("keystone_admin_vip")
     $qpid_host            = map_params("qpid_vip")
     $qpid_port            = map_params("qpid_port")
+    $qpid_username        = map_params("qpid_username")
+    $qpid_password        = map_params("qpid_password")
 
     Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec['cinder-manage db_sync']
     if (map_params('include_mysql') == 'true') {
@@ -89,6 +91,8 @@ class quickstack::pacemaker::cinder(
       qpid_heartbeat => $qpid_heartbeat,
       qpid_host      => $qpid_host,
       qpid_port      => $qpid_port,
+      qpid_username  => $qpid_username,
+      qpid_password  => $qpid_password,
       use_syslog     => $use_syslog,
       log_facility   => $log_facility,
       enabled        => $enabled,

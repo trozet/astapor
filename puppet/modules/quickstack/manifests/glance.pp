@@ -34,6 +34,8 @@ class quickstack::glance (
   $filesystem_store_datadir = '/var/lib/glance/images/',
   $qpid_host                = '127.0.0.1',
   $qpid_port                = '5672',
+  $qpid_username           = '',
+  $qpid_password           = '',
 ) {
 
   # Configure the db string
@@ -81,9 +83,8 @@ class quickstack::glance (
   }
 
   class { 'glance::notify::qpid':
-    # TODO qpid auth
-    qpid_password => 'guest',
-    qpid_username => 'guest',
+    qpid_password => $qpid_password,
+    qpid_username => $qpid_username,
     qpid_hostname => $qpid_host,
     qpid_port     => $qpid_port,
     qpid_protocol => 'tcp',
