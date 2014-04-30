@@ -389,10 +389,18 @@ class quickstack::controller_common (
     }
   }
 
+  # This exists to cover havana release, where we only exposed the pub and priv
+  # hosts, admin was not a param there.
+  if $controller_admin_host == undef or $controller_admin_host == '' {
+    $real_admin_host = $controller_priv_host
+  } else {
+    $real_admin_host = $controller_admin_host
+  }
+
   if str2bool_i("$keystonerc") {
     class { 'quickstack::admin_client':
       admin_password        => $admin_password,
-      controller_admin_host => $controller_admin_host,
+      controller_admin_host => $real_admin_host,
     }
   }
 
