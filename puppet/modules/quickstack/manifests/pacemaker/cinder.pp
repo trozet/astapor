@@ -7,6 +7,9 @@ class quickstack::pacemaker::cinder(
 
   $glusterfs_shares  = [],
 
+  $nfs_shares        = [],
+  $nfs_mount_options = undef,
+
   $db_ssl            = false,
   $db_ssl_ca         = undef,
 
@@ -135,9 +138,11 @@ class quickstack::pacemaker::cinder(
       Class['::quickstack::cinder']
       ->
       class {'::quickstack::cinder_volume':
-        volume_backend   => $volume_backend,
-        iscsi_bind_addr  => map_params('local_bind_addr'),
-        glusterfs_shares => $glusterfs_shares,
+        volume_backend    => $volume_backend,
+        iscsi_bind_addr   => map_params('local_bind_addr'),
+        glusterfs_shares  => $glusterfs_shares,
+        nfs_shares        => $nfs_shares,
+        nfs_mount_options => $nfs_mount_options,
       }
     }
   }
