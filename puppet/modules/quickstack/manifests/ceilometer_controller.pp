@@ -56,6 +56,5 @@ class quickstack::ceilometer_controller(
     class { 'ceilometer::api':
         keystone_host     => $controller_priv_host,
         keystone_password => $ceilometer_user_password,
-        require           => Class['ceilometer::db'],
     }
 }
