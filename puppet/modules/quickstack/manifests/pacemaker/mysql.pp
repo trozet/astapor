@@ -7,6 +7,12 @@ class quickstack::pacemaker::mysql (
   include quickstack::pacemaker::common
 
   if (map_params('include_mysql') == 'true') {
+    quickstack::pacemaker::vips { "mysql":
+      public_vip  => map_params("db_vip"),
+      private_vip => map_params("db_vip"),
+      admin_vip   => map_params("db_vip"),
+    }
+
     class {'quickstack::hamysql::node':
       mysql_root_password          => $mysql_root_password,
       keystone_db_password         => map_params("keystone_db_password"),
@@ -18,6 +24,7 @@ class quickstack::pacemaker::mysql (
       neutron                      => str2bool_i(map_params("neutron")),
       mysql_bind_address           => map_params("local_bind_addr"),
       mysql_virtual_ip             => map_params("db_vip"),
+      mysql_virtual_ip_managed     => "false",
       mysql_shared_storage_device  => $storage_device,
       mysql_shared_storage_type    => $storage_type,
       mysql_shared_storage_options => $storage_options,
