@@ -7,6 +7,8 @@ class quickstack::pacemaker::mysql (
   include quickstack::pacemaker::common
 
   if (map_params('include_mysql') == 'true') {
+    Class['::quickstack::pacemaker::common']
+    ->
     quickstack::pacemaker::vips { "mysql":
       public_vip  => map_params("db_vip"),
       private_vip => map_params("db_vip"),
