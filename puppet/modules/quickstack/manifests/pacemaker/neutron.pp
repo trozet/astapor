@@ -14,7 +14,7 @@ class quickstack::pacemaker::neutron (
 ) {
   include quickstack::pacemaker::common
 
-  if (map_params('include_neutron') == 'true') {
+  if (map_params('include_neutron') == 'true' and map_params("db_is_ready")) {
     $neutron_group = map_params("neutron_group")
     $neutron_public_vip = map_params("neutron_public_vip")
     $ovs_nic = find_nic("$ovs_tunnel_network","$ovs_tunnel_iface","")
