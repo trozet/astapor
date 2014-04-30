@@ -1,6 +1,6 @@
 class quickstack::firewall::load_balancer (
   $ports = ['81'],
-  $proto = 'http',
+  $proto = 'tcp',
 ){
 
   include quickstack::firewall::common
