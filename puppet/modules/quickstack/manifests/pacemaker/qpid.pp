@@ -9,10 +9,10 @@ class quickstack::pacemaker::qpid (
   $backend_port          = '5672',
   $max_connections       = '65535',
   $worker_threads        = '17',
-  $connection_backlog    = '10',
+  $connection_backlog    = '65535',
   $realm                 = 'QPID',
   $log_to_file           = 'UNSET',
-  $haproxy_timeout       = '60s',
+  $haproxy_timeout       = '120s',
   # perhaps we will expose these to params to ::qpid:server soon
   #$auth                  = 'no',
   #$clustered             = false,
