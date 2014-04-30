@@ -97,6 +97,7 @@ class quickstack::pacemaker::common (
       loglevel => alert,
     }
   }
+  Class['pacemaker::corosync'] ->
   exec { 'stonith-setup-complete': command => '/bin/true'}
 
   if $fencing {
