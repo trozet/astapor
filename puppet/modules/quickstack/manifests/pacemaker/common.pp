@@ -38,6 +38,7 @@ class quickstack::pacemaker::common (
   $fence_ipmilan_password         = "",
   $fence_ipmilan_interval         = "60s",
   $fence_ipmilan_hostlist         = "",
+  $fence_ipmilan_host_to_address  = [],
   $fence_xvm_clu_iface            = "eth2",
   $fence_xvm_clu_network          = "",
   $fence_xvm_manage_key_file      = "false",
@@ -68,12 +69,13 @@ class quickstack::pacemaker::common (
       disable => false,
     }
     class {'quickstack::pacemaker::stonith::ipmilan':
-      address        => $fence_ipmilan_address,
-      username       => $fence_ipmilan_username,
-      password       => $fence_ipmilan_password,
-      interval       => $fence_ipmilan_interval,
-      pcmk_host_list => $fence_ipmilan_hostlist,
-      lanplus        => true,
+      address         => $fence_ipmilan_address,
+      username        => $fence_ipmilan_username,
+      password        => $fence_ipmilan_password,
+      interval        => $fence_ipmilan_interval,
+      pcmk_host_list  => $fence_ipmilan_hostlist,
+      host_to_address => $fence_ipmilan_host_to_address,
+      lanplus         => true,
     }
   }
   elsif $fencing_type =~ /(?i-mx:^fence_xvm$)/ {
