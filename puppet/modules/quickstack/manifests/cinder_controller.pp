@@ -58,7 +58,11 @@ class quickstack::cinder_controller(
   if str2bool_i("$cinder_backend_gluster") {
     class { '::cinder::volume': }
 
-    class { 'gluster::client': }
+    if defined('gluster::client') {
+      class { 'gluster::client': }
+    } else {
+      class { 'gluster::mount::base': repo => false }
+    }
 
     if ($::selinux != "false") {
       selboolean{'virt_use_fusefs':
