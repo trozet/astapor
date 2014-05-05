@@ -139,6 +139,15 @@ class quickstack::pacemaker::cinder(
         iscsi_bind_addr  => map_params('local_bind_addr'),
         glusterfs_shares => $glusterfs_shares,
       }
+      ->
+      Exec['pcs-cinder-server-set-up']
+
+      Exec['all-cinder-nodes-are-up']
+      ->
+      pacemaker::resource::lsb {'openstack-cinder-volume':
+        group => "$pcmk_cinder_group",
+        clone => true,
+      }
     }
   }
 }
