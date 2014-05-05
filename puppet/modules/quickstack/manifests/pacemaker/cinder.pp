@@ -144,6 +144,15 @@ class quickstack::pacemaker::cinder(
         nfs_shares        => $nfs_shares,
         nfs_mount_options => $nfs_mount_options,
       }
+      ->
+      Exec['pcs-cinder-server-set-up']
+
+      Exec['all-cinder-nodes-are-up']
+      ->
+      pacemaker::resource::lsb {'openstack-cinder-volume':
+        group => "$pcmk_cinder_group",
+        clone => true,
+      }
     }
   }
 }
