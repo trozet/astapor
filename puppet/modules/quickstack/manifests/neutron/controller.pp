@@ -265,6 +265,15 @@ class quickstack::neutron::controller (
     neutron_admin_password    => $neutron_user_password,
   }
 
+  class { '::neutron::server::notifications':
+    notify_nova_on_port_status_changes => true,
+    notify_nova_on_port_data_changes   => true,
+    nova_url                           => "http://${controller_priv_host}:8774/v2",
+    nova_admin_auth_url                => "http://${controller_priv_host}:35357/v2.0",
+    nova_admin_username                => "nova",
+    nova_admin_password                => "${nova_user_password}",
+  }
+
   firewall { '001 neutron server (API)':
     proto    => 'tcp',
     dport    => ['9696'],

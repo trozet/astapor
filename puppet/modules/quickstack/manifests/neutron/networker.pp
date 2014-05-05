@@ -50,14 +50,6 @@ class quickstack::neutron::networker (
     qpid_password         => $qpid_password,
   }
 
-  neutron_config {
-    'database/connection': value => $sql_connection;
-    'keystone_authtoken/admin_tenant_name': value => 'services';
-    'keystone_authtoken/admin_user':        value => 'neutron';
-    'keystone_authtoken/admin_password':    value => $neutron_user_password;
-    'keystone_authtoken/auth_host':         value => $controller_priv_host;
-  }
-
   class { '::neutron::plugins::ovs':
     sql_connection      => $sql_connection,
     tenant_network_type => $tenant_network_type,
@@ -88,6 +80,23 @@ class quickstack::neutron::networker (
     shared_secret => $neutron_metadata_proxy_secret,
     auth_url      => "http://${controller_priv_host}:35357/v2.0",
     metadata_ip   => $controller_priv_host,
+  }
+
+  class { '::neutron::server':
+    auth_host      => $controller_priv_host,
+    auth_password  => $neutron_user_password,
+    auth_tenant    => 'services',
+    auth_user      => 'neutron',
+    connection     => $sql_connection,
+  }
+
+  class { '::neutron::server::notifications':
+    notify_nova_on_port_status_changes => true,
+    notify_nova_on_port_data_changes   => true,
+    nova_url                           => "http://${controller_priv_host}:8774/v2",
+    nova_admin_auth_url                => "http://${controller_priv_host}:35357/v2.0",
+    nova_admin_username                => "nova",
+    nova_admin_password                => "${nova_user_password}",
   }
 
   #class { 'neutron::agents::lbaas': }
