@@ -6,6 +6,7 @@ class quickstack::compute_common (
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
+  $cinder_backend_nfs          = 'false',
   $controller_priv_host        = $quickstack::params::controller_priv_host,
   $controller_pub_host         = $quickstack::params::controller_pub_host,
   $mysql_host                  = $quickstack::params::mysql_host,
@@ -29,6 +30,14 @@ class quickstack::compute_common (
 
     if ($::selinux != "false") {
       selboolean{'virt_use_fusefs':
+          value => on,
+          persistent => true,
+      }
+    }
+  }
+  if str2bool_i("$cinder_backend_nfs") {
+    if ($::selinux != "false") {
+      selboolean{'virt_use_nfs':
           value => on,
           persistent => true,
       }
