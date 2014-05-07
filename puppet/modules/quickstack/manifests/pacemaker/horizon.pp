@@ -106,7 +106,7 @@ class quickstack::pacemaker::horizon (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include horizon",
     }
     ->
-    pacemaker::resource::lsb {"$::horizon::params::http_service":
+    quickstack::pacemaker::resource::lsb {"$::horizon::params::http_service":
       group => "$::horizon::params::http_service",
       clone => true,
     }

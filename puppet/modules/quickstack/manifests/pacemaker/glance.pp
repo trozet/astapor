@@ -62,7 +62,7 @@ class quickstack::pacemaker::glance (
       if str2bool_i("$pcmk_fs_manage") {
         Exec['stonith-setup-complete']
         ->
-        pacemaker::resource::filesystem { "glance fs":
+        quickstack::pacemaker::resource::filesystem { "glance-fs":
           device => $pcmk_fs_device,
           directory => $pcmk_fs_dir,
           fstype => $pcmk_fs_type,
@@ -73,7 +73,7 @@ class quickstack::pacemaker::glance (
         Class['::quickstack::glance']
 
         Class['::quickstack::pacemaker::common'] ->
-        Pacemaker::Resource::Filesystem["glance fs"]
+        Quickstack::Pacemaker::Resource::Filesystem["glance-fs"]
       }
     }
 
@@ -145,12 +145,12 @@ class quickstack::pacemaker::glance (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
-    pacemaker::resource::lsb {'openstack-glance-api':
+    quickstack::pacemaker::resource::lsb {'openstack-glance-api':
       group => "$pcmk_glance_group",
       clone => true,
     }
     ->
-    pacemaker::resource::lsb {'openstack-glance-registry':
+    quickstack::pacemaker::resource::lsb {'openstack-glance-registry':
       group => "$pcmk_glance_group",
       clone => true,
     }

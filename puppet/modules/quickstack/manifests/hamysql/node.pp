@@ -24,11 +24,13 @@ class quickstack::hamysql::node (
   $mysql_resource_group_name    = $quickstack::params::mysql_resource_group_name,
   $mysql_clu_member_addrs       = $quickstack::params::mysql_clu_member_addrs,
   $corosync_setup               = true,
+  $cluster_control_ip           = '',
 ) inherits quickstack::params {
 
     include mysql::python
 
     $mysql_virtual_ip_managed_bool = str2bool_i("$mysql_virtual_ip_managed")
+    $pcs_resource_setup = has_interface_with("ipaddress", $cluster_control_ip)
 
     package { 'mysql-server':
       ensure => installed,
@@ -39,53 +41,54 @@ class quickstack::hamysql::node (
       socket => '/var/run/mysqld/mysql.sock',
     }
     -> Class['pacemaker::corosync']
-    if $mysql_virtual_ip_managed_bool {
+    if ($mysql_virtual_ip_managed_bool and $pcs_resource_setup) {
       Class['pacemaker::corosync']
-      -> Pacemaker::Resource::Ip['mysql-clu-vip']
+      -> ::Pacemaker::Resource::Ip['mysql-clu-vip']
     }
     if $corosync_setup {
       class {'pacemaker::corosync':
         cluster_name => "hamysql",
         cluster_members => $mysql_clu_member_addrs,
       }
-      ->
-      # TODO: use quickstack::pacemaker::common instead
-      class {"pacemaker::stonith":
-        disable => true,
-      }
-      if $mysql_virtual_ip_managed_bool {
+      if ($mysql_virtual_ip_managed_bool and $pcs_resource_setup) {
+        # TODO: use quickstack::pacemaker::common instead
+        class {"pacemaker::stonith":
+          disable => true,
+        } ->
         Class['pacemaker::corosync']
-        -> Pacemaker::Resource::Ip['mysql-clu-vip']
+        -> ::Pacemaker::Resource::Ip['mysql-clu-vip']
       }
     }
-    if $mysql_virtual_ip_managed_bool {
-      pacemaker::resource::ip { 'mysql-clu-vip' :
+    if ($mysql_virtual_ip_managed_bool and $pcs_resource_setup) {
+      ::pacemaker::resource::ip { 'mysql-clu-vip' :
         ip_address => $mysql_virtual_ip,
         group => $mysql_resource_group_name,
         cidr_netmask => $mysql_virt_ip_cidr_mask,
         nic => $mysql_virt_ip_nic,
       }
-      pacemaker::constraint::base { 'ip-mysql-constr' :
+      ::pacemaker::constraint::base { 'ip-mysql-constr' :
         constraint_type => "order",
         first_resource  => "ip-${mysql_virtual_ip}",
         second_resource => "mysql-ostk-mysql",
         first_action    => "start",
         second_action   => "start",
       }
-      Pacemaker::Resource::Ip['mysql-clu-vip'] ->
-      Pacemaker::Resource::Filesystem['mysql-clu-fs']
+      ::Pacemaker::Resource::Ip['mysql-clu-vip'] ->
+      ::Pacemaker::Resource::Filesystem['mysql-clu-fs']
 
-      Pacemaker::Constraint::Base['fs-mysql-constr'] ->
-      Pacemaker::Constraint::Base['ip-mysql-constr']
+      ::Pacemaker::Constraint::Base['fs-mysql-constr'] ->
+      ::Pacemaker::Constraint::Base['ip-mysql-constr']
     }
-    pacemaker::resource::filesystem { 'mysql-clu-fs' :
-      device => "$mysql_shared_storage_device",
-      directory => "/var/lib/mysql",
-      fstype => $mysql_shared_storage_type,
-      fsoptions => $mysql_shared_storage_options,
-      group => $mysql_resource_group_name,
+    if ($pcs_resource_setup) {
+      ::pacemaker::resource::filesystem { 'mysql-clu-fs' :
+        device => "$mysql_shared_storage_device",
+        directory => "/var/lib/mysql",
+        fstype => $mysql_shared_storage_type,
+        fsoptions => $mysql_shared_storage_options,
+        group => $mysql_resource_group_name,
+      }
+      -> Exec['wait-for-fs-to-be-active']
     }
-    ->
     exec {"wait-for-fs-to-be-active":
       timeout => 3600,
       tries => 360,
@@ -105,21 +108,25 @@ class quickstack::hamysql::node (
       command => "/bin/ln -sf /var/run/mysqld/mysql.sock /var/lib/mysql/mysql.sock",
       onlyif => "/bin/mount | grep -q '/var/lib/mysql'",
     }
-    ->
-    pacemaker::resource::mysql { 'mysql-clu-mysql' :
-      name => "ostk-mysql",
-      group => $mysql_resource_group_name,
-      additional_params => "socket=/var/run/mysqld/mysql.sock",
+    -> Exec['wait-for-mysql-to-start']
+    if ($pcs_resource_setup) {
+      Exec['create-socket-symlink-if-we-own-the-mount']
+      ->
+      ::pacemaker::resource::mysql { 'mysql-clu-mysql' :
+        name => "ostk-mysql",
+        group => $mysql_resource_group_name,
+        additional_params => "socket=/var/run/mysqld/mysql.sock",
+      }
+      ->
+      ::pacemaker::constraint::base { 'fs-mysql-constr' :
+        constraint_type => "order",
+        first_resource  => "fs-varlibmysql",
+        second_resource => "mysql-ostk-mysql",
+        first_action    => "start",
+        second_action   => "start",
+      }
+      -> Exec['wait-for-mysql-to-start']
     }
-    ->
-    pacemaker::constraint::base { 'fs-mysql-constr' :
-      constraint_type => "order",
-      first_resource  => "fs-varlibmysql",
-      second_resource => "mysql-ostk-mysql",
-      first_action    => "start",
-      second_action   => "start",
-    }
-    ->
     exec {"wait-for-mysql-to-start":
       timeout => 3600,
       tries => 360,

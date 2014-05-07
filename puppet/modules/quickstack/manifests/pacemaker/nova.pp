@@ -104,7 +104,7 @@ class quickstack::pacemaker::nova (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include nova",
     } ->
 
-    pacemaker::resource::lsb {['openstack-nova-consoleauth',
+    quickstack::pacemaker::resource::lsb {['openstack-nova-consoleauth',
                               'openstack-nova-novncproxy',
                               'openstack-nova-api',
                               'openstack-nova-scheduler',
@@ -113,7 +113,7 @@ class quickstack::pacemaker::nova (
       clone => true,
     }
     ->
-    pacemaker::constraint::base { 'nova-console-vnc-constr' :
+    quickstack::pacemaker::constraint::base { 'nova-console-vnc-constr' :
       constraint_type => "order",
       first_resource  => "lsb-openstack-nova-consoleauth-clone",
       second_resource => "lsb-openstack-nova-novncproxy-clone",
@@ -121,13 +121,13 @@ class quickstack::pacemaker::nova (
       second_action   => "start",
     }
     ->
-    pacemaker::constraint::colocation { 'nova-console-vnc-colo' :
+    quickstack::pacemaker::constraint::colocation { 'nova-console-vnc-colo' :
       source => "lsb-openstack-nova-novncproxy-clone",
       target => "lsb-openstack-nova-consoleauth-clone",
       score => "INFINITY",
     }
     ->
-    pacemaker::constraint::base { 'nova-vnc-api-constr' :
+    quickstack::pacemaker::constraint::base { 'nova-vnc-api-constr' :
       constraint_type => "order",
       first_resource  => "lsb-openstack-nova-novncproxy-clone",
       second_resource => "lsb-openstack-nova-api-clone",
@@ -135,13 +135,13 @@ class quickstack::pacemaker::nova (
       second_action   => "start",
     }
     ->
-    pacemaker::constraint::colocation { 'nova-vnc-api-colo' :
+    quickstack::pacemaker::constraint::colocation { 'nova-vnc-api-colo' :
       source => "lsb-openstack-nova-api-clone",
       target => "lsb-openstack-nova-novncproxy-clone",
       score => "INFINITY",
     }
     ->
-    pacemaker::constraint::base { 'nova-api-scheduler-constr' :
+    quickstack::pacemaker::constraint::base { 'nova-api-scheduler-constr' :
       constraint_type => "order",
       first_resource  => "lsb-openstack-nova-api-clone",
       second_resource => "lsb-openstack-nova-scheduler-clone",
@@ -149,13 +149,13 @@ class quickstack::pacemaker::nova (
       second_action   => "start",
     }
     ->
-    pacemaker::constraint::colocation { 'nova-api-scheduler-colo' :
+    quickstack::pacemaker::constraint::colocation { 'nova-api-scheduler-colo' :
       source => "lsb-openstack-nova-scheduler-clone",
       target => "lsb-openstack-nova-api-clone",
       score => "INFINITY",
     }
     ->
-    pacemaker::constraint::base { 'nova-scheduler-conductor-constr' :
+    quickstack::pacemaker::constraint::base { 'nova-scheduler-conductor-constr' :
       constraint_type => "order",
       first_resource  => "lsb-openstack-nova-scheduler-clone",
       second_resource => "lsb-openstack-nova-conductor-clone",

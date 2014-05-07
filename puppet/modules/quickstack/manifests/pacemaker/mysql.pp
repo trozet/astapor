@@ -7,6 +7,10 @@ class quickstack::pacemaker::mysql (
   include quickstack::pacemaker::common
 
   if (map_params('include_mysql') == 'true') {
+    # is the one node to run pcs commands from
+    $is_control_node = has_interface_with("ipaddress",
+                                          map_params("cluster_control_ip"))
+
     Class['::quickstack::pacemaker::common']
     ->
     quickstack::pacemaker::vips { "mysql":
@@ -32,6 +36,7 @@ class quickstack::pacemaker::mysql (
       mysql_shared_storage_options => $storage_options,
       mysql_resource_group_name    => map_params("db_group"),
       corosync_setup               => false,
+      cluster_control_ip           => map_params("cluster_control_ip"),
       mysql_virt_ip_nic            => '',
       mysql_virt_ip_cidr_mask      => '32',
     }
@@ -54,6 +59,10 @@ class quickstack::pacemaker::mysql (
         Exec["pcs-mysql-server-set-up"] -> Exec["mysql-has-users"]
       }
     }
-    Exec['stonith-setup-complete'] -> Pacemaker::Resource::Filesystem['mysql-clu-fs']
+    if ($is_control_node) {
+      Exec['stonith-setup-complete'] -> ::Pacemaker::Resource::Filesystem['mysql-clu-fs']
+    } else {
+      Exec['stonith-setup-complete'] -> Exec['wait-for-fs-to-be-active']
+    }
   }
 }

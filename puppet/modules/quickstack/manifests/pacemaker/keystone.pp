@@ -149,7 +149,7 @@ class quickstack::pacemaker::keystone (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include keystone",
     } ->
-    pacemaker::resource::lsb {'openstack-keystone':
+    quickstack::pacemaker::resource::lsb {'openstack-keystone':
       group => map_params("keystone_group"),
       clone => true,
     }
