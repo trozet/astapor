@@ -57,6 +57,7 @@ class quickstack::neutron::all (
 
   class { '::neutron':
     allow_overlapping_ips => str2bool_i("$allow_overlapping_ips"),
+    bind_host             => $neutron_priv_host,
     core_plugin           => $neutron_core_plugin,
     enabled               => str2bool_i("$enabled"),
     rpc_backend           => $rpc_backend,
