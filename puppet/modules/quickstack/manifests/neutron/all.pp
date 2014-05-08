@@ -201,6 +201,8 @@ class quickstack::neutron::all (
     metadata_ip   => $neutron_priv_host,
   }
 
+  include quickstack::neutron::notifications
+
   #class { 'neutron::agents::lbaas': }
 
   #class { 'neutron::agents::fwaas': }
