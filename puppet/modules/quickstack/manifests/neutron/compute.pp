@@ -22,6 +22,8 @@ class quickstack::neutron::compute (
   $ovs_tunnel_iface            = 'eth1',
   $ovs_tunnel_network          = '',
   $qpid_host                   = $quickstack::params::qpid_host,
+  $qpid_port                   = '5672',
+  $qpid_ssl_port               = '5671',
   $qpid_username               = $quickstack::params::qpid_username,
   $qpid_password               = $quickstack::params::qpid_password,
   $tenant_network_type         = $quickstack::params::tenant_network_type,
@@ -36,11 +38,11 @@ class quickstack::neutron::compute (
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
-    $qpid_port = '5671'
+    $real_qpid_port = $qpid_ssl_port
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
   } else {
     $qpid_protocol = 'tcp'
-    $qpid_port = '5672'
+    $real_qpid_port = $qpid_port
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
   }
 
@@ -48,7 +50,7 @@ class quickstack::neutron::compute (
     allow_overlapping_ips => true,
     rpc_backend           => 'neutron.openstack.common.rpc.impl_qpid',
     qpid_hostname         => $qpid_host,
-    qpid_port             => $qpid_port,
+    qpid_port             => $real_qpid_port,
     qpid_protocol         => $qpid_protocol,
     qpid_username         => $qpid_username,
     qpid_password         => $qpid_password,
@@ -100,6 +102,8 @@ class quickstack::neutron::compute (
     nova_db_password           => $nova_db_password,
     nova_user_password         => $nova_user_password,
     qpid_host                  => $qpid_host,
+    qpid_port                  => $qpid_port,
+    qpid_ssl_port              => $qpid_ssl_port,
     qpid_username              => $qpid_username,
     qpid_password              => $qpid_password,
     verbose                    => $verbose,
