@@ -36,6 +36,8 @@ class quickstack::neutron::all (
   $provider_vlan_auto_create     = '',
   $provider_vlan_auto_trunk      = '',
   $qpid_host                     = '127.0.0.1',
+  $qpid_port                     = '5672',
+  $qpid_ssl_port                 = '5671',
   $qpid_username                 = '',
   $qpid_password                 = '',
   $rpc_backend                   = 'neutron.openstack.common.rpc.impl_qpid',
@@ -47,11 +49,11 @@ class quickstack::neutron::all (
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
-    $qpid_port = '5671'
+    $real_qpid_port = $qpid_ssl_port
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
   } else {
     $qpid_protocol = 'tcp'
-    $qpid_port = '5672'
+    $real_qpid_port = $qpid_port
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
   }
 
@@ -62,7 +64,7 @@ class quickstack::neutron::all (
     enabled               => str2bool_i("$enabled"),
     rpc_backend           => $rpc_backend,
     qpid_hostname         => $qpid_host,
-    qpid_port             => $qpid_port,
+    qpid_port             => $real_qpid_port,
     qpid_protocol         => $qpid_protocol,
     qpid_username         => $qpid_username,
     qpid_password         => $qpid_password,
@@ -174,7 +176,6 @@ class quickstack::neutron::all (
     neutron_admin_password => $neutron_user_password,
     neutron_url            => "http://${neutron_priv_host}:9696",
     neutron_admin_auth_url => "http://${neutron_priv_host}:35357/v2.0",
-
   }
 
   $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
