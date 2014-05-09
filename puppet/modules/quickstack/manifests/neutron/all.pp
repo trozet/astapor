@@ -23,6 +23,7 @@ class quickstack::neutron::all (
   $neutron_db_password,
   $neutron_metadata_proxy_secret,
   $neutron_priv_host             = '127.0.0.1',
+  $neutron_url                   = '127.0.0.1',
   $neutron_user_password,
   $nexus_config                  = '',
   $nexus_credentials             = '',
@@ -174,8 +175,8 @@ class quickstack::neutron::all (
 
   class { '::nova::network::neutron':
     neutron_admin_password => $neutron_user_password,
-    neutron_url            => "http://${neutron_priv_host}:9696",
-    neutron_admin_auth_url => "http://${neutron_priv_host}:35357/v2.0",
+    neutron_url            => "http://${neutron_url}:9696",
+    neutron_admin_auth_url => "http://${auth_host}:35357/v2.0",
   }
 
   $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
