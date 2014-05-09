@@ -57,13 +57,14 @@ class quickstack::pacemaker::neutron (
     }
     ->
     class { 'quickstack::neutron::all':
-      neutron_priv_host             => map_params("local_bind_addr"),
       auth_host                     => map_params("keystone_public_vip"),
       enable_tunneling              => $enable_tunneling,
       enabled                       => $enabled,
       external_network_bridge       => $external_network_bridge,
       mysql_host                    => map_params("db_vip"),
       neutron_db_password           => map_params("neutron_db_password"),
+      neutron_priv_host             => map_params("local_bind_addr"),
+      neutron_url                   => map_params("neutron_public_vip"),
       neutron_user_password         => map_params("neutron_user_password"),
       neutron_metadata_proxy_secret => map_params("neutron_metadata_proxy_secret"),
       ovs_bridge_mappings           => $ovs_bridge_mappings,
@@ -72,6 +73,7 @@ class quickstack::pacemaker::neutron (
       ovs_vlan_ranges               => $ovs_vlan_ranges,
       ovs_tunnel_types              => $ovs_tunnel_types,
       qpid_host                     => map_params("qpid_vip"),
+      qpid_port                     => map_params("qpid_port"),
       qpid_username                 => map_params("qpid_username"),
       qpid_password                 => map_params("qpid_password"),
       tenant_network_type           => $tenant_network_type,

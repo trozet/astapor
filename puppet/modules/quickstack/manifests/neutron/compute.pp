@@ -1,6 +1,7 @@
 # Quickstack compute node configuration for neutron (OpenStack Networking)
 class quickstack::neutron::compute (
   $admin_password              = $quickstack::params::admin_password,
+  $auth_host                   = '127.0.0.1',
   $ceilometer                  = 'true',
   $ceilometer_host             = 'false',
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
@@ -8,13 +9,14 @@ class quickstack::neutron::compute (
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
   $cinder_backend_nfs          = 'false',
   $controller_admin_host       = $quickstack::params::controller_admin_host,
-  $controller_priv_host        = $quickstack::params::controller_priv_host,
-  $controller_pub_host         = $quickstack::params::controller_pub_host,
+  $glance_host                 = '127.0.0.1',
+  $nova_host                   = '127.0.0.1',
   $enable_tunneling            = $quickstack::params::enable_tunneling,
   $mysql_host                  = $quickstack::params::mysql_host,
   $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
   $neutron_db_password         = $quickstack::params::neutron_db_password,
   $neutron_user_password       = $quickstack::params::neutron_user_password,
+  $neutron_host                = '127.0.0.1',
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
   $ovs_bridge_mappings         = $quickstack::params::ovs_bridge_mappings,
@@ -59,7 +61,7 @@ class quickstack::neutron::compute (
 
   neutron_config {
     'database/connection': value => $sql_connection;
-    'keystone_authtoken/auth_host':         value => $controller_priv_host;
+    'keystone_authtoken/auth_host':         value => $auth_host;
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
@@ -83,23 +85,24 @@ class quickstack::neutron::compute (
 
   class { '::nova::network::neutron':
     neutron_admin_password    => $neutron_user_password,
-    neutron_url               => "http://${controller_priv_host}:9696",
-    neutron_admin_auth_url    => "http://${controller_admin_host}:35357/v2.0",
+    neutron_url               => "http://${neutron_host}:9696",
+    neutron_admin_auth_url    => "http://${auth_host}:35357/v2.0",
   }
 
 
   class { 'quickstack::compute_common':
     admin_password             => $admin_password,
+    auth_host                  => $auth_host,
     ceilometer                 => $ceilometer,
     ceilometer_host            => $ceilometer_host,
     ceilometer_metering_secret => $ceilometer_metering_secret,
     ceilometer_user_password   => $ceilometer_user_password,
     cinder_backend_gluster     => $cinder_backend_gluster,
     cinder_backend_nfs         => $cinder_backend_nfs,
-    controller_priv_host       => $controller_priv_host,
-    controller_pub_host        => $controller_pub_host,
+    glance_host                => $glance_host,
     mysql_host                 => $mysql_host,
     nova_db_password           => $nova_db_password,
+    nova_host                  => $nova_host,
     nova_user_password         => $nova_user_password,
     qpid_host                  => $qpid_host,
     qpid_port                  => $qpid_port,
