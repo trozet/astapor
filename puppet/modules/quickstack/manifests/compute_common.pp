@@ -2,14 +2,14 @@
 class quickstack::compute_common (
   $admin_password              = $quickstack::params::admin_password,
   $ceilometer                  = 'true',
-  $ceilometer_host             = 'false',
+  $auth_host                   = '127.0.0.1',
   $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
   $cinder_backend_nfs          = 'false',
-  $controller_priv_host        = $quickstack::params::controller_priv_host,
-  $controller_pub_host         = $quickstack::params::controller_pub_host,
+  $glance_host                 = '127.0.0.1',
   $mysql_host                  = $quickstack::params::mysql_host,
+  $nova_host                   = '127.0.0.1',
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
   $qpid_host                   = $quickstack::params::qpid_host,
@@ -62,7 +62,7 @@ class quickstack::compute_common (
   class { '::nova':
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
-    glance_api_servers => "http://${controller_priv_host}:9292/v1",
+    glance_api_servers => "http://${glance_host}:9292/v1",
     rpc_backend        => 'nova.openstack.common.rpc.impl_qpid',
     qpid_hostname      => $qpid_host,
     qpid_protocol      => $qpid_protocol,
@@ -85,16 +85,11 @@ class quickstack::compute_common (
 
   class { '::nova::compute':
     enabled => true,
-    vncproxy_host => $controller_pub_host,
+    vncproxy_host => $nova_host,
     vncserver_proxyclient_address => $::ipaddress,
   }
 
   if str2bool_i("$ceilometer") {
-    if "$ceilometer_host" == 'false' {
-      $auth_host = $controller_priv_host
-    } else {
-      $auth_host = $ceilometer_host
-    }
     class { 'ceilometer':
       metering_secret => $ceilometer_metering_secret,
       qpid_hostname   => $qpid_host,
