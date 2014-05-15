@@ -6,12 +6,20 @@ class quickstack::pacemaker::rsync::keystone (
     path => '/usr/bin:/usr/sbin:/bin',
   }
 
+  if ($::selinux != "false") {
+    selboolean{'rsync_client':
+      value            => on,
+      persistent => true,
+    }
+  }
+
   quickstack::pacemaker::rsync::get { '/etc/keystone/ssl':
     source           => "rsync://$keystone_private_vip/keystone/",
-    override_options => "aI",
+    override_options => "aIX",
     purge            => true,
     unless           => "/tmp/ha-all-in-one-util.bash i_am_vip $keystone_private_vip",
-  } ->
+  }
+  ->
 
   quickstack::rsync::simple { "keystone":
     path         => '/etc/keystone/ssl',
