@@ -102,10 +102,7 @@ class quickstack::pacemaker::neutron (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include neutron",
     }
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-db-check':
-      group => "neutron-agents-pre",
-      clone => true,
-    }
+    class {"quickstack::pacemaker::neutron_db_check":}
     ->
     quickstack::pacemaker::resource::lsb {'neutron-server':
       group => "neutron-agents-pre",
@@ -145,7 +142,7 @@ class quickstack::pacemaker::neutron (
     ->
     quickstack::pacemaker::constraint::base { 'neutron-db-server-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-neutron-db-check",
+      first_resource  => "neutron-db-check",
       second_resource => "lsb-neutron-server",
       first_action    => "start",
       second_action   => "start",
@@ -153,7 +150,7 @@ class quickstack::pacemaker::neutron (
     ->
     quickstack::pacemaker::constraint::colocation { 'neutron-db-server-colo' :
       source => "lsb-neutron-server",
-      target => "lsb-neutron-db-check",
+      target => "neutron-db-check",
       score  => "INFINITY",
     }
     ->
