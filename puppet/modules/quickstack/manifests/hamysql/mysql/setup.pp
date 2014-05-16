@@ -37,7 +37,7 @@ class quickstack::hamysql::mysql::setup (
     }
     database_user { "$keystone_db_user@%":
       ensure => 'present',
-      password_hash => mysql_password($keystone_db_password),
+      password_hash => mysql_password("$keystone_db_password"),
       provider      => 'mysql',
       require => Database[$keystone_db_dbname],
     }
@@ -53,7 +53,7 @@ class quickstack::hamysql::mysql::setup (
     }
     database_user { "$glance_db_user@%":
       ensure => 'present',
-      password_hash => mysql_password($glance_db_password),
+      password_hash => mysql_password("$glance_db_password"),
       provider      => 'mysql',
       require => Database[$glance_db_dbname],
     }
@@ -69,7 +69,7 @@ class quickstack::hamysql::mysql::setup (
     }
     database_user { "$nova_db_user@%":
       ensure => 'present',
-      password_hash => mysql_password($nova_db_password),
+      password_hash => mysql_password("$nova_db_password"),
       provider      => 'mysql',
       require => Database[$nova_db_dbname],
     }
@@ -85,7 +85,7 @@ class quickstack::hamysql::mysql::setup (
     }
     database_user { "$cinder_db_user@%":
       ensure => 'present',
-      password_hash => mysql_password($cinder_db_password),
+      password_hash => mysql_password("$cinder_db_password"),
       provider      => 'mysql',
       require => Database[$cinder_db_dbname],
     }
@@ -101,7 +101,7 @@ class quickstack::hamysql::mysql::setup (
     }
     database_user { "$heat_db_user@%":
       ensure => 'present',
-      password_hash => mysql_password($heat_db_password),
+      password_hash => mysql_password("$heat_db_password"),
       provider      => 'mysql',
       require => Database[$heat_db_dbname],
     }
@@ -118,7 +118,7 @@ class quickstack::hamysql::mysql::setup (
       }
       database_user { "$neutron_db_user@%":
         ensure => 'present',
-        password_hash => mysql_password($neutron_db_password),
+        password_hash => mysql_password("$neutron_db_password"),
         provider      => 'mysql',
         require => Database[$neutron_db_dbname],
       }
