@@ -133,4 +133,16 @@ class quickstack::pacemaker::common (
     mode    => '0755',
     content => template('quickstack/ha-all-in-one-util.erb'),
   }
+
+  if has_interface_with("ipaddress", map_params("cluster_control_ip")){
+    Exec['all-nodes-joined-cluster']
+    ->
+    exec {"pcs-resource-default":
+      command => "/usr/sbin/pcs resource defaults resource-stickiness=100",
+    }
+    ->
+    exec {"pcs-property-start-failure-is-false":
+      command => "/usr/sbin/pcs property set start-failure-is-fatal=false",
+    }
+  }
 }
