@@ -109,7 +109,8 @@ class quickstack::db::mysql (
       'ssl_cert'       => $mysql_cert,
       'ssl_key'        => $mysql_key,
     },
-    enabled     => $enabled,
+    package_name => 'mariadb-galera-server',
+    enabled      => $enabled,
   }
 
   # This removes default users and guest access
