@@ -32,7 +32,7 @@ class quickstack::hamysql::node (
     $mysql_virtual_ip_managed_bool = str2bool_i("$mysql_virtual_ip_managed")
     $pcs_resource_setup = has_interface_with("ipaddress", $cluster_control_ip)
 
-    package { 'mysql-server':
+    package { 'mariadb-galera-server':
       ensure => installed,
     }
     ->
