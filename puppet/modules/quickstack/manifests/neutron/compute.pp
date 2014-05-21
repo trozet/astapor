@@ -7,7 +7,6 @@ class quickstack::neutron::compute (
   $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
   $cinder_backend_nfs          = 'false',
-  $controller_admin_host       = $quickstack::params::controller_admin_host,
   $glance_host                 = '127.0.0.1',
   $nova_host                   = '127.0.0.1',
   $enable_tunneling            = $quickstack::params::enable_tunneling,
