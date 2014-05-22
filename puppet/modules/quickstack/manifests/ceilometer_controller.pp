@@ -19,8 +19,8 @@ class quickstack::ceilometer_controller(
     }
 
     class { 'mongodb':
-       enable_10gen => false,
-       port         => '27017',
+      enable_10gen => false,
+      port         => '27017',
     }
 
     class { 'ceilometer':
@@ -38,7 +38,7 @@ class quickstack::ceilometer_controller(
     # way to run mongo on a different host in the future
     class { 'ceilometer::db':
         database_connection => 'mongodb://localhost:27017/ceilometer',
-        require             => Class['mongodb'],
+        require             => Service['mongod'],
     }
 
     class { 'ceilometer::collector':
@@ -57,6 +57,6 @@ class quickstack::ceilometer_controller(
     class { 'ceilometer::api':
         keystone_host     => $controller_priv_host,
         keystone_password => $ceilometer_user_password,
-        require           => Class['mongodb'],
+        require             => Service['mongod'],
     }
 }
