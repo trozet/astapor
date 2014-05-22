@@ -27,6 +27,7 @@ class quickstack::ceilometer_controller(
     # way to run mongo on a different host in the future
     class { 'ceilometer::db':
         database_connection => 'mongodb://localhost:27017/ceilometer',
+        require             => Service['mongod'],
     }
 
     class { 'ceilometer':
@@ -56,5 +57,6 @@ class quickstack::ceilometer_controller(
     class { 'ceilometer::api':
         keystone_host     => $controller_priv_host,
         keystone_password => $ceilometer_user_password,
+        require             => Service['mongod'],
     }
 }
