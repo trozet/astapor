@@ -135,7 +135,7 @@ class quickstack::pacemaker::common (
   }
 
   if has_interface_with("ipaddress", map_params("cluster_control_ip")){
-    Exec['all-nodes-joined-cluster']
+    Exec['stonith-setup-complete']
     ->
     exec {"pcs-resource-default":
       command => "/usr/sbin/pcs resource defaults resource-stickiness=100",
