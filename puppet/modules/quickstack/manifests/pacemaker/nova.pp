@@ -26,9 +26,9 @@ class quickstack::pacemaker::nova (
     )
     Exec['i-am-nova-vip-OR-nova-is-up-on-vip'] -> Exec['nova-db-sync']
     if (map_params('include_mysql') == 'true') {
-       if str2bool_i("$hamysql_is_running") {
-         Exec['mysql-has-users'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
-       }
+      if str2bool_i("$hamysql_is_running") {
+        Exec['mysql-has-users'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
+      }
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
@@ -75,10 +75,10 @@ class quickstack::pacemaker::nova (
       neutron                       => str2bool_i(map_params("neutron")),
       neutron_metadata_proxy_secret => map_params("neutron_metadata_proxy_secret"),
       qpid_heartbeat                => $qpid_heartbeat,
-      qpid_hostname                 => map_params("qpid_vip"),
-      qpid_port                     => map_params("qpid_port"),
-      qpid_username                 => map_params("qpid_username"),
-      qpid_password                 => map_params("qpid_password"),
+      amqp_hostname                 => map_params("qpid_vip"),
+      amqp_port                     => map_params("qpid_port"),
+      amqp_username                 => map_params("qpid_username"),
+      amqp_password                 => map_params("qpid_password"),
       rpc_backend                   => $rpc_backend,
       verbose                       => $verbose,
     }
