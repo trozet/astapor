@@ -368,6 +368,17 @@ params = {
   "gluster_volume3_name"          => 'swift',
   "gluster_volume3_path"          => '/swift',
   "gluster_volume3_uid"           => '160',
+  "galera_bootstrap"              => false,
+  "galera_monitor_username"       => "monitor_user",
+  "galera_monitor_password"       => SecureRandom.hex,
+  "wsrep_cluster_name"            => "galera_cluster",
+  "wsrep_cluster_members"         => ['192.168.203.11', '192.168.203.12', '192.168.203.13'],
+  "wsrep_sst_method"              => "rsync",
+  "wsrep_sst_username"            => "sst_user",
+  "wsrep_sst_password"            => SecureRandom.hex,
+  "wsrep_ssl"                     => true,
+  "wsrep_ssl_key"                 => "/etc/pki/galera/galera.key",
+  "wsrep_ssl_cert"                => "/etc/pki/galera/galera.crt",
 }
 
 hostgroups = [
@@ -409,7 +420,9 @@ hostgroups = [
     {:name=>"Gluster Server",
      :class=>["puppet::vardir",
               "quickstack::gluster::server",
-             ]}
+             ]},
+    {:name=>"Galera Server",
+     :class=>"quickstack::galera::server"}
 ]
 
 def get_key_type(value)
