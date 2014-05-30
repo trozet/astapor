@@ -114,7 +114,7 @@ class quickstack::pacemaker::common (
       tries     => 360,
       try_sleep => 10,
       path => '/usr/bin:/usr/sbin:/bin',
-      command => 'test $(crm_node -q) == 1 && test "$(crm_node -p | sort)" == "$(crm_node -l | sort)"',
+      command => 'crm_mon --as-xml 2>&1 | grep -e "<node .*online=\"false\"" -e "<node .*pending=\"true\"" -e "<node .*unclean=\"true\"" -e "[C|c]onnection refused" >/dev/null 2>&1; test "$?" == "1"',
     }
     Class['pacemaker::corosync'] -> Exec['all-nodes-joined-cluster'] ->
     Class['pacemaker::stonith']
