@@ -1,4 +1,4 @@
-class quickstack::storage_backend::lvm_cinder(
+class quickstack::storage_backend::cinder(
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
   $cinder_backend_iscsi        = $quickstack::params::cinder_backend_iscsi,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
