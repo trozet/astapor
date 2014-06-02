@@ -44,17 +44,28 @@ all_members_include() {
 # update a resource property with same name as my node
 # to include the argument in a list if it is not there already
 update_my_node_property() {
-   element=$1
-   mynode=$(my_cluster_ip)
-   if ! $(property_exists $mynode); then
-     /usr/sbin/pcs property set $mynode=$element --force || return 1
-     return 0
-   fi
-   if $(property_includes $mynode $element); then
-     return 0
-   fi
-   /usr/sbin/pcs property set $mynode=$(get_property_value $mynode),$element --force || return 1
-   return 0
+  element=$1
+  mynode=$(my_cluster_ip)
+  if ! $(property_exists $mynode); then
+    /usr/sbin/pcs property set $mynode=$element --force || return 1
+    return 0
+  fi
+  if $(property_includes $mynode $element); then
+    return 0
+  fi
+  /usr/sbin/pcs property set $mynode=$(get_property_value $mynode),$element --force || return 1
+  return 0
+}
+
+update_my_node_property_verified() {
+  element=$1
+  mynode=$(my_cluster_ip)
+  property_includes $mynode $element
+  while [ $? -ne 0 ]; do
+    update_my_node_property $element $mynode
+    sleep 1
+    property_includes $mynode $element
+  done
 }
 
 # obsolete, but here as an illustration of how i_am_vip works
@@ -98,7 +109,7 @@ case "$1" in
      property_exists $2
      ;;
   "update_my_node_property")
-     update_my_node_property $2 $3
+     update_my_node_property_verified $2
      ;;
   "all_members_include")
      all_members_include $2
