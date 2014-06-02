@@ -1,5 +1,5 @@
 class quickstack::amqp::server (
-  $amqp_server                   = $quickstack::params::amqp_server,
+  $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_port                     = $quickstack::params::amqp_port,
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -11,14 +11,14 @@ class quickstack::amqp::server (
   $freeipa                       = $quickstack::params::freeipa,
 ) inherits quickstack::params {
 
-  if $amqp_server == 'qpid' {
+  if $amqp_provider == 'qpid' {
     $klass = 'qpid'
   } else {
     $klass = 'rabbitmq'
   }
 
   class { "quickstack::amqp::server::${klass}":
-    amqp_server   => $amqp_server,
+    amqp_provider => $amqp_provider,
     amqp_host     => $amqp_host,
     amqp_port     => $amqp_port,
     amqp_username => $amqp_username,

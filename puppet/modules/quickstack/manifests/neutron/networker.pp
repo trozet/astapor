@@ -10,7 +10,7 @@ class quickstack::neutron::networker (
   $ovs_tunnel_iface              = 'eth1',
   $ovs_tunnel_network            = '',
   $mysql_host                    = $quickstack::params::mysql_host,
-  $amqp_server                   = $quickstack::params::amqp_server,
+  $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
   $external_network_bridge       = 'br-ex',
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -43,7 +43,7 @@ class quickstack::neutron::networker (
   class { '::neutron':
     verbose               => true,
     allow_overlapping_ips => true,
-    rpc_backend           => amqp_backend('neutron', $amqp_server),
+    rpc_backend           => amqp_backend('neutron', $amqp_provider),
     qpid_hostname         => $amqp_host,
     qpid_protocol         => $qpid_protocol,
     qpid_port             => $amqp_port,

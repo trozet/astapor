@@ -86,7 +86,7 @@ class quickstack::params {
   $neutron_metadata_proxy_secret = 'CHANGEME'
 
   $mysql_host                    = '172.16.0.1'
-  $amqp_server                   = 'rabbitmq'
+  $amqp_provider                 = 'rabbitmq'
   $amqp_host                     = '172.16.0.1'
   $amqp_username                 = 'openstack'
   $amqp_password                 = 'CHANGEME'

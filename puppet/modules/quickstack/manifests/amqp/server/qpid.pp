@@ -1,5 +1,5 @@
 class quickstack::amqp::server::qpid (
-  $amqp_server                   = $quickstack::params::amqp_server,
+  $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_port                     = $quickstack::params::amqp_port,
   $amqp_username                 = $quickstack::params::amqp_username,
