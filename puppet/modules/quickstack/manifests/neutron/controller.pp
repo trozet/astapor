@@ -162,6 +162,19 @@ class quickstack::neutron::controller (
     core_plugin           => $neutron_core_plugin
   }
   ->
+  class { '::nova::network::neutron':
+    neutron_admin_password    => $neutron_user_password,
+  }
+
+  class { '::neutron::server::notifications':
+    notify_nova_on_port_status_changes => true,
+    notify_nova_on_port_data_changes   => true,
+    nova_url                           => "http://${controller_priv_host}:8774/v2",
+    nova_admin_auth_url                => "http://${controller_priv_host}:35357/v2.0",
+    nova_admin_username                => "nova",
+    nova_admin_password                => "${nova_user_password}",
+  }
+  ->
   # FIXME: This really should be handled by the neutron-puppet module, which has
   # a review request open right now: https://review.openstack.org/#/c/50162/
   # If and when that is merged (or similar), the below can be removed.
@@ -264,19 +277,6 @@ class quickstack::neutron::controller (
       mysql_ca                     => $mysql_ca,
       tenant_network_type          => $tenant_network_type,
     }
-  }
-
-  class { '::nova::network::neutron':
-    neutron_admin_password    => $neutron_user_password,
-  }
-
-  class { '::neutron::server::notifications':
-    notify_nova_on_port_status_changes => true,
-    notify_nova_on_port_data_changes   => true,
-    nova_url                           => "http://${controller_priv_host}:8774/v2",
-    nova_admin_auth_url                => "http://${controller_priv_host}:35357/v2.0",
-    nova_admin_username                => "nova",
-    nova_admin_password                => "${nova_user_password}",
   }
 
   firewall { '001 neutron server (API)':
