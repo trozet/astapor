@@ -1,7 +1,7 @@
 # Class for nodes running any OpenStack services
-class quickstack::openstack_common(
-) inherits quickstack::params {
+class quickstack::openstack_common {
 
+  include quickstack::firewall::common
   # openstack-selinux does not exist in el7 yet, but it when it does
   # can just remove the ::operatingsystemrelease clause below
   if (str2bool($::selinux) and $::operatingsystem != "Fedora") {
