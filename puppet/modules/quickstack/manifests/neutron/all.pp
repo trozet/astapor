@@ -7,9 +7,8 @@ class quickstack::neutron::all (
   $enable_tunneling              = true,
   $enabled                       = true,
   $external_network_bridge       = 'br-ex',
-  $ml2_install_deps              = true,
   $ml2_type_drivers              = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
-  $ml2_tenant_network_types      = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
+  $ml2_tenant_network_types      = ['vxlan', 'vlan', 'gre', 'flat'],
   $ml2_mechanism_drivers         = ['openvswitch'],
   $ml2_flat_networks             = ['*'],
   $ml2_network_vlan_ranges       = ['10:50'],
@@ -19,7 +18,7 @@ class quickstack::neutron::all (
   $ml2_security_group            = 'dummy',
   $mysql_ca                      = undef,
   $mysql_host                    = '127.0.0.1',
-  $neutron_core_plugin           = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2',
+  $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
   $neutron_db_password,
   $neutron_metadata_proxy_secret,
   $neutron_priv_host             = '127.0.0.1',
@@ -93,39 +92,6 @@ class quickstack::neutron::all (
   }
 
   if $neutron_core_plugin == 'neutron.plugins.ml2.plugin.Ml2Plugin' {
-    # FIXME: This lovely workaround is because puppet-neutron doesn't
-    # install the ml2 package for us, which makes everything else fail.
-    # This has been fixed upstream, so we can remove this whole chunk once our
-    # puppet rpm deps catch up.
-    if str2bool_i("$ml2_install_deps") {
-      # test mechanism drivers
-      validate_array($ml2_mechanism_drivers)
-      if ! $ml2_mechanism_drivers {
-        warning('Without networking mechanism driver, ml2 will not communicate with L2 agents')
-      }
-
-      # Specific plugin configuration
-      # We need this before https://review.openstack.org/#/c/67004/ is
-      # merged
-      if ('openvswitch' in $ml2_mechanism_drivers) {
-        if (!defined(Package['neutron-plugin-ovs'])) {
-          package { 'neutron-plugin-ovs':
-            ensure => present,
-            name   => $::neutron::params::ovs_server_package,
-            before => Class['::neutron::plugins::ml2'],
-          }
-        }
-      }
-      if ('linuxbridge' in $ml2_mechanism_drivers) {
-        if (!defined(Package['neutron-plugin-linuxbridge'])) {
-          package { 'neutron-plugin-linuxbridge':
-            ensure => present,
-            name   => $::neutron::params::linuxbridge_server_package,
-            before => Class['::neutron::plugins::ml2'],
-          }
-        }
-      }
-    }
 
     neutron_config {
       'DEFAULT/service_plugins':
