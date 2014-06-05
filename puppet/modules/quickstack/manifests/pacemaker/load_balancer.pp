@@ -22,7 +22,7 @@ class quickstack::pacemaker::load_balancer {
     command   => "/tmp/ha-all-in-one-util.bash all_members_include haproxy",
 
   } ->
-  quickstack::pacemaker::resource::lsb {'haproxy':
+  quickstack::pacemaker::resource::service {'haproxy':
     group => "$loadbalancer_group",
     clone => true,
   }

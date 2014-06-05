@@ -104,7 +104,7 @@ class quickstack::pacemaker::nova (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include nova",
     } ->
 
-    quickstack::pacemaker::resource::lsb {['openstack-nova-consoleauth',
+    quickstack::pacemaker::resource::service {['openstack-nova-consoleauth',
                               'openstack-nova-novncproxy',
                               'openstack-nova-api',
                               'openstack-nova-scheduler',

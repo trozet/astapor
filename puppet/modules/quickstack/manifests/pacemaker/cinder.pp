@@ -124,12 +124,12 @@ class quickstack::pacemaker::cinder(
       command   => "/tmp/ha-all-in-one-util.bash all_members_include cinder",
     }
     ->
-    quickstack::pacemaker::resource::lsb {'openstack-cinder-api':
+    quickstack::pacemaker::resource::service {'openstack-cinder-api':
       group => "$pcmk_cinder_group",
       clone => true,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'openstack-cinder-scheduler':
+    quickstack::pacemaker::resource::service {'openstack-cinder-scheduler':
       group => "$pcmk_cinder_group",
       clone => true,
     }
@@ -149,7 +149,7 @@ class quickstack::pacemaker::cinder(
 
       Exec['all-cinder-nodes-are-up']
       ->
-      quickstack::pacemaker::resource::lsb {'openstack-cinder-volume':
+      quickstack::pacemaker::resource::service {'openstack-cinder-volume':
         group => "$pcmk_cinder_group",
         clone => true,
       }
