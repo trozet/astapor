@@ -34,7 +34,7 @@ property_includes() {
 
 all_members_include() {
   element=$1
-  members=$(/usr/sbin/crm_node -l)
+  members=$(/usr/sbin/crm_node -l | perl -p -e 's/^.*\s+(\S+)$/$1/g')
   if [ "x${members}" = "x" ]; then return 1; fi
   for member in $members; do
     property_includes $member $element || return 1
