@@ -124,39 +124,39 @@ class quickstack::pacemaker::neutron (
     ->
     class {"quickstack::pacemaker::neutron_db_check":}
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-server':
+    quickstack::pacemaker::resource::service {'neutron-server':
       group => "neutron-agents-pre",
       clone => false,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-ovs-cleanup':
+    quickstack::pacemaker::resource::service {'neutron-ovs-cleanup':
       group => "neutron-agents-pre",
       clone => false,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-netns-cleanup':
+    quickstack::pacemaker::resource::service {'neutron-netns-cleanup':
       group => "neutron-agents-pre",
       clone => false,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-agent-watch':
+    quickstack::pacemaker::resource::service {'neutron-agent-watch':
       group => "neutron-agents-pre",
       clone => false,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-openvswitch-agent':
+    quickstack::pacemaker::resource::service {'neutron-openvswitch-agent':
       clone => false,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-dhcp-agent':
+    quickstack::pacemaker::resource::service {'neutron-dhcp-agent':
       clone => false,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-l3-agent':
+    quickstack::pacemaker::resource::service {'neutron-l3-agent':
       clone => false,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'neutron-metadata-agent':
+    quickstack::pacemaker::resource::service {'neutron-metadata-agent':
       clone => false,
     }
     ->

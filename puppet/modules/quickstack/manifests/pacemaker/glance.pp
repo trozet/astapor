@@ -145,12 +145,12 @@ class quickstack::pacemaker::glance (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
-    quickstack::pacemaker::resource::lsb {'openstack-glance-api':
+    quickstack::pacemaker::resource::service {'openstack-glance-api':
       group => "$pcmk_glance_group",
       clone => true,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'openstack-glance-registry':
+    quickstack::pacemaker::resource::service {'openstack-glance-registry':
       group => "$pcmk_glance_group",
       clone => true,
     }

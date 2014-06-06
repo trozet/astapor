@@ -127,12 +127,12 @@ class quickstack::pacemaker::heat(
       command   => "/tmp/ha-all-in-one-util.bash all_members_include heat",
     }
     ->
-    quickstack::pacemaker::resource::lsb {'openstack-heat-api':
+    quickstack::pacemaker::resource::service {'openstack-heat-api':
       group => "$heat_group",
       clone => true,
     }
     ->
-    quickstack::pacemaker::resource::lsb {'openstack-heat-engine':
+    quickstack::pacemaker::resource::service {'openstack-heat-engine':
       group => "$heat_group",
       clone => false,
     }
@@ -150,7 +150,7 @@ class quickstack::pacemaker::heat(
 
       Exec["all-heat-nodes-are-up"]
       ->
-      quickstack::pacemaker::resource::lsb {"openstack-heat-api-cfn":
+      quickstack::pacemaker::resource::service {"openstack-heat-api-cfn":
         group => "$heat_cfn_group",
         clone => true,
       }
@@ -159,7 +159,7 @@ class quickstack::pacemaker::heat(
     if str2bool_i($heat_cloudwatch_enabled) {
       Exec["all-heat-nodes-are-up"]
       ->
-      quickstack::pacemaker::resource::lsb {"openstack-heat-api-cloudwatch":
+      quickstack::pacemaker::resource::service {"openstack-heat-api-cloudwatch":
         group => "$heat_group",
         clone => true,
       }

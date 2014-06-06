@@ -39,9 +39,9 @@ class quickstack::pacemaker::keystone (
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage db_sync']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup']
     if (map_params('include_mysql') == 'true') {
-       if str2bool_i("$hamysql_is_running") {
-         Exec['mysql-has-users'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
-       }
+      if str2bool_i("$hamysql_is_running") {
+        Exec['mysql-has-users'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
+      }
     }
 
     Class['::quickstack::pacemaker::common'] ->
@@ -149,7 +149,7 @@ class quickstack::pacemaker::keystone (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include keystone",
     } ->
-    quickstack::pacemaker::resource::lsb {'openstack-keystone':
+    quickstack::pacemaker::resource::service {'openstack-keystone':
       group => map_params("keystone_group"),
       clone => true,
     }

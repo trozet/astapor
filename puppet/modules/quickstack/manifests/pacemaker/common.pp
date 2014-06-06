@@ -46,6 +46,12 @@ class quickstack::pacemaker::common (
 ) {
   include quickstack::pacemaker::params
 
+  if (map_params("cluster_control_ip") == map_params("local_bind_addr")) {
+    $setup_cluster = true
+  } else {
+    $setup_cluster = false
+  }
+
   package {'rpcbind': } ->
   service {'rpcbind':
     enable => true,
@@ -54,6 +60,7 @@ class quickstack::pacemaker::common (
   class {'pacemaker::corosync':
     cluster_name    => $pacemaker_cluster_name,
     cluster_members => $pacemaker_cluster_members,
+    setup_cluster   => $setup_cluster,
   }
 
   if $fencing_type =~ /(?i-mx:^disabled$)/ {
