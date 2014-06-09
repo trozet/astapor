@@ -46,11 +46,12 @@ class quickstack::neutron::controller (
   $ml2_tenant_network_types      = ['vxlan', 'vlan', 'gre', 'flat'],
   $ml2_mechanism_drivers         = ['openvswitch'],
   $ml2_flat_networks             = ['*'],
-  $ml2_network_vlan_ranges       = ['10:50'],
+  $ml2_network_vlan_ranges       = ['physnet1:1000:2999'],
   $ml2_tunnel_id_ranges          = ['20:100'],
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
-  $ml2_security_group            = 'dummy',
+  $ml2_security_group            = true,
+  $ml2_firewall_driver           = 'dummy',
   $amqp_server                   = $quickstack::params::amqp_server,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -209,7 +210,8 @@ class quickstack::neutron::controller (
       tunnel_id_ranges      => $ml2_tunnel_id_ranges,
       vxlan_group           => $ml2_vxlan_group,
       vni_ranges            => $ml2_vni_ranges,
-      enable_security_group => $ml2_security_group,
+      enable_security_group => str2bool_i("$ml2_security_group"),
+      firewall_driver       => $ml2_firewall_driver,
     }
   }
 
