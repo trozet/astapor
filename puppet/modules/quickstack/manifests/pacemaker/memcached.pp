@@ -18,6 +18,7 @@ class quickstack::pacemaker::memcached {
   quickstack::pacemaker::resource::service { 'memcached':
     group   => 'openstack_memcached',
     clone   => true,
+    options => 'start-delay=10s',
   }
 
 }
