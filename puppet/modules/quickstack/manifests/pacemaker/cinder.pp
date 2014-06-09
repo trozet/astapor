@@ -1,26 +1,33 @@
 class quickstack::pacemaker::cinder(
-  $db_name           = 'cinder',
-  $db_user           = 'cinder',
+  $db_name                = 'cinder',
+  $db_user                = 'cinder',
 
-  $volume            = false,
-  $volume_backend    = 'iscsi',
+  $volume                 = false,
+  $backend_glusterfs      = false,
+  $backend_glusterfs_name = 'glusterfs_backend',
+  $backend_iscsi          = false,
+  $backend_iscsi_name     = 'iscsi_backend',
+  $backend_nfs            = false,
+  $backend_nfs_name       = 'nfs_backend',
 
-  $glusterfs_shares  = [],
+  $multiple_backends      = false,
 
-  $nfs_shares        = [],
-  $nfs_mount_options = undef,
+  $glusterfs_shares       = [],
 
-  $db_ssl            = false,
-  $db_ssl_ca         = undef,
+  $nfs_shares             = [],
+  $nfs_mount_options      = undef,
 
-  $qpid_heartbeat    = '60',
+  $db_ssl                 = false,
+  $db_ssl_ca              = undef,
 
-  $use_syslog        = false,
-  $log_facility      = 'LOG_USER',
+  $qpid_heartbeat         = '60',
 
-  $enabled           = true,
-  $debug             = false,
-  $verbose           = false,
+  $use_syslog             = false,
+  $log_facility           = 'LOG_USER',
+
+  $enabled                = true,
+  $debug                  = false,
+  $verbose                = false,
 ) {
 
   include ::quickstack::pacemaker::common
@@ -138,11 +145,17 @@ class quickstack::pacemaker::cinder(
       Class['::quickstack::cinder']
       ->
       class {'::quickstack::cinder_volume':
-        volume_backend    => $volume_backend,
-        iscsi_bind_addr   => map_params('local_bind_addr'),
-        glusterfs_shares  => $glusterfs_shares,
-        nfs_shares        => $nfs_shares,
-        nfs_mount_options => $nfs_mount_options,
+        backend_glusterfs      => $backend_glusterfs,
+        backend_glusterfs_name => $backend_glusterfs_name,
+        backend_iscsi          => $backend_iscsi,
+        backend_iscsi_name     => $backend_iscsi_name,
+        backend_nfs            => $backend_nfs,
+        backend_nfs_name       => $backend_nfs_name,
+        multiple_backends      => $multiple_backends,
+        iscsi_bind_addr        => map_params('local_bind_addr'),
+        glusterfs_shares       => $glusterfs_shares,
+        nfs_shares             => $nfs_shares,
+        nfs_mount_options      => $nfs_mount_options,
       }
       ->
       Exec['pcs-cinder-server-set-up']
