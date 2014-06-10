@@ -165,7 +165,7 @@ class quickstack::neutron::controller (
   class { '::nova::network::neutron':
     neutron_admin_password    => $neutron_user_password,
   }
-
+  ->
   class { '::neutron::server::notifications':
     notify_nova_on_port_status_changes => true,
     notify_nova_on_port_data_changes   => true,
