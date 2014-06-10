@@ -9,13 +9,15 @@ class quickstack::cinder(
   $db_ssl_ca      = '',
   $glance_host    = '127.0.0.1',
   $keystone_host  = '127.0.0.1',
-  $qpid_heartbeat = '60',
-  $qpid_host      = '127.0.0.1',
-  $qpid_port      = '5672',
-  $qpid_username  = '',
-  $qpid_password  = '',
   $use_syslog     = false,
   $log_facility   = 'LOG_USER',
+
+  $rpc_backend    = 'cinder.openstack.common.rpc.impl_qpid',
+  $amqp_host      = '127.0.0.1',
+  $amqp_port      = '5672',
+  $amqp_username  = '',
+  $amqp_password  = '',
+  $qpid_heartbeat = '60',
 
   $enabled        = true,
   $debug          = false,
@@ -23,10 +25,10 @@ class quickstack::cinder(
 ) {
   include ::quickstack::firewall::cinder
 
-  $qpid_password_safe_for_cinder = $qpid_password ? {
+  $amqp_password_safe_for_cinder = $amqp_password ? {
     ''      => 'guest',
     false   => 'guest',
-    default => $qpid_password,
+    default => $amqp_password,
   }
 
   cinder_config {
@@ -41,16 +43,20 @@ class quickstack::cinder(
   }
 
   class {'::cinder':
-    rpc_backend    => 'cinder.openstack.common.rpc.impl_qpid',
-    qpid_hostname  => $qpid_host,
-    qpid_port      => $qpid_port,
-    qpid_username  => $qpid_username,
-    qpid_password  => $qpid_password_safe_for_cinder,
-    qpid_heartbeat => $qpid_heartbeat,
-    sql_connection => $sql_connection,
-    verbose        => str2bool_i("$verbose"),
-    use_syslog     => str2bool_i("$use_syslog"),
-    log_facility   => $log_facility,
+    rpc_backend     => $rpc_backend,
+    qpid_hostname   => $amqp_host,
+    qpid_port       => $amqp_port,
+    qpid_username   => $amqp_username,
+    qpid_password   => $amqp_password_safe_for_cinder,
+    qpid_heartbeat  => $qpid_heartbeat,
+    rabbit_host     => $amqp_host,
+    rabbit_port     => $amqp_port,
+    rabbit_userid   => $amqp_username,
+    rabbit_password => $amqp_password_safe_for_cinder,
+    sql_connection  => $sql_connection,
+    verbose         => str2bool_i("$verbose"),
+    use_syslog      => str2bool_i("$use_syslog"),
+    log_facility    => $log_facility,
   }
 
   class {'::cinder::api':
