@@ -3,6 +3,8 @@ class quickstack::pacemaker::cinder(
   $db_user                = 'cinder',
 
   $volume                 = false,
+  $backend_eqlx           = false,
+  $backend_eqlx_name      = 'eqlx_backend',
   $backend_glusterfs      = false,
   $backend_glusterfs_name = 'glusterfs_backend',
   $backend_iscsi          = false,
@@ -16,6 +18,16 @@ class quickstack::pacemaker::cinder(
 
   $nfs_shares             = [],
   $nfs_mount_options      = undef,
+
+  $san_ip                 = '',
+  $san_login              = 'grpadmin',
+  $san_password           = '',
+  $san_thin_provision     = false,
+  $eqlx_group_name        = 'group-0',
+  $eqlx_pool              = 'default',
+  $eqlx_use_chap          = false,
+  $eqlx_chap_login        = 'chapadmin',
+  $eqlx_chap_password     = '',
 
   $db_ssl                 = false,
   $db_ssl_ca              = undef,
@@ -153,11 +165,22 @@ class quickstack::pacemaker::cinder(
         backend_iscsi_name     => $backend_iscsi_name,
         backend_nfs            => $backend_nfs,
         backend_nfs_name       => $backend_nfs_name,
+        backend_eqlx           => $backend_eqlx,
+        backend_eqlx_name      => $backend_eqlx_name,
         multiple_backends      => $multiple_backends,
         iscsi_bind_addr        => map_params('local_bind_addr'),
         glusterfs_shares       => $glusterfs_shares,
         nfs_shares             => $nfs_shares,
         nfs_mount_options      => $nfs_mount_options,
+        san_ip                 => $san_ip,
+        san_login              => $san_login,
+        san_password           => $san_password,
+        san_thin_provision     => $san_thin_provision,
+        eqlx_group_name        => $eqlx_group_name,
+        eqlx_pool              => $eqlx_pool,
+        eqlx_use_chap          => $eqlx_use_chap,
+        eqlx_chap_login        => $eqlx_chap_login,
+        eqlx_chap_password     => $eqlx_chap_password,
       }
       ->
       Exec['pcs-cinder-server-set-up']

@@ -1,4 +1,6 @@
 class quickstack::cinder_volume(
+  $backend_eqlx           = false,
+  $backend_eqlx_name      = 'eqlx_backend',
   $backend_glusterfs      = false,
   $backend_glusterfs_name = 'glusterfs_backend',
   $backend_iscsi          = false,
@@ -14,6 +16,16 @@ class quickstack::cinder_volume(
 
   $nfs_shares             = [],
   $nfs_mount_options      = undef,
+
+  $san_ip                 = '',
+  $san_login              = 'grpadmin',
+  $san_password           = '',
+  $san_thin_provision     = false,
+  $eqlx_group_name        = 'group-0',
+  $eqlx_pool              = 'default',
+  $eqlx_use_chap          = false,
+  $eqlx_chap_login        = 'chapadmin',
+  $eqlx_chap_password     = '',
 ) {
   class { '::cinder::volume': }
 
@@ -57,6 +69,18 @@ class quickstack::cinder_volume(
         nfs_servers       => $nfs_shares,
         nfs_mount_options => $nfs_mount_options,
         nfs_shares_config => '/etc/cinder/shares-nfs.conf',
+      }
+    } elsif str2bool_i("$backend_eqlx") {
+      class { '::cinder::volume::eqlx':
+        san_ip             => $san_ip,
+        san_login          => $san_login,
+        san_password       => $san_password,
+        san_thin_provision => $san_thin_provision,
+        eqlx_group_name    => $eqlx_group_name,
+        eqlx_pool          => $eqlx_pool,
+        eqlx_use_chap      => $eqlx_use_chap,
+        eqlx_chap_login    => $eqlx_chap_login,
+        eqlx_chap_password => $eqlx_chap_password,
       }
     } elsif str2bool_i("$backend_iscsi") {
       include ::quickstack::firewall::iscsi
@@ -119,6 +143,23 @@ class quickstack::cinder_volume(
       }
     }
 
+    if str2bool_i("$backend_eqlx") {
+      $eqlx_backends = ["eqlx"]
+
+      cinder::backend::eqlx { 'eqlx':
+        volume_backend_name => $backend_eqlx_name,
+        san_ip              => $san_ip,
+        san_login           => $san_login,
+        san_password        => $san_password,
+        san_thin_provision  => $san_thin_provision,
+        eqlx_group_name     => $eqlx_group_name,
+        eqlx_pool           => $eqlx_pool,
+        eqlx_use_chap       => $eqlx_use_chap,
+        eqlx_chap_login     => $eqlx_chap_login,
+        eqlx_chap_password  => $eqlx_chap_password,
+      }
+    }
+
     if str2bool_i("$backend_iscsi") {
       $iscsi_backends = ["iscsi"]
 
@@ -133,6 +174,7 @@ class quickstack::cinder_volume(
     $enabled_backends = join_arrays_if_exist(
       'glusterfs_backends',
       'nfs_backends',
+      'eqlx_backends',
       'iscsi_backends')
     if $enabled_backends == [] {
       fail("Enable at least one backend for cinder-volume.")
