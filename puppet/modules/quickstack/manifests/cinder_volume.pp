@@ -1,10 +1,10 @@
 class quickstack::cinder_volume(
   $backend_glusterfs      = false,
-  $backend_glusterfs_name = 'glusterfs',
+  $backend_glusterfs_name = 'glusterfs_backend',
   $backend_iscsi          = false,
-  $backend_iscsi_name     = 'iscsi',
+  $backend_iscsi_name     = 'iscsi_backend',
   $backend_nfs            = false,
-  $backend_nfs_name       = 'nfs',
+  $backend_nfs_name       = 'nfs_backend',
 
   $multiple_backends      = false,
 
