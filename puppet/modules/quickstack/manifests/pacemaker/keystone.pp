@@ -38,6 +38,7 @@ class quickstack::pacemaker::keystone (
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Service['keystone']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage db_sync']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup']
+    Exec['keystone-manage db_sync'] -> Exec['pcs-keystone-server-set-up']
     if (map_params('include_mysql') == 'true') {
       if str2bool_i("$hamysql_is_running") {
         Exec['mysql-has-users'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
@@ -56,8 +57,8 @@ class quickstack::pacemaker::keystone (
       timeout   => 3600,
       tries     => 360,
       try_sleep => 10,
-      command   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
-      unless   => "/tmp/ha-all-in-one-util.bash i_am_keystone_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
+      command   => "/tmp/ha-all-in-one-util.bash i_am_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
+      unless   => "/tmp/ha-all-in-one-util.bash i_am_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
     } ->
     class { "::quickstack::pacemaker::rsync::keystone":
       keystone_private_vip => map_params("keystone_private_vip"),
@@ -150,8 +151,9 @@ class quickstack::pacemaker::keystone (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include keystone",
     } ->
     quickstack::pacemaker::resource::service {'openstack-keystone':
-      group => map_params("keystone_group"),
-      clone => true,
+      group   => map_params("keystone_group"),
+      clone   => true,
+      options => 'start-delay=10s',
     }
     # TODO: Consider if we should pre-emptively purge any directories keystone has
     # created in /tmp
