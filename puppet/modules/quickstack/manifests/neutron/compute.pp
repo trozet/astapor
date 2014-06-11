@@ -11,7 +11,6 @@ class quickstack::neutron::compute (
   $nova_host                   = '127.0.0.1',
   $enable_tunneling            = $quickstack::params::enable_tunneling,
   $mysql_host                  = $quickstack::params::mysql_host,
-  $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
   $neutron_db_password         = $quickstack::params::neutron_db_password,
   $neutron_user_password       = $quickstack::params::neutron_user_password,
   $neutron_host                = '127.0.0.1',
@@ -60,7 +59,6 @@ class quickstack::neutron::compute (
     rabbit_port           => $real_amqp_port,
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
-    core_plugin           => $neutron_core_plugin
   }
 
   neutron_config {
@@ -89,9 +87,9 @@ class quickstack::neutron::compute (
   }
 
   class { '::nova::network::neutron':
-    neutron_admin_password    => $neutron_user_password,
-    neutron_url               => "http://${neutron_host}:9696",
-    neutron_admin_auth_url    => "http://${auth_host}:35357/v2.0",
+    neutron_admin_password => $neutron_user_password,
+    neutron_url            => "http://${neutron_host}:9696",
+    neutron_admin_auth_url => "http://${auth_host}:35357/v2.0",
   }
 
 

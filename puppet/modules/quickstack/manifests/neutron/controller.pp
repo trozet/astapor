@@ -42,16 +42,16 @@ class quickstack::neutron::controller (
   $provider_vlan_auto_trunk      = $quickstack::params::provider_vlan_auto_trunk,
   $enable_tunneling              = $quickstack::params::enable_tunneling,
   $tunnel_id_ranges              = '1:1000',
-  $ml2_type_drivers              = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
-  $ml2_tenant_network_types      = ['vxlan', 'vlan', 'gre', 'flat'],
-  $ml2_mechanism_drivers         = ['openvswitch'],
+  $ml2_type_drivers              = ['vxlan', 'flat'],
+  $ml2_tenant_network_types      = ['vxlan', 'flat'],
+  $ml2_mechanism_drivers         = ['openvswitch','l2population'],
   $ml2_flat_networks             = ['*'],
   $ml2_network_vlan_ranges       = ['physnet1:1000:2999'],
   $ml2_tunnel_id_ranges          = ['20:100'],
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
-  $ml2_security_group            = true,
-  $ml2_firewall_driver           = 'dummy',
+  $ml2_security_group            = 'true',
+  $ml2_firewall_driver           = 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver',
   $amqp_server                   = $quickstack::params::amqp_server,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -163,7 +163,7 @@ class quickstack::neutron::controller (
   }
   ->
   class { '::nova::network::neutron':
-    neutron_admin_password    => $neutron_user_password,
+    neutron_admin_password => $neutron_user_password,
   }
   ->
   class { '::neutron::server::notifications':
