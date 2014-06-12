@@ -11,7 +11,6 @@ class quickstack::neutron::compute (
   $nova_host                   = '127.0.0.1',
   $enable_tunneling            = $quickstack::params::enable_tunneling,
   $mysql_host                  = $quickstack::params::mysql_host,
-  $neutron_core_plugin         = $quickstack::params::neutron_core_plugin,
   $neutron_db_password         = $quickstack::params::neutron_db_password,
   $neutron_user_password       = $quickstack::params::neutron_user_password,
   $neutron_host                = '127.0.0.1',
@@ -60,11 +59,20 @@ class quickstack::neutron::compute (
     rabbit_port           => $real_amqp_port,
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
-    core_plugin           => $neutron_core_plugin
+    verbose               => $verbose,
+  }
+  ->
+  class { '::neutron::server::notifications':
+    notify_nova_on_port_status_changes => true,
+    notify_nova_on_port_data_changes   => true,
+    nova_url                           => "http://${nova_host}:8774/v2",
+    nova_admin_auth_url                => "http://${auth_host}:35357/v2.0",
+    nova_admin_username                => "nova",
+    nova_admin_password                => "${nova_user_password}",
   }
 
   neutron_config {
-    'database/connection': value => $sql_connection;
+    'database/connection':                  value => $sql_connection;
     'keystone_authtoken/auth_host':         value => $auth_host;
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
@@ -89,9 +97,9 @@ class quickstack::neutron::compute (
   }
 
   class { '::nova::network::neutron':
-    neutron_admin_password    => $neutron_user_password,
-    neutron_url               => "http://${neutron_host}:9696",
-    neutron_admin_auth_url    => "http://${auth_host}:35357/v2.0",
+    neutron_admin_password => $neutron_user_password,
+    neutron_url            => "http://${neutron_host}:9696",
+    neutron_admin_auth_url => "http://${auth_host}:35357/v2.0",
   }
 
 
