@@ -40,6 +40,10 @@ class quickstack::pacemaker::stonith::ipmilan (
       ''      => '',
       default => "passwd=${password}",
     }
+    $pcmk_host_list_val = $pcmk_host_list ? {
+      ''      => '$(/usr/sbin/crm_node -n)',
+      default => "${pcmk_host_list}",
+    }
     $pcmk_host_list_chunk = $pcmk_host_list ? {
       ''      => 'pcmk_host_list="$(/usr/sbin/crm_node -n)"',
       default => "pcmk_host_list=\"${pcmk_host_list}\"",
@@ -57,6 +61,9 @@ class quickstack::pacemaker::stonith::ipmilan (
       command => "/usr/sbin/pcs stonith create stonith-ipmilan-${real_address} fence_ipmilan ${pcmk_host_list_chunk} ipaddr=${real_address} ${username_chunk} ${password_chunk} ${lanplus_chunk} op monitor interval=${interval}",
       unless  => "/usr/sbin/pcs stonith show stonith-ipmilan-${real_address} > /dev/null 2>&1",
       require => Class['pacemaker::corosync'],
+    } ->
+    exec { "adding non-local constraint stonith::ipmilan ${address}":
+      command => "/usr/sbin/pcs constraint location stonith-ipmilan-${real_address} avoids ${pcmk_host_list_val}",
     }
   }
 }
