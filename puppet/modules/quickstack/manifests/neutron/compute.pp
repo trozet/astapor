@@ -61,9 +61,18 @@ class quickstack::neutron::compute (
     rabbit_password       => $amqp_password,
     verbose               => $verbose,
   }
+  ->
+  class { '::neutron::server::notifications':
+    notify_nova_on_port_status_changes => true,
+    notify_nova_on_port_data_changes   => true,
+    nova_url                           => "http://${nova_host}:8774/v2",
+    nova_admin_auth_url                => "http://${auth_host}:35357/v2.0",
+    nova_admin_username                => "nova",
+    nova_admin_password                => "${nova_user_password}",
+  }
 
   neutron_config {
-    'database/connection': value => $sql_connection;
+    'database/connection':                  value => $sql_connection;
     'keystone_authtoken/auth_host':         value => $auth_host;
     'keystone_authtoken/admin_tenant_name': value => 'services';
     'keystone_authtoken/admin_user':        value => 'neutron';
