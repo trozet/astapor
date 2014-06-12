@@ -1,9 +1,16 @@
 class quickstack::storage_backend::cinder(
   $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
+  $cinder_backend_gluster_name = $quickstack::params::cinder_backend_gluster_name,
   $cinder_backend_iscsi        = $quickstack::params::cinder_backend_iscsi,
+  $cinder_backend_iscsi_name   = $quickstack::params::cinder_backend_iscsi_name,
+  $cinder_backend_nfs          = $quickstack::params::cinder_backend_nfs,
+  $cinder_backend_nfs_name     = $quickstack::params::cinder_backend_nfs_name,
   $cinder_db_password          = $quickstack::params::cinder_db_password,
-  $cinder_gluster_volume       = $quickstack::params::cinder_gluster_volume,
-  $cinder_gluster_peers        = $quickstack::params::cinder_gluster_peers,
+  $cinder_multiple_backends    = $quickstack::params::cinder_multiple_backends,
+  $cinder_gluster_shares       = $quickstack::params::cinder_gluster_shares,
+  $cinder_nfs_shares           = $quickstack::params::cinder_nfs_shares,
+  $cinder_nfs_mount_options    = $quickstack::params::cinder_nfs_mount_options,
+  $cinder_user_password        = $quickstack::params::cinder_user_password,
   $controller_priv_host        = $quickstack::params::controller_priv_host,
   $cinder_iscsi_iface          = 'eth1',
   $cinder_iscsi_network        = '',
@@ -43,40 +50,21 @@ class quickstack::storage_backend::cinder(
     verbose        => $verbose,
   }
 
-  class { '::cinder::volume': }
+  $iscsi_ip_address = find_ip("$cinder_iscsi_network",
+                              "$cinder_iscsi_iface",
+                              "")
 
-  if str2bool_i("$cinder_backend_gluster") {
-    if defined('gluster::client') {
-      class { 'gluster::client': }
-    } else {
-      class { 'gluster::mount::base': repo => false }
-    }
-
-    if ($::selinux != "false") {
-      selboolean{'virt_use_fusefs':
-          value => on,
-          persistent => true,
-      }
-    }
-
-    class { '::cinder::volume::glusterfs':
-      glusterfs_mount_point_base => '/var/lib/cinder/volumes',
-      glusterfs_shares           => suffix($cinder_gluster_peers, ":/${cinder_gluster_volume}")
-    }
-  }
-
-  if str2bool_i("$cinder_backend_iscsi") {
-    $iscsi_ip_address = find_ip("$cinder_iscsi_network",
-                                "$cinder_iscsi_iface",
-                                "")
-    class { '::cinder::volume::iscsi':
-      iscsi_ip_address => $iscsi_ip_address,
-    }
-
-    firewall { '010 cinder iscsi':
-      proto  => 'tcp',
-      dport  => ['3260'],
-      action => 'accept',
-    }
+  class { 'quickstack::cinder_volume':
+    backend_glusterfs      => $cinder_backend_gluster,
+    backend_glusterfs_name => $cinder_backend_gluster_name,
+    backend_iscsi          => $cinder_backend_iscsi,
+    backend_iscsi_name     => $cinder_backend_iscsi_name,
+    backend_nfs            => $cinder_backend_nfs,
+    backend_nfs_name       => $cinder_backend_nfs_name,
+    multiple_backends      => $cinder_multiple_backends,
+    iscsi_bind_addr        => $iscsi_ip_address,
+    glusterfs_shares       => $cinder_gluster_shares,
+    nfs_shares             => $cinder_nfs_shares,
+    nfs_mount_options      => $cinder_nfs_mount_options,
   }
 }

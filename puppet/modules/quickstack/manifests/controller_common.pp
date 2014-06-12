@@ -4,11 +4,28 @@ class quickstack::controller_common (
   $admin_password                = $quickstack::params::admin_password,
   $ceilometer_metering_secret    = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password      = $quickstack::params::ceilometer_user_password,
+  $cinder_backend_eqlx           = $quickstack::params::cinder_backend_eqlx,
+  $cinder_backend_eqlx_name      = $quickstack::params::cinder_backend_eqlx_name,
   $cinder_backend_gluster        = $quickstack::params::cinder_backend_gluster,
+  $cinder_backend_gluster_name   = $quickstack::params::cinder_backend_gluster_name,
   $cinder_backend_iscsi          = $quickstack::params::cinder_backend_iscsi,
+  $cinder_backend_iscsi_name     = $quickstack::params::cinder_backend_iscsi_name,
+  $cinder_backend_nfs            = $quickstack::params::cinder_backend_nfs,
+  $cinder_backend_nfs_name       = $quickstack::params::cinder_backend_nfs_name,
   $cinder_db_password            = $quickstack::params::cinder_db_password,
-  $cinder_gluster_peers          = $quickstack::params::cinder_gluster_peers,
-  $cinder_gluster_volume         = $quickstack::params::cinder_gluster_volume,
+  $cinder_multiple_backends      = $quickstack::params::cinder_multiple_backends,
+  $cinder_gluster_shares         = $quickstack::params::cinder_gluster_shares,
+  $cinder_nfs_shares             = $quickstack::params::cinder_nfs_shares,
+  $cinder_nfs_mount_options      = $quickstack::params::cinder_nfs_mount_options,
+  $cinder_san_ip                 = $quickstack::params::cinder_san_ip,
+  $cinder_san_login              = $quickstack::params::cinder_san_login,
+  $cinder_san_password           = $quickstack::params::cinder_san_password,
+  $cinder_san_thin_provision     = $quickstack::params::cinder_san_thin_provision,
+  $cinder_eqlx_group_name        = $quickstack::params::cinder_eqlx_group_name,
+  $cinder_eqlx_pool              = $quickstack::params::cinder_eqlx_pool,
+  $cinder_eqlx_use_chap          = $quickstack::params::cinder_eqlx_use_chap,
+  $cinder_eqlx_chap_login        = $quickstack::params::cinder_eqlx_chap_login,
+  $cinder_eqlx_chap_password     = $quickstack::params::cinder_eqlx_chap_password,
   $cinder_user_password          = $quickstack::params::cinder_user_password,
   $controller_admin_host         = $quickstack::params::controller_admin_host,
   $controller_priv_host          = $quickstack::params::controller_priv_host,
@@ -286,24 +303,54 @@ class quickstack::controller_common (
     swift_is_ringserver        => true,
   }
 
-  class { 'quickstack::cinder_controller':
-    cinder_backend_gluster      => $cinder_backend_gluster,
-    cinder_backend_iscsi        => $cinder_backend_iscsi,
-    cinder_db_password          => $cinder_db_password,
-    cinder_gluster_volume       => $cinder_gluster_volume,
-    cinder_gluster_peers        => $cinder_gluster_peers,
-    cinder_user_password        => $cinder_user_password,
-    controller_priv_host        => $controller_priv_host,
-    mysql_host                  => $mysql_host,
-    mysql_ca                    => $mysql_ca,
-    ssl                         => $ssl,
-    amqp_server                 => $amqp_server,
-    amqp_host                   => $amqp_host,
-    amqp_port                   => $amqp_port,
-    qpid_protocol               => $qpid_protocol,
-    amqp_username               => $amqp_username,
-    amqp_password               => $amqp_password,
-    verbose                     => $verbose,
+  class { 'quickstack::cinder':
+    user_password => $cinder_user_password,
+    db_host       => $mysql_host,
+    db_ssl        => $ssl,
+    db_ssl_ca     => $mysql_ca,
+    db_password   => $cinder_db_password,
+    glance_host   => $controller_priv_host,
+    rpc_backend   => amqp_backend('cinder', $amqp_server),
+    amqp_host     => $amqp_host,
+    amqp_port     => $amqp_port,
+    amqp_username => $amqp_username,
+    amqp_password => $amqp_password,
+    qpid_protocol => $qpid_protocol,
+    verbose       => $verbose,
+  }
+
+  # preserve original behavior - fall back to iscsi
+  # https://github.com/redhat-openstack/astapor/blob/7cf25e1022bee08b0c385ae956d4e9e4ade14a9d/puppet/modules/quickstack/manifests/cinder_controller.pp#L85
+  if (!str2bool_i("$cinder_backend_gluster") and
+      !str2bool_i("$cinder_backend_eqlx") and
+      !str2bool_i("$cinder_backend_nfs")) {
+    $cinder_backend_iscsi_with_fallback = 'true'
+  } else {
+    $cinder_backend_iscsi_with_fallback = $cinder_backend_iscsi
+  }
+  class { 'quickstack::cinder_volume':
+    backend_eqlx           => $cinder_backend_eqlx,
+    backend_eqlx_name      => $cinder_backend_eqlx_name,
+    backend_glusterfs      => $cinder_backend_gluster,
+    backend_glusterfs_name => $cinder_backend_gluster_name,
+    backend_iscsi          => $cinder_backend_iscsi_with_fallback,
+    backend_iscsi_name     => $cinder_backend_iscsi_name,
+    backend_nfs            => $cinder_backend_nfs,
+    backend_nfs_name       => $cinder_backend_nfs_name,
+    multiple_backends      => $cinder_multiple_backends,
+    iscsi_bind_addr        => $controller_priv_host,
+    glusterfs_shares       => $cinder_gluster_shares,
+    nfs_shares             => $cinder_nfs_shares,
+    nfs_mount_options      => $cinder_nfs_mount_options,
+    san_ip                 => $cinder_san_ip,
+    san_login              => $cinder_san_login,
+    san_password           => $cinder_san_password,
+    san_thin_provision     => $cinder_san_thin_provision,
+    eqlx_group_name        => $cinder_eqlx_group_name,
+    eqlx_pool              => $cinder_eqlx_pool,
+    eqlx_use_chap          => $cinder_eqlx_use_chap,
+    eqlx_chap_login        => $cinder_eqlx_chap_login,
+    eqlx_chap_password     => $cinder_eqlx_chap_password,
   }
 
   class { 'quickstack::heat_controller':

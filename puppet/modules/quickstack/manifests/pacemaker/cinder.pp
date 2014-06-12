@@ -1,26 +1,46 @@
 class quickstack::pacemaker::cinder(
-  $db_name           = 'cinder',
-  $db_user           = 'cinder',
+  $db_name                = 'cinder',
+  $db_user                = 'cinder',
 
-  $volume            = false,
-  $volume_backend    = 'iscsi',
+  $volume                 = false,
+  $backend_eqlx           = false,
+  $backend_eqlx_name      = 'eqlx_backend',
+  $backend_glusterfs      = false,
+  $backend_glusterfs_name = 'glusterfs_backend',
+  $backend_iscsi          = false,
+  $backend_iscsi_name     = 'iscsi_backend',
+  $backend_nfs            = false,
+  $backend_nfs_name       = 'nfs_backend',
 
-  $glusterfs_shares  = [],
+  $multiple_backends      = false,
 
-  $nfs_shares        = [],
-  $nfs_mount_options = undef,
+  $glusterfs_shares       = [],
 
-  $db_ssl            = false,
-  $db_ssl_ca         = undef,
+  $nfs_shares             = [],
+  $nfs_mount_options      = undef,
 
-  $qpid_heartbeat    = '60',
+  $san_ip                 = '',
+  $san_login              = 'grpadmin',
+  $san_password           = '',
+  $san_thin_provision     = false,
+  $eqlx_group_name        = 'group-0',
+  $eqlx_pool              = 'default',
+  $eqlx_use_chap          = false,
+  $eqlx_chap_login        = 'chapadmin',
+  $eqlx_chap_password     = '',
 
-  $use_syslog        = false,
-  $log_facility      = 'LOG_USER',
+  $db_ssl                 = false,
+  $db_ssl_ca              = undef,
 
-  $enabled           = true,
-  $debug             = false,
-  $verbose           = false,
+  $rpc_backend            = 'cinder.openstack.common.rpc.impl_qpid',
+  $qpid_heartbeat         = '60',
+
+  $use_syslog             = false,
+  $log_facility           = 'LOG_USER',
+
+  $enabled                = true,
+  $debug                  = false,
+  $verbose                = false,
 ) {
 
   include ::quickstack::pacemaker::common
@@ -89,11 +109,12 @@ class quickstack::pacemaker::cinder(
       db_ssl_ca      => $db_ssl_ca,
       glance_host    => $glance_host,
       keystone_host  => $keystone_host,
+      rpc_backend    => $rpc_backend,
+      amqp_host      => $qpid_host,
+      amqp_port      => $qpid_port,
+      amqp_username  => $qpid_username,
+      amqp_password  => $qpid_password,
       qpid_heartbeat => $qpid_heartbeat,
-      qpid_host      => $qpid_host,
-      qpid_port      => $qpid_port,
-      qpid_username  => $qpid_username,
-      qpid_password  => $qpid_password,
       use_syslog     => $use_syslog,
       log_facility   => $log_facility,
       enabled        => $enabled,
@@ -138,11 +159,28 @@ class quickstack::pacemaker::cinder(
       Class['::quickstack::cinder']
       ->
       class {'::quickstack::cinder_volume':
-        volume_backend    => $volume_backend,
-        iscsi_bind_addr   => map_params('local_bind_addr'),
-        glusterfs_shares  => $glusterfs_shares,
-        nfs_shares        => $nfs_shares,
-        nfs_mount_options => $nfs_mount_options,
+        backend_glusterfs      => $backend_glusterfs,
+        backend_glusterfs_name => $backend_glusterfs_name,
+        backend_iscsi          => $backend_iscsi,
+        backend_iscsi_name     => $backend_iscsi_name,
+        backend_nfs            => $backend_nfs,
+        backend_nfs_name       => $backend_nfs_name,
+        backend_eqlx           => $backend_eqlx,
+        backend_eqlx_name      => $backend_eqlx_name,
+        multiple_backends      => $multiple_backends,
+        iscsi_bind_addr        => map_params('local_bind_addr'),
+        glusterfs_shares       => $glusterfs_shares,
+        nfs_shares             => $nfs_shares,
+        nfs_mount_options      => $nfs_mount_options,
+        san_ip                 => $san_ip,
+        san_login              => $san_login,
+        san_password           => $san_password,
+        san_thin_provision     => $san_thin_provision,
+        eqlx_group_name        => $eqlx_group_name,
+        eqlx_pool              => $eqlx_pool,
+        eqlx_use_chap          => $eqlx_use_chap,
+        eqlx_chap_login        => $eqlx_chap_login,
+        eqlx_chap_password     => $eqlx_chap_password,
       }
       ->
       Exec['pcs-cinder-server-set-up']
