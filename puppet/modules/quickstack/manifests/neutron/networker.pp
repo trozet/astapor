@@ -108,6 +108,8 @@ class quickstack::neutron::networker (
 
   #class { 'neutron::agents::fwaas': }
 
+  class {'quickstack::neutron::firewall::gre':}
+
   class {'quickstack::neutron::firewall::vxlan':
     port => $ovs_vxlan_udp_port,
   }

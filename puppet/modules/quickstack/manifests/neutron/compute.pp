@@ -119,6 +119,8 @@ class quickstack::neutron::compute (
     use_qemu_for_poc           => $use_qemu_for_poc,
   }
 
+  class {'quickstack::neutron::firewall::gre':}
+
   class {'quickstack::neutron::firewall::vxlan':
     port => $ovs_vxlan_udp_port,
   }
