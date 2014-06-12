@@ -59,6 +59,7 @@ class quickstack::neutron::compute (
     rabbit_port           => $real_amqp_port,
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
+    verbose               => $verbose,
   }
 
   neutron_config {
