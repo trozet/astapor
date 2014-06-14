@@ -27,7 +27,6 @@
 #
 # [*fence_xvm_key_file_password*]
 #
-# TODO: expose params fence_ipmilan_lanplus, fence_ipmilan_lanplus_options
 
 class quickstack::pacemaker::common (
   $pacemaker_cluster_name         = "openstack",
@@ -39,6 +38,8 @@ class quickstack::pacemaker::common (
   $fence_ipmilan_interval         = "60s",
   $fence_ipmilan_hostlist         = "",
   $fence_ipmilan_host_to_address  = [],
+  $fence_ipmilan_expose_lanplus   = "true",
+  $fence_ipmilan_lanplus_options  = "",
   $fence_xvm_clu_iface            = "eth2",
   $fence_xvm_clu_network          = "",
   $fence_xvm_manage_key_file      = "false",
@@ -82,7 +83,8 @@ class quickstack::pacemaker::common (
       interval        => $fence_ipmilan_interval,
       pcmk_host_list  => $fence_ipmilan_hostlist,
       host_to_address => $fence_ipmilan_host_to_address,
-      lanplus         => true,
+      lanplus         => str2bool_i("$fence_ipmilan_expose_lanplus"),
+      lanplus_options => $fence_ipmilan_lanplus_options,
     }
   }
   elsif $fencing_type =~ /(?i-mx:^fence_xvm$)/ {
