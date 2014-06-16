@@ -1,16 +1,17 @@
 class quickstack::pacemaker::nova (
-  $auto_assign_floating_ip = 'true',
-  $db_name                 = 'nova',
-  $db_user                 = 'nova',
-  $default_floating_pool   = 'nova',
-  $force_dhcp_release      = 'false',
-  $image_service           = 'nova.image.glance.GlanceImageService',
-  $memcached_port          = '11211',
-  $multi_host              = 'true',
+  $auto_assign_floating_ip    = 'true',
+  $db_name                    = 'nova',
+  $db_user                    = 'nova',
+  $default_floating_pool      = 'nova',
+  $force_dhcp_release         = 'false',
+  $image_service              = 'nova.image.glance.GlanceImageService',
+  $memcached_port             = '11211',
+  $multi_host                 = 'true',
   $neutron_metadata_proxy_secret,
-  $qpid_heartbeat          = '60',
-  $rpc_backend             = 'nova.openstack.common.rpc.impl_qpid',
-  $verbose                 = 'false',
+  $qpid_heartbeat             = '60',
+  $rpc_backend                = 'nova.openstack.common.rpc.impl_qpid',
+  $scheduler_host_subset_size = '30',
+  $verbose                    = 'false',
 ) {
 
   include quickstack::pacemaker::common
@@ -39,6 +40,12 @@ class quickstack::pacemaker::nova (
     if (map_params('include_glance') == 'true') {
       Exec['all-glance-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
     }
+    if ($scheduler_host_subset_size == '1') {
+      $sched_clone = false
+    } else {
+      $sched_clone = true
+    }
+
 
     Class['::quickstack::pacemaker::common']
     ->
@@ -70,6 +77,7 @@ class quickstack::pacemaker::nova (
       glance_host                   => map_params("glance_private_vip"),
       glance_port                   => "${::quickstack::load_balancer::glance::api_port}",
       image_service                 => $image_service,
+      manage_service                => 'false',
       memcached_servers             => $memcached_servers,
       multi_host                    => $multi_host,
       neutron                       => str2bool_i(map_params("neutron")),
@@ -80,6 +88,7 @@ class quickstack::pacemaker::nova (
       amqp_username                 => map_params("qpid_username"),
       amqp_password                 => map_params("qpid_password"),
       rpc_backend                   => $rpc_backend,
+      scheduler_host_subset_size    => $scheduler_host_subset_size,
       verbose                       => $verbose,
     }
     ->
@@ -102,63 +111,67 @@ class quickstack::pacemaker::nova (
       tries     => 360,
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include nova",
-    } ->
-
+    }
+    ->
     quickstack::pacemaker::resource::service {['openstack-nova-consoleauth',
                               'openstack-nova-novncproxy',
                               'openstack-nova-api',
-                              'openstack-nova-scheduler',
                               'openstack-nova-conductor' ]:
-      group => "$pcmk_nova_group",
-      clone => true,
+      clone   => true,
+      options => 'start-delay=10s',
+    }
+    ->
+    quickstack::pacemaker::resource::service {'openstack-nova-scheduler':
+      clone   => $sched_clone,
+      options => 'start-delay=10s',
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-console-vnc-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-openstack-nova-consoleauth-clone",
-      second_resource => "lsb-openstack-nova-novncproxy-clone",
+      first_resource  => "openstack-nova-consoleauth-clone",
+      second_resource => "openstack-nova-novncproxy-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-console-vnc-colo' :
-      source => "lsb-openstack-nova-novncproxy-clone",
-      target => "lsb-openstack-nova-consoleauth-clone",
+      source => "openstack-nova-novncproxy-clone",
+      target => "openstack-nova-consoleauth-clone",
       score => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-vnc-api-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-openstack-nova-novncproxy-clone",
-      second_resource => "lsb-openstack-nova-api-clone",
+      first_resource  => "openstack-nova-novncproxy-clone",
+      second_resource => "openstack-nova-api-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-vnc-api-colo' :
-      source => "lsb-openstack-nova-api-clone",
-      target => "lsb-openstack-nova-novncproxy-clone",
+      source => "openstack-nova-api-clone",
+      target => "openstack-nova-novncproxy-clone",
       score => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-api-scheduler-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-openstack-nova-api-clone",
-      second_resource => "lsb-openstack-nova-scheduler-clone",
+      first_resource  => "openstack-nova-api-clone",
+      second_resource => "openstack-nova-scheduler-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-api-scheduler-colo' :
-      source => "lsb-openstack-nova-scheduler-clone",
-      target => "lsb-openstack-nova-api-clone",
+      source => "openstack-nova-scheduler-clone",
+      target => "openstack-nova-api-clone",
       score => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-scheduler-conductor-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-openstack-nova-scheduler-clone",
-      second_resource => "lsb-openstack-nova-conductor-clone",
+      first_resource  => "openstack-nova-scheduler-clone",
+      second_resource => "openstack-nova-conductor-clone",
       first_action    => "start",
       second_action   => "start",
     }
