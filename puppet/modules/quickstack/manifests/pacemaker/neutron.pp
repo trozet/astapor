@@ -163,13 +163,13 @@ class quickstack::pacemaker::neutron (
     quickstack::pacemaker::constraint::base { 'neutron-db-server-constr' :
       constraint_type => "order",
       first_resource  => "neutron-db-check",
-      second_resource => "lsb-neutron-server",
+      second_resource => "neutron-server",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'neutron-db-server-colo' :
-      source => "lsb-neutron-server",
+      source => "neutron-server",
       target => "neutron-db-check",
       score  => "INFINITY",
     }
@@ -177,56 +177,56 @@ class quickstack::pacemaker::neutron (
     quickstack::pacemaker::constraint::base { 'neutron-pre-openvswitch-constr' :
       constraint_type => "order",
       first_resource  => "neutron-agents-pre",
-      second_resource => "lsb-neutron-openvswitch-agent",
+      second_resource => "neutron-openvswitch-agent",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'neutron-openvswitch-pre-colo' :
-      source => "lsb-neutron-openvswitch-agent",
+      source => "neutron-openvswitch-agent",
       target => "neutron-agents-pre",
       score  => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'neutron-openvswitch-dhcp-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-neutron-openvswitch-agent",
-      second_resource => "lsb-neutron-dhcp-agent",
+      first_resource  => "neutron-openvswitch-agent",
+      second_resource => "neutron-dhcp-agent",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'neutron-openvswitch-dhcp-colo' :
-      source => "lsb-neutron-dhcp-agent",
-      target => "lsb-neutron-openvswitch-agent",
+      source => "neutron-dhcp-agent",
+      target => "neutron-openvswitch-agent",
       score  => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'neutron-openvswitch-l3-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-neutron-openvswitch-agent",
-      second_resource => "lsb-neutron-l3-agent",
+      first_resource  => "neutron-openvswitch-agent",
+      second_resource => "neutron-l3-agent",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'neutron-openvswitch-l3-colo' :
-      source => "lsb-neutron-l3-agent",
-      target => "lsb-neutron-openvswitch-agent",
+      source => "neutron-l3-agent",
+      target => "neutron-openvswitch-agent",
       score  => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'neutron-openvswitch-metadata-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-neutron-openvswitch-agent",
-      second_resource => "lsb-neutron-metadata-agent",
+      first_resource  => "neutron-openvswitch-agent",
+      second_resource => "neutron-metadata-agent",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'neutron-openvswitch-metadata-colo' :
-      source => "lsb-neutron-metadata-agent",
-      target => "lsb-neutron-openvswitch-agent",
+      source => "neutron-metadata-agent",
+      target => "neutron-openvswitch-agent",
       score  => "INFINITY",
     }
   }

@@ -102,8 +102,8 @@ class quickstack::pacemaker::swift (
     ->
     quickstack::pacemaker::constraint::base { 'swift-object-expirer-constr' :
       constraint_type => "order",
-      first_resource  => "lsb-openstack-swift-proxy-clone",
-      second_resource => "lsb-openstack-swift-object-expirer",
+      first_resource  => "openstack-swift-proxy-clone",
+      second_resource => "openstack-swift-object-expirer",
       first_action    => "start",
       second_action   => "start",
     }
