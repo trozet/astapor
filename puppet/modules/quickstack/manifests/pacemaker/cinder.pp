@@ -146,12 +146,10 @@ class quickstack::pacemaker::cinder(
     }
     ->
     quickstack::pacemaker::resource::service {'openstack-cinder-api':
-      group => "$pcmk_cinder_group",
       clone => true,
     }
     ->
     quickstack::pacemaker::resource::service {'openstack-cinder-scheduler':
-      group => "$pcmk_cinder_group",
       clone => true,
     }
 
@@ -188,7 +186,6 @@ class quickstack::pacemaker::cinder(
       Exec['all-cinder-nodes-are-up']
       ->
       quickstack::pacemaker::resource::service {'openstack-cinder-volume':
-        group => "$pcmk_cinder_group",
         clone => true,
       }
     }

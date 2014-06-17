@@ -107,7 +107,6 @@ class quickstack::pacemaker::horizon (
     }
     ->
     quickstack::pacemaker::resource::service {"$::horizon::params::http_service":
-      group => "$::horizon::params::http_service",
       clone => true,
     }
   }

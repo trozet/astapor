@@ -16,7 +16,6 @@ class quickstack::pacemaker::memcached {
     command   => "/tmp/ha-all-in-one-util.bash all_members_include memcached",
   } ->
   quickstack::pacemaker::resource::service { 'memcached':
-    group   => 'openstack_memcached',
     clone   => true,
     options => 'start-delay=10s',
   }
