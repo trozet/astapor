@@ -32,6 +32,11 @@ class quickstack::cinder_volume(
   if !str2bool_i("$multiple_backends") {
     # single backend
 
+    # ensure multiple backends config option is empty
+    class { 'cinder::backends':
+      enabled_backends => [],
+    }
+
     if str2bool_i("$backend_glusterfs") {
       if defined('gluster::client') {
         class { 'gluster::client': }
