@@ -42,6 +42,10 @@ class quickstack::compute_common (
     }
   }
   if str2bool_i("$cinder_backend_nfs") {
+    package { 'nfs-utils':
+      ensure => 'present',
+    }
+
     if ($::selinux != "false") {
       selboolean{'virt_use_nfs':
           value => on,

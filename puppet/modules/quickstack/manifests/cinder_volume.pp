@@ -58,6 +58,10 @@ class quickstack::cinder_volume(
         glusterfs_shares_config    => '/etc/cinder/shares-glusterfs.conf',
       }
     } elsif str2bool_i("$backend_nfs") {
+      package { 'nfs-utils':
+        ensure => 'present',
+      }
+
       if ($::selinux != "false") {
         selboolean { 'virt_use_nfs':
             value => on,
@@ -127,6 +131,10 @@ class quickstack::cinder_volume(
 
     if str2bool_i("$backend_nfs") {
       $nfs_backends = ["nfs"]
+
+      package { 'nfs-utils':
+        ensure => 'present',
+      }
 
       if ($::selinux != "false") {
         selboolean { 'virt_use_nfs':
