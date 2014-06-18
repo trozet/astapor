@@ -66,7 +66,7 @@ class quickstack::params {
                                 = false
   $cinder_rbd_max_clone_depth   = '5'
   $cinder_rbd_user              = 'cinder'
-  $cinder_rbd_secret_uuid       = 'cca93169-0dfb-4c76-b043-040a5f19e504'
+  $cinder_rbd_secret_uuid       = ''
 
   # Glance
   $glance_db_password           = 'CHANGEME'

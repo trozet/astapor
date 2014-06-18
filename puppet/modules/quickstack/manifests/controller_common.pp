@@ -341,6 +341,7 @@ class quickstack::controller_common (
   # https://github.com/redhat-openstack/astapor/blob/7cf25e1022bee08b0c385ae956d4e9e4ade14a9d/puppet/modules/quickstack/manifests/cinder_controller.pp#L85
   if (!str2bool_i("$cinder_backend_gluster") and
       !str2bool_i("$cinder_backend_eqlx") and
+      !str2bool_i("$cinder_backend_rbd") and
       !str2bool_i("$cinder_backend_nfs")) {
     $cinder_backend_iscsi_with_fallback = 'true'
   } else {
