@@ -151,7 +151,6 @@ class quickstack::pacemaker::keystone (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include keystone",
     } ->
     quickstack::pacemaker::resource::service {'openstack-keystone':
-      group   => map_params("keystone_group"),
       clone   => true,
       options => 'start-delay=10s',
     }

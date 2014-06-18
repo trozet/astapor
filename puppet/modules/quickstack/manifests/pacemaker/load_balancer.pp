@@ -23,7 +23,6 @@ class quickstack::pacemaker::load_balancer {
 
   } ->
   quickstack::pacemaker::resource::service {'haproxy':
-    group => "$loadbalancer_group",
     clone => true,
   }
 }

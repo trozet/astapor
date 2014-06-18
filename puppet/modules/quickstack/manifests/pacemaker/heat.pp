@@ -128,7 +128,6 @@ class quickstack::pacemaker::heat(
     }
     ->
     quickstack::pacemaker::resource::service {'openstack-heat-api':
-      group => "$heat_group",
       clone => true,
     }
     ->
@@ -151,7 +150,6 @@ class quickstack::pacemaker::heat(
       Exec["all-heat-nodes-are-up"]
       ->
       quickstack::pacemaker::resource::service {"openstack-heat-api-cfn":
-        group => "$heat_cfn_group",
         clone => true,
       }
     }
@@ -160,7 +158,6 @@ class quickstack::pacemaker::heat(
       Exec["all-heat-nodes-are-up"]
       ->
       quickstack::pacemaker::resource::service {"openstack-heat-api-cloudwatch":
-        group => "$heat_group",
         clone => true,
       }
     }
