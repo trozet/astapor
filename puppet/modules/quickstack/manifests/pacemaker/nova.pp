@@ -16,7 +16,7 @@ class quickstack::pacemaker::nova (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_nova') == 'true' and map_params("db_is_ready")) {
+  if (map_params('include_nova') == 'true') {
     $nova_private_vip = map_params("nova_private_vip")
     $pcmk_nova_group = map_params("nova_group")
     $memcached_ips =  map_params("lb_backend_server_addrs")
@@ -27,9 +27,7 @@ class quickstack::pacemaker::nova (
     )
     Exec['i-am-nova-vip-OR-nova-is-up-on-vip'] -> Exec['nova-db-sync']
     if (map_params('include_mysql') == 'true') {
-      if str2bool_i("$hamysql_is_running") {
-        Exec['mysql-has-users'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
-      }
+      Exec['all-galera-nodes-are-up'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']

@@ -1,5 +1,5 @@
-class quickstack::pacemaker::rsync::keystone (
-  $keystone_private_vip,
+class quickstack::pacemaker::rsync::galera (
+  $db_vip,
 ) {
 
   Exec {
@@ -13,17 +13,17 @@ class quickstack::pacemaker::rsync::keystone (
     }
   }
 
-  quickstack::pacemaker::rsync::get { '/etc/keystone/ssl':
-    source           => "rsync://$keystone_private_vip/keystone/",
+  quickstack::pacemaker::rsync::get { '/etc/pki/galera':
+    source           => "rsync://$db_vip/galera/",
     override_options => "aIX",
     purge            => true,
-    unless           => "/tmp/ha-all-in-one-util.bash i_am_vip $keystone_private_vip",
+    unless           => "/tmp/ha-all-in-one-util.bash i_am_vip $db_vip",
   }
   ->
 
-  quickstack::rsync::simple { "keystone":
-    path            => '/etc/keystone/ssl',
-    bind_addr       => "$keystone_private_vip",
+  quickstack::rsync::simple { "galera":
+    path            => '/etc/pki/galera',
+    bind_addr       => "$db_vip",
     max_connections => 10,
   }
 

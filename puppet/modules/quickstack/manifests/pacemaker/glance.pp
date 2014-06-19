@@ -32,7 +32,7 @@ class quickstack::pacemaker::glance (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_glance') == 'true' and map_params("db_is_ready")) {
+  if (map_params('include_glance') == 'true') {
     $glance_private_vip = map_params("glance_private_vip")
     $pcmk_glance_group = map_params("glance_group")
 
@@ -41,9 +41,7 @@ class quickstack::pacemaker::glance (
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec['glance-manage db_sync']
 
     if (map_params('include_mysql') == 'true') {
-      if str2bool_i("$hamysql_is_running") {
-        Exec['mysql-has-users'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
-      }
+      Exec['all-galera-nodes-are-up'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']

@@ -20,6 +20,7 @@ class quickstack::galera::server (
       root_password  => $mysql_root_password,
       default_engine => 'InnoDB',
     },
+    wsrep_bind_address    => $mysql_bind_address,
     wsrep_cluster_name    => $wsrep_cluster_name,
     wsrep_cluster_members => $wsrep_cluster_members,
     wsrep_sst_method      => $wsrep_sst_method,
@@ -33,5 +34,6 @@ class quickstack::galera::server (
   class {'::galera::monitor':
     mysql_username => $galera_monitor_username,
     mysql_password => $galera_monitor_password,
+    mysql_host     => 'localhost',
   }
 }

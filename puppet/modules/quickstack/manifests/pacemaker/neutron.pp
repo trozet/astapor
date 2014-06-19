@@ -23,15 +23,13 @@ class quickstack::pacemaker::neutron (
 ) {
   include quickstack::pacemaker::common
 
-  if (map_params('include_neutron') == 'true' and map_params("db_is_ready")) {
+  if (map_params('include_neutron') == 'true') {
     $neutron_group = map_params("neutron_group")
     $neutron_public_vip = map_params("neutron_public_vip")
     $ovs_nic = find_nic("$ovs_tunnel_network","$ovs_tunnel_iface","")
 
     if (map_params('include_mysql') == 'true') {
-      if str2bool_i("$hamysql_is_running") {
-        Exec['mysql-has-users'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
-      }
+      Exec['all-galera-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']

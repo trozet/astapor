@@ -432,7 +432,7 @@ hostgroups = [
               "quickstack::pacemaker::heat",
               "quickstack::pacemaker::cinder",
               "quickstack::pacemaker::horizon",
-              "quickstack::pacemaker::mysql",
+              "quickstack::pacemaker::galera",
               "quickstack::pacemaker::neutron",
              ]},
     {:name=>"Gluster Server",
