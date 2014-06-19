@@ -49,6 +49,14 @@ class quickstack::pacemaker::neutron (
       Exec['all-nova-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
 
+    class {"::quickstack::load_balancer::neutron":
+      frontend_pub_host    => map_params("neutron_public_vip"),
+      frontend_priv_host    => map_params("neutron_private_vip"),
+      frontend_admin_host    => map_params("neutron_admin_vip"),
+      backend_server_names => map_params("lb_backend_server_names"),
+      backend_server_addrs => map_params("lb_backend_server_addrs"),
+    }
+
     Class['::quickstack::pacemaker::common']
     ->
     quickstack::pacemaker::vips { "$neutron_group":
@@ -99,14 +107,6 @@ class quickstack::pacemaker::neutron (
       tenant_network_type           => $tenant_network_type,
       tunnel_id_ranges              => $tunnel_id_ranges,
       verbose                       => $verbose,
-    }
-    class {"::quickstack::load_balancer::neutron":
-      frontend_pub_host    => map_params("neutron_public_vip"),
-      frontend_priv_host    => map_params("neutron_private_vip"),
-      frontend_admin_host    => map_params("neutron_admin_vip"),
-      backend_server_names => map_params("lb_backend_server_names"),
-      backend_server_addrs => map_params("lb_backend_server_addrs"),
-      require              => Quickstack::Pacemaker::Vips["$neutron_group"],
     }
     ->
     exec {"pcs-neutron-server-set-up":

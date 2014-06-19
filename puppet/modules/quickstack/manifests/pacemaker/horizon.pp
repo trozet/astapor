@@ -50,6 +50,14 @@ class quickstack::pacemaker::horizon (
       Exec['all-heat-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
 
+    class {"::quickstack::load_balancer::horizon":
+      frontend_pub_host    => $horizon_public_vip,
+      frontend_priv_host   => $horizon_private_vip,
+      frontend_admin_host  => $horizon_admin_vip,
+      backend_server_names => map_params("lb_backend_server_names"),
+      backend_server_addrs => map_params("lb_backend_server_addrs"),
+    }
+
     Class['::quickstack::pacemaker::common']
     ->
     quickstack::pacemaker::vips { "$pcmk_horizon_group":
@@ -81,14 +89,6 @@ class quickstack::pacemaker::horizon (
       keystone_host         => map_params("keystone_admin_vip"),
       memcached_servers     => $memcached_servers,
       secret_key            => $secret_key,
-    }
-    ->
-    class {"::quickstack::load_balancer::horizon":
-      frontend_pub_host    => $horizon_public_vip,
-      frontend_priv_host   => $horizon_private_vip,
-      frontend_admin_host  => $horizon_admin_vip,
-      backend_server_names => map_params("lb_backend_server_names"),
-      backend_server_addrs => map_params("lb_backend_server_addrs"),
     }
     ->
     exec {"pcs-horizon-server-set-up":

@@ -95,7 +95,6 @@ class quickstack::pacemaker::params (
 
   include quickstack::pacemaker::common
   include quickstack::pacemaker::mysql
-  include quickstack::load_balancer::common
   include quickstack::pacemaker::qpid
   include quickstack::pacemaker::keystone
   include quickstack::pacemaker::swift
@@ -106,14 +105,13 @@ class quickstack::pacemaker::params (
   include quickstack::pacemaker::load_balancer
 
   Class['::quickstack::pacemaker::common'] ->
+  Class['::quickstack::pacemaker::load_balancer'] ->
   Class['::quickstack::pacemaker::mysql'] ->
-  Class['::quickstack::load_balancer::common'] ->
   Class['::quickstack::pacemaker::qpid'] ->
   Class['::quickstack::pacemaker::keystone'] ->
   Class['::quickstack::pacemaker::swift'] ->
   Class['::quickstack::pacemaker::glance'] ->
   Class['::quickstack::pacemaker::nova'] ->
   Class['::quickstack::pacemaker::cinder'] ->
-  Class['::quickstack::pacemaker::heat'] ->
-  Class['::quickstack::pacemaker::load_balancer']
+  Class['::quickstack::pacemaker::heat']
 }
