@@ -60,6 +60,12 @@ class quickstack::ceilometer_controller(
         enabled => true,
     }
 
+    class { 'ceilometer::alarm::notifier':
+    }
+
+    class { 'ceilometer::alarm::evaluator':
+    }
+
     class { 'ceilometer::api':
         keystone_host     => $controller_priv_host,
         keystone_password => $ceilometer_user_password,
