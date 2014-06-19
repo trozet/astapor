@@ -92,7 +92,6 @@ class quickstack::pacemaker::qpid (
       private_vip => map_params("qpid_vip"),
       admin_vip   => map_params("qpid_vip"),
     } ->
-    Class['::quickstack::load_balancer::qpid'] ->
 
     exec {"pcs-qpid-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property qpid"

@@ -45,6 +45,14 @@ class quickstack::pacemaker::keystone (
       }
     }
 
+    class {"::quickstack::load_balancer::keystone":
+      frontend_pub_host    => map_params("keystone_public_vip"),
+      frontend_priv_host   => map_params("keystone_private_vip"),
+      frontend_admin_host  => map_params("keystone_admin_vip"),
+      backend_server_names => map_params("lb_backend_server_names"),
+      backend_server_addrs => map_params("lb_backend_server_addrs"),
+    }
+
     Class['::quickstack::pacemaker::common'] ->
 
     quickstack::pacemaker::vips { "$keystone_group":
@@ -129,14 +137,6 @@ class quickstack::pacemaker::keystone (
       heat_cfn_public_address     => map_params("heat_cfn_public_vip"),
       heat_cfn_internal_address   => map_params("heat_cfn_private_vip"),
       heat_cfn_admin_address      => map_params("heat_cfn_admin_vip"),
-    } ->
-    class {"::quickstack::load_balancer::keystone":
-      frontend_pub_host    => map_params("keystone_public_vip"),
-      frontend_priv_host   => map_params("keystone_private_vip"),
-      frontend_admin_host  => map_params("keystone_admin_vip"),
-      backend_server_names => map_params("lb_backend_server_names"),
-      backend_server_addrs => map_params("lb_backend_server_addrs"),
-      require              => Quickstack::Pacemaker::Vips["$keystone_group"],
     } ->
     exec {"pcs-keystone-server-set-up":
       command => "/usr/sbin/pcs property set keystone=running --force",

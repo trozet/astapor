@@ -77,6 +77,14 @@ class quickstack::pacemaker::glance (
       }
     }
 
+    class {"::quickstack::load_balancer::glance":
+      frontend_pub_host    => map_params("glance_public_vip"),
+      frontend_priv_host   => map_params("glance_private_vip"),
+      frontend_admin_host  => map_params("glance_admin_vip"),
+      backend_server_names => map_params("lb_backend_server_names"),
+      backend_server_addrs => map_params("lb_backend_server_addrs"),
+    }
+
     Class['::quickstack::pacemaker::common']
     ->
     # assuming openstack-glance-api and openstack-glance-registry
@@ -126,13 +134,6 @@ class quickstack::pacemaker::glance (
 
     Class['::quickstack::glance']
     ->
-    class {"::quickstack::load_balancer::glance":
-      frontend_pub_host    => map_params("glance_public_vip"),
-      frontend_priv_host   => map_params("glance_private_vip"),
-      frontend_admin_host  => map_params("glance_admin_vip"),
-      backend_server_names => map_params("lb_backend_server_names"),
-      backend_server_addrs => map_params("lb_backend_server_addrs"),
-    } ->
     exec {"pcs-glance-server-set-up":
       command => "/usr/sbin/pcs property set glance=running --force",
     } ->
