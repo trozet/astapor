@@ -1,8 +1,7 @@
 class quickstack::rsync::common ( ) {
+  include ::xinetd
+
   package { 'rsync':
-    ensure => installed,
-  }
-  package { 'xinetd':
     ensure => installed,
   }
 

@@ -30,7 +30,7 @@ class quickstack::pacemaker::keystone (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_keystone') == 'true' and map_params("db_is_ready")) {
+  if (map_params('include_keystone') == 'true') {
     $keystone_group = map_params("keystone_group")
     $keystone_private_vip = map_params("keystone_private_vip")
 
@@ -40,9 +40,7 @@ class quickstack::pacemaker::keystone (
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup']
     Exec['keystone-manage db_sync'] -> Exec['pcs-keystone-server-set-up']
     if (map_params('include_mysql') == 'true') {
-      if str2bool_i("$hamysql_is_running") {
-        Exec['mysql-has-users'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
-      }
+      Exec['all-galera-nodes-are-up'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }
 
     class {"::quickstack::load_balancer::keystone":

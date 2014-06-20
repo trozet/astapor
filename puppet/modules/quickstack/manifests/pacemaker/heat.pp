@@ -17,7 +17,7 @@ class quickstack::pacemaker::heat(
 
   include ::quickstack::pacemaker::common
 
-  if (map_params('include_heat') == 'true' and map_params("db_is_ready")) {
+  if (map_params('include_heat') == 'true') {
 
     include ::quickstack::pacemaker::qpid
 
@@ -43,9 +43,7 @@ class quickstack::pacemaker::heat(
 
     Exec['i-am-heat-vip-OR-heat-is-up-on-vip'] -> Exec<| title == 'heat-manage db_sync' |>
     if (map_params('include_mysql') == 'true') {
-      if str2bool_i("$hamysql_is_running") {
-        Exec['mysql-has-users'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']
-      }
+      Exec['all-galera-nodes-are-up'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']

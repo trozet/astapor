@@ -6,9 +6,9 @@ class quickstack::pacemaker::rsync::keystone (
     path => '/usr/bin:/usr/sbin:/bin',
   }
 
-  if ($::selinux != "false") {
-    selboolean{'rsync_client':
-      value            => on,
+  if (($::selinux != "false") and (! defined(Selboolean['rsync_client']))) {
+    selboolean { 'rsync_client':
+      value      => on,
       persistent => true,
     }
   }
@@ -22,8 +22,8 @@ class quickstack::pacemaker::rsync::keystone (
   ->
 
   quickstack::rsync::simple { "keystone":
-    path         => '/etc/keystone/ssl',
-    bind_addr    => "$keystone_private_vip",
+    path            => '/etc/keystone/ssl',
+    bind_addr       => "$keystone_private_vip",
     max_connections => 10,
   }
 
