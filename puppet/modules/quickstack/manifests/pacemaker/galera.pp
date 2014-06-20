@@ -50,7 +50,7 @@ class quickstack::pacemaker::galera (
       unless    => $galera_test,
     } ->
     class { "::quickstack::pacemaker::rsync::galera":
-      db_vip => map_params("db_vip"),
+      cluster_control_ip => map_params("cluster_control_ip"),
     } ->
     class { '::quickstack::galera::server':
       mysql_bind_address      => map_params("local_bind_addr"),

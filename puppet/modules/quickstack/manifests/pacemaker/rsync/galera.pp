@@ -1,5 +1,5 @@
 class quickstack::pacemaker::rsync::galera (
-  $db_vip,
+  $cluster_control_up,
 ) {
 
   Exec {
@@ -13,18 +13,18 @@ class quickstack::pacemaker::rsync::galera (
     }
   }
 
-  quickstack::pacemaker::rsync::get { '/etc/pki/galera':
-    source           => "rsync://$db_vip/galera/",
-    override_options => "aIX",
-    purge            => true,
-    unless           => "/tmp/ha-all-in-one-util.bash i_am_vip $db_vip",
-  }
-  ->
-
-  quickstack::rsync::simple { "galera":
-    path            => '/etc/pki/galera',
-    bind_addr       => "$db_vip",
-    max_connections => 10,
+  if (has_interface_with("ipaddress", $cluster_control_up)) {    
+    quickstack::rsync::simple { "galera":
+      path            => '/etc/pki/galera',
+      bind_addr       => "$cluster_control_up",
+      max_connections => 10,
+    }
+  } else {
+    quickstack::pacemaker::rsync::get { '/etc/pki/galera':
+      source           => "rsync://$cluster_control_up/galera/",
+      override_options => "aIX",
+      purge            => true,
+    }
   }
 
   # NOTE: we may also want to add a module setting up known hosts, and then we
