@@ -1,5 +1,5 @@
 class quickstack::pacemaker::rsync::galera (
-  $cluster_control_up,
+  $cluster_control_ip,
 ) {
 
   Exec {
@@ -13,15 +13,15 @@ class quickstack::pacemaker::rsync::galera (
     }
   }
 
-  if (has_interface_with("ipaddress", $cluster_control_up)) {    
+  if (has_interface_with("ipaddress", $cluster_control_ip)) {    
     quickstack::rsync::simple { "galera":
       path            => '/etc/pki/galera',
-      bind_addr       => "$cluster_control_up",
+      bind_addr       => "$cluster_control_ip",
       max_connections => 10,
     }
   } else {
     quickstack::pacemaker::rsync::get { '/etc/pki/galera':
-      source           => "rsync://$cluster_control_up/galera/",
+      source           => "rsync://$cluster_control_ip/galera/",
       override_options => "aIX",
       purge            => true,
     }
