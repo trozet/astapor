@@ -35,10 +35,15 @@ class quickstack::pacemaker::keystone (
     $keystone_private_vip = map_params("keystone_private_vip")
 
     # because the dep on openstack::keystone is not enough for some reason...
-    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Service['keystone']
-    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage db_sync']
-    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup']
-    Exec['keystone-manage db_sync'] -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Service['keystone'] -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage db_sync'] -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup'] -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_user<| |> -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_user_role<| |> -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_endpoint<| |> -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_tenant<| |> -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_service<| |> -> Exec['pcs-keystone-server-set-up']
+
     if (map_params('include_mysql') == 'true') {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }

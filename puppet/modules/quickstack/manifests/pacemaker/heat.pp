@@ -41,7 +41,8 @@ class quickstack::pacemaker::heat(
       heat_cloudwatch_enabled             => $heat_cloudwatch_enabled,
     }
 
-    Exec['i-am-heat-vip-OR-heat-is-up-on-vip'] -> Exec<| title == 'heat-manage db_sync' |>
+    Exec['i-am-heat-vip-OR-heat-is-up-on-vip'] -> Exec<| title == 'heat-dbsync' |>
+    -> Exec['pcs-heat-server-set-up']
     if (map_params('include_mysql') == 'true') {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']
     }
