@@ -4,7 +4,11 @@
 <%  require 'facter'
     require 'securerandom'
 
-    mail_auto = "admin@#{Facter.domain}"
+    if Facter.version  =~ /2.*/
+      mail_auto = "admin@#{Facter.value('domain')}"
+    else
+      mail_auto = "admin@#{Facter.domain}"
+    end
 
     def passwd_auto
       SecureRandom.hex
@@ -14,7 +18,6 @@
 verbose: true
 heat_cfn: false
 heat_cloudwatch: false
-admin_email: <%= mail_auto %>
 admin_password: <%= passwd_auto %>
 ceilometer_metering_secret: <%= passwd_auto %>
 ceilometer_user_password: <%= passwd_auto %>
@@ -101,6 +104,7 @@ amqp_server: rabbitmq
 amqp_host: 172.16.0.1
 amqp_username: openstack
 amqp_password: <%= passwd_auto %>
+admin_email: <%= mail_auto %>
 neutron_metadata_proxy_secret: <%= passwd_auto %>
 enable_ovs_agent: true
 ovs_vlan_ranges: ''
