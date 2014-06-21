@@ -87,12 +87,6 @@ class quickstack::pacemaker::params (
                             "$private_iface",
                             "$private_ip")
 
-  # Hackery explained: an external db is always ready.  Or, if hamysql
-  # was running in the cluster at the start of the puppet run, we can
-  # presume openstack db users have been created by the time the
-  # openstack services want to configure their db's.
-  $db_is_ready = ! str2bool_i("$include_mysql") or str2bool_i("$hamysql_is_running")
-
   include quickstack::pacemaker::common
   include quickstack::pacemaker::load_balancer
   include quickstack::pacemaker::galera
