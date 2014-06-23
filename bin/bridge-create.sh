@@ -4,6 +4,13 @@
 BRIDGE_NAME=$1
 PHYSICAL_INTERFACE=$2
 
+if [ -z "$*" ]
+then
+  echo "Usage: $0 <brige_name_to_create> <existing_physical_interface>"
+  echo "       e.g.: $0 br-ex eth0"
+  exit 1
+fi
+
 # create openvswitch bridge
 /usr/bin/ovs-vsctl --may-exist add-br ${BRIDGE_NAME}
 
@@ -24,6 +31,15 @@ PHYSICAL_INTERFACE=$2
 
 # set bridge device type
 /bin/echo -e "DEVICETYPE=ovs" >> /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+
+# determine if physical interface was set to dhcp
+DHCP=$(grep "^BOOTPROTO=.*dhcp" /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME})
+if [ -n "${DHCP}" ]
+then
+  # set bridge dhcp options for ovs if dhcp was set on physical interface
+  /bin/echo -e "OVSBOOTPROTO=dhcp" >> /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+  /bin/echo -e "OVSDHCPINTERFACES=${PHYSICAL_INTERFACE}" >> /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+fi
 
 # create new physical interface config
 cat > /etc/sysconfig/network-scripts/ifcfg-${PHYSICAL_INTERFACE} <<EOF
