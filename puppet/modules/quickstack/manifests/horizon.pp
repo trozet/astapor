@@ -34,6 +34,11 @@ class quickstack::horizon(
     apache::listen { '443': }
   }
 
+  # needed for https://bugzilla.redhat.com/show_bug.cgi?id=1111656
+  class { 'apache':
+    default_vhost => false,
+  }
+
   class {'::horizon':
     bind_address          => $bind_address,
     cache_server_ip       => $cache_server_ip,
