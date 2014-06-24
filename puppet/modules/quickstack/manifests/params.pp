@@ -101,7 +101,7 @@ class quickstack::params {
   $ovs_tunnel_types              = []
 
   # neutron plugin config
-  $neutron_core_plugin           = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'
+  $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin'
   # If using the Cisco plugin, use either OVS or n1k for virtualised l2
   $cisco_vswitch_plugin          = 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2'
   # If using the Cisco plugin, Nexus hardware can be used for l2
