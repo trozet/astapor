@@ -1,17 +1,18 @@
 #!/usr/bin/ruby
-# Setup Foreman default values (create or update) for:
-# - Smart Class Parameters for Quickstack puppet modules
-# - Hostgroups
-# Version 1.1
+# From hostgroups and quickstack parameters yaml files:
+# - get/set Foreman smart class parameters
+# - get/set Foreman hostgroups
+# - generates site.pp manifest from hostgroups
+# Version 1.2
 # Requires Foreman 1.6.0.15+
 
 require 'rubygems'
 require 'erb'
 require 'foreman_api'
 require 'logger'
-require 'yaml'
 require 'optparse'
 require 'ostruct'
+require 'yaml'
 
 class Optparse
   def self.parse(args)
@@ -25,7 +26,16 @@ class Optparse
     options.verbose = false
 
     opt_parser = OptionParser.new do |opts|
-      opts.banner = "Usage: #{__FILE__} [options] parameters | hostgroups | nodes"
+      opts.banner = <<-EOS
+Usage: #{__FILE__} [OPTIONS] COMMAND
+  COMMAND
+    hostgroups
+    parameters
+    list_parameters
+    nodes
+
+  OPTIONS
+      EOS
 
       opts.on('-b', '--url_base URL', 'Base URL') do |b|
         options.base_url = b
@@ -35,7 +45,7 @@ class Optparse
         options.params = d
       end
 
-      opts.on('-g', '--hostgroups File', 'File of Hostgroups defaults (YAML)') do |g|
+      opts.on('-g', '--hostgroups FILE', 'File of Hostgroups defaults (YAML)') do |g|
         options.hostgroups = g
       end
 
@@ -88,7 +98,7 @@ class ConfigurationQuickstack < Configuration
 end
 
 class Foreman
-  attr_reader :hostgroupclasses, :puppetclasses, :smart_params
+  attr_reader :hostgroups, :hostgroupclasses, :puppetclasses, :smart_params
 
   def initialize(options, log)
     @log = log
@@ -161,21 +171,32 @@ class Foreman
 end
 
 class Hostgroup
+  include Enumerable
+
   attr_reader :name, :pclassnames
 
   def initialize(name, pclassnames)
     @name = name
     @pclassnames = pclassnames
   end
+
+  def each
+    @pclassnames.each do |puppet_class|
+      yield name, puppet_class
+    end
+  end
 end
 
 class Hostgroups
-  def initialize(list, log)
+  include Enumerable
+
+  def initialize(list, foreman, log)
+    @foreman = foreman
     @hostgroups = []
     @log = log
     list.each do |hg|
       pclassnames = hg[:class].kind_of?(Array) ? hg[:class] : [ hg[:class] ]
-      @hostgroups << Hostgroup.new(hg[:name],pclassnames)
+      @hostgroups << Hostgroup.new(hg[:name], pclassnames)
     end
   end
 
@@ -191,24 +212,21 @@ class Hostgroups
     node << "}\n\n"
   end
 
-  def params_to_foreman(params, foreman)
-    @log.info("Pushing parameters to Foreman")
-    @hostgroups.each do |hg|
-      hg.pclassnames.each do |pclassname|
-        puppetclass = foreman.puppet_class_get(pclassname)
+  def each
+    @hostgroups.each do |hostgroup|
+      yield hostgroup
+    end
+  end
+
+  def smart_params_each
+    self.each do |hg|
+      hg.each do |name, pclassname|
+        puppetclass = @foreman.puppet_class_get(pclassname)
         if puppetclass.has_key?('quickstack')
           puppetclass['quickstack'].each do |pclass|
-            res = foreman.puppetclasses.show({ 'id' => pclass['id'] })[0]
+            res = @foreman.puppetclasses.show({ 'id' => pclass['id'] })[0]
             res['smart_class_parameters'].each do |param|
-              if params.include?(param['parameter'])
-                data = { 'id' => param['id'],
-                  'smart_class_parameter' => {
-                    'default_value'  => params.get(param['parameter']),
-                    'parameter_type' => foreman.key_type_get(param['parameter'])}
-                }
-                foreman.smart_params.update(data)
-                @log.info("#{pclass['name']}: #{param['parameter']} [UPDATED]")
-              end
+              yield name, pclass, param
             end
           end
         else
@@ -218,16 +236,39 @@ class Hostgroups
     end
   end
 
-  def to_foreman(foreman)
-    @log.info("Pushing Hostgroups to Foreman")
-    @hostgroups.each do |hg|
-      id = foreman.hostgroup_create_update(hg.name)
-      foreman.puppet_classes_get(hg).each do |pclass_id|
-        hostgroupclasses = foreman.hostgroupclasses.index({ 'hostgroup_id' => id, })[0]['results']
+  def smart_class_params_get
+    @log.info('Fetching Foreman smart class parameters for each puppet classes')
+    smart_params_each do |hg, pclass, param|
+      smart_param = @foreman.smart_params.show({ 'id' => param['id'] })[0]
+      @log.info("'#{hg}' #{pclass['name']} #{smart_param['parameter']} => #{smart_param['default_value']}")
+    end
+  end
+
+  def smart_class_params_set(params)
+    @log.info('Pushing parameters to Foreman smart class parameters')
+    smart_params_each do |hg, pclass, param|
+      if params.include?(param['parameter'])
+        data = { 'id' => param['id'],
+          'smart_class_parameter' => {
+            'default_value'  => params.get(param['parameter']),
+            'parameter_type' => @foreman.key_type_get(param['parameter'])}
+        }
+        @foreman.smart_params.update(data)
+        @log.info("'#{hg}' #{pclass['name']} #{param['parameter']} [UPDATED]")
+      end
+    end
+  end
+
+  def to_foreman
+    @log.info('Pushing Hostgroups to Foreman')
+    self.each do |hg|
+      id = @foreman.hostgroup_create_update(hg.name)
+      @foreman.puppet_classes_get(hg).each do |pclass_id|
+        hostgroupclasses = @foreman.hostgroupclasses.index({ 'hostgroup_id' => id, })[0]['results']
         if hostgroupclasses
           unless hostgroupclasses.include?(pclass_id)
             data = { 'hostgroup_id' => id, 'puppetclass_id' => pclass_id }
-            foreman.hostgroupclasses.create(data)
+            @foreman.hostgroupclasses.create(data)
             @log.info("Hostgroup: #{hg.name}: puppetclass #{pclass_id} [ADDED]")
           end
         end
@@ -236,7 +277,7 @@ class Hostgroups
   end
 
   def to_nodes
-    @log.info("Generating nodes manifests")
+    @log.info('Generating nodes manifests')
     nodes = "#Quickstack: nodes defintions generated from hostgroups\n"
     @hostgroups.each do |hg|
       nodes << node_add(hg.name, hg.pclassnames)
@@ -291,14 +332,20 @@ log = Logger.new(STDOUT)
 log.datetime_format = "%d/%m/%Y %H:%M:%S"
 log.level = options.verbose ? Logger::INFO : Logger::WARN
 
-hostgroups = Hostgroups.new(ConfigurationHostgroups.new(options.hostgroups).data, log)
+hostgroups = Hostgroups.new(ConfigurationHostgroups.new(options.hostgroups).data, Foreman.new(options, log), log)
 
 case ARGV[0]
+
+when 'list_parameters'
+  params = Parameters.new(ConfigurationQuickstack.new(options.params).data, log)
+  hostgroups.smart_class_params_get
 when 'parameters'
   params = Parameters.new(ConfigurationQuickstack.new(options.params).data, log)
-  hostgroups.params_to_foreman(params, Foreman.new(options, log))
+  hostgroups.smart_class_params_set(params)
 when 'hostgroups'
-  hostgroups.to_foreman(Foreman.new(options, log))
+  hostgroups.to_foreman
 when 'nodes'
   puts hostgroups.to_nodes
+else
+  puts Optparse.parse(['-h'])
 end
