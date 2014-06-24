@@ -25,7 +25,7 @@ class quickstack::nova_network::compute (
   $network_overrides            = {"force_dhcp_release" => false},
   $network_fixed_range          = '10.0.0.0/24',
   $network_floating_range       = '10.0.0.0/24',
-  $amqp_server                  = $quickstack::params::amqp_server,
+  $amqp_provider                = $quickstack::params::amqp_provider,
   $amqp_host                    = $quickstack::params::amqp_host,
   $amqp_port                    = '5672',
   $amqp_ssl_port                = '5671',

@@ -15,7 +15,7 @@ class quickstack::storage_backend::cinder(
   $cinder_iscsi_iface          = 'eth1',
   $cinder_iscsi_network        = '',
   $mysql_host                  = $quickstack::params::mysql_host,
-  $amqp_server                 = $quickstack::params::amqp_server,
+  $amqp_provider               = $quickstack::params::amqp_provider,
   $amqp_host                   = $quickstack::params::amqp_host,
   $amqp_username               = $quickstack::params::amqp_username,
   $amqp_password               = $quickstack::params::amqp_password,
@@ -36,7 +36,7 @@ class quickstack::storage_backend::cinder(
     $sql_connection = "mysql://cinder:${cinder_db_password}@${mysql_host}/cinder"
   }
   class { '::cinder':
-    rpc_backend    => amqp_backend('cinder', $amqp_server),
+    rpc_backend    => amqp_backend('cinder', $amqp_provider),
     qpid_hostname  => $amqp_host,
     qpid_port      => $amqp_port,
     qpid_protocol  => $qpid_protocol,

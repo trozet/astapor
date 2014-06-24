@@ -56,7 +56,7 @@ class quickstack::controller_common (
   $swift_ringserver_ip           = '192.168.203.1',
   $swift_storage_ips             = ["192.168.203.2","192.168.203.3","192.168.203.4"],
   $swift_storage_device          = 'device1',
-  $amqp_server                   = $quickstack::params::amqp_server,
+  $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
   $amqp_password                 = $quickstack::params::amqp_password,
@@ -101,7 +101,7 @@ class quickstack::controller_common (
         group_id => 'apache',
         hostname => $controller_pub_host,
       }
-      if $amqp_server == 'rabbitmq' {
+      if $amqp_provider == 'rabbitmq' {
         certmonger::request_ipa_cert { 'amqp':
           seclib => "openssl",
           principal => "amqp/${controller_priv_host}",
@@ -153,7 +153,7 @@ class quickstack::controller_common (
   }
 
   class {'quickstack::amqp::server':
-    amqp_server   => $amqp_server,
+    amqp_provider => $amqp_provider,
     amqp_host     => $amqp_host,
     amqp_port     => $amqp_port,
     amqp_username => $amqp_username,
@@ -219,7 +219,7 @@ class quickstack::controller_common (
     db_password    => $glance_db_password,
     require        => Class['quickstack::db::mysql'],
   }
-  if $amqp_server == 'qpid' {
+  if $amqp_provider == 'qpid' {
     class { 'glance::notify::qpid':
       qpid_password => $amqp_password,
       qpid_username => $amqp_username,
@@ -235,7 +235,7 @@ class quickstack::controller_common (
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${controller_priv_host}:9292/v1",
-    rpc_backend        => amqp_backend('nova', $amqp_server),
+    rpc_backend        => amqp_backend('nova', $amqp_provider),
     qpid_hostname      => $amqp_host,
     qpid_username      => $amqp_username,
     qpid_password      => $amqp_password,
@@ -283,7 +283,7 @@ class quickstack::controller_common (
     controller_admin_host       => $controller_admin_host,
     controller_priv_host        => $controller_priv_host,
     controller_pub_host         => $controller_pub_host,
-    amqp_server                 => $amqp_server,
+    amqp_provider               => $amqp_provider,
     amqp_host                   => $amqp_host,
     qpid_protocol               => $qpid_protocol,
     amqp_port                   => $amqp_port,
@@ -310,7 +310,7 @@ class quickstack::controller_common (
     db_ssl_ca     => $mysql_ca,
     db_password   => $cinder_db_password,
     glance_host   => $controller_priv_host,
-    rpc_backend   => amqp_backend('cinder', $amqp_server),
+    rpc_backend   => amqp_backend('cinder', $amqp_provider),
     amqp_host     => $amqp_host,
     amqp_port     => $amqp_port,
     amqp_username => $amqp_username,
@@ -365,7 +365,7 @@ class quickstack::controller_common (
     mysql_host                  => $mysql_host,
     mysql_ca                    => $mysql_ca,
     ssl                         => $ssl,
-    amqp_server                 => $amqp_server,
+    amqp_provider               => $amqp_provider,
     amqp_host                   => $amqp_host,
     amqp_port                   => $amqp_port,
     qpid_protocol               => $qpid_protocol,

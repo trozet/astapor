@@ -21,7 +21,7 @@ class quickstack::neutron::compute (
   $ovs_vlan_ranges             = $quickstack::params::ovs_vlan_ranges,
   $ovs_tunnel_iface            = 'eth1',
   $ovs_tunnel_network          = '',
-  $amqp_server                 = $quickstack::params::amqp_server,
+  $amqp_provider               = $quickstack::params::amqp_provider,
   $amqp_host                   = $quickstack::params::amqp_host,
   $amqp_port                   = '5672',
   $amqp_ssl_port               = '5671',
@@ -49,7 +49,7 @@ class quickstack::neutron::compute (
 
   class { '::neutron':
     allow_overlapping_ips => true,
-    rpc_backend           => amqp_backend('neutron', $amqp_server),
+    rpc_backend           => amqp_backend('neutron', $amqp_provider),
     qpid_hostname         => $amqp_host,
     qpid_port             => $real_amqp_port,
     qpid_protocol         => $qpid_protocol,

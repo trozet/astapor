@@ -4,7 +4,7 @@ class quickstack::ceilometer_controller(
   $controller_admin_host,
   $controller_priv_host,
   $controller_pub_host,
-  $amqp_server,
+  $amqp_provider,
   $amqp_host,
   $amqp_port = '5672',
   $qpid_protocol = 'tcp',
@@ -42,7 +42,7 @@ class quickstack::ceilometer_controller(
         rabbit_port     => $amqp_port,
         rabbit_userid   => $amqp_username,
         rabbit_password => $amqp_password,
-        rpc_backend     => amqp_backend('ceilometer', $amqp_server),
+        rpc_backend     => amqp_backend('ceilometer', $amqp_provider),
         verbose         => $verbose,
     }
 

@@ -12,7 +12,7 @@ class quickstack::compute_common (
   $nova_host                   = '127.0.0.1',
   $nova_db_password            = $quickstack::params::nova_db_password,
   $nova_user_password          = $quickstack::params::nova_user_password,
-  $amqp_server                 = $quickstack::params::amqp_server,
+  $amqp_provider               = $quickstack::params::amqp_provider,
   $amqp_host                   = $quickstack::params::amqp_host,
   $amqp_port                   = '5672',
   $amqp_ssl_port               = '5671',
@@ -73,7 +73,7 @@ class quickstack::compute_common (
     sql_connection     => $nova_sql_connection,
     image_service      => 'nova.image.glance.GlanceImageService',
     glance_api_servers => "http://${glance_host}:9292/v1",
-    rpc_backend        => amqp_backend('nova', $amqp_server),
+    rpc_backend        => amqp_backend('nova', $amqp_provider),
     qpid_hostname      => $amqp_host,
     qpid_protocol      => $qpid_protocol,
     qpid_port          => $real_amqp_port,
@@ -113,7 +113,7 @@ class quickstack::compute_common (
       rabbit_port     => $real_amqp_port,
       rabbit_userid   => $amqp_username,
       rabbit_password => $amqp_password,
-      rpc_backend     => amqp_backend('ceilometer', $amqp_server),
+      rpc_backend     => amqp_backend('ceilometer', $amqp_provider),
       verbose         => $verbose,
     }
 
