@@ -21,6 +21,7 @@ class quickstack::neutron::compute (
   $ovs_vlan_ranges             = $quickstack::params::ovs_vlan_ranges,
   $ovs_tunnel_iface            = 'eth1',
   $ovs_tunnel_network          = '',
+  $ovs_l2_population           = 'True',
   $amqp_provider               = $quickstack::params::amqp_provider,
   $amqp_host                   = $quickstack::params::amqp_host,
   $amqp_port                   = '5672',
@@ -86,6 +87,9 @@ class quickstack::neutron::compute (
     tunnel_id_ranges    => $tunnel_id_ranges,
     vxlan_udp_port      => $ovs_vxlan_udp_port,
   }
+
+  neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
+
   $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
   class { '::neutron::agents::ovs':
     bridge_uplinks   => $ovs_bridge_uplinks,
