@@ -249,21 +249,6 @@ class quickstack::neutron::controller (
     }
   }
 
-  if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
-    neutron_plugin_ovs {
-      'OVS/enable_tunneling': value => $enable_tunneling;
-      'SECURITYGROUP/firewall_driver':
-      value => 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver';
-    }
-
-    class { '::neutron::plugins::ovs':
-      sql_connection      => $sql_connection,
-      tenant_network_type => $tenant_network_type,
-      network_vlan_ranges => $ovs_vlan_ranges,
-      tunnel_id_ranges    => $tunnel_id_ranges,
-    }
-  }
-
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
     class { 'quickstack::neutron::plugins::cisco':
       neutron_db_password          => $neutron_db_password,

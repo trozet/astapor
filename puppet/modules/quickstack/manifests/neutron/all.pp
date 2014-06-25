@@ -42,7 +42,6 @@ class quickstack::neutron::all (
   $qpid_password                 = '',
   $rpc_backend                   = 'neutron.openstack.common.rpc.impl_qpid',
   $tenant_network_type           = 'vlan',
-  $tunnel_id_ranges              = '1:1000',
   $verbose                       = 'false',
   $ssl                           = 'false',
 ) {
@@ -108,17 +107,6 @@ class quickstack::neutron::all (
       vxlan_group           => $ml2_vxlan_group,
       vni_ranges            => $ml2_vni_ranges,
       enable_security_group => $ml2_security_group,
-    }
-  }
-
-  if $neutron_core_plugin == 'neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2' {
-
-    class { '::neutron::plugins::ovs':
-      sql_connection      => $sql_connection,
-      tenant_network_type => $tenant_network_type,
-      network_vlan_ranges => $ovs_vlan_ranges,
-      tunnel_id_ranges    => $tunnel_id_ranges,
-      vxlan_udp_port      => $ovs_vxlan_udp_port,
     }
   }
 
