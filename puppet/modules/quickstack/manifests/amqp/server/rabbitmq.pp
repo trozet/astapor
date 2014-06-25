@@ -32,5 +32,6 @@ class quickstack::amqp::server::rabbitmq (
     admin_enable          => false,
     package_provider      => "yum",
     package_source        => undef,
+    manage_repos          => false,
   }
 }
