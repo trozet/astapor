@@ -13,7 +13,7 @@ class quickstack::load_balancer::galera (
     addr                 => [ $frontend_pub_host ],
     port                 => "$public_port",
     mode                 => "$public_mode",
-    listen_options       => { 'option'     => [ "$log" ],
+    listen_options       => { 'option' => [ "$log", 'httpchk' ],
                               'stick-table' => 'type ip size 2',
                               'stick' => 'on dst', },
     member_options       => [ 'check', 'port 9200' ],
