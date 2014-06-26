@@ -90,8 +90,9 @@ class quickstack::pacemaker::galera (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include galera",
     } ->
     quickstack::pacemaker::resource::service {'mysqld':
-      group => "$pcmk_galera_group",
-      clone => true,
+      group          => "$pcmk_galera_group",
+      monitor_params => { 'start-delay' => '60s' },
+      clone          => true,
     }
   }
 }
