@@ -11,11 +11,11 @@ class quickstack::neutron::all (
   $ml2_tenant_network_types      = ['vxlan', 'vlan', 'gre', 'flat'],
   $ml2_mechanism_drivers         = ['openvswitch','l2population'],
   $ml2_flat_networks             = ['*'],
-  $ml2_network_vlan_ranges       = ['10:50'],
+  $ml2_network_vlan_ranges       = ['yourphysnet:10:50'],
   $ml2_tunnel_id_ranges          = ['20:100'],
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
-  $ml2_security_group            = 'dummy',
+  $ml2_security_group            = 'True',
   $mysql_ca                      = undef,
   $mysql_host                    = '127.0.0.1',
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',
@@ -85,6 +85,7 @@ class quickstack::neutron::all (
     before      => Service['neutron-server'],
     require     => [Neutron_config['database/connection'], Neutron_config['DEFAULT/core_plugin']],
   }
+  File['/etc/neutron/plugin.ini'] -> Exec['neutron-db-manage upgrade']
 
   class { '::neutron::server':
     auth_host      => $auth_host,

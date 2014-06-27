@@ -27,7 +27,7 @@ class quickstack::pacemaker::nova (
     )
     Exec['i-am-nova-vip-OR-nova-is-up-on-vip'] -> Exec['nova-db-sync']
     if (map_params('include_mysql') == 'true') {
-      Exec['all-galera-nodes-are-up'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
+      Exec['all-galera-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']

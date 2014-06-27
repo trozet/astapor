@@ -41,7 +41,7 @@ class quickstack::pacemaker::glance (
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec['glance-manage db_sync']
 
     if (map_params('include_mysql') == 'true') {
-      Exec['all-galera-nodes-are-up'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
+      Exec['all-galera-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
     }
     if (map_params('include_keystone') == 'true') {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
