@@ -19,7 +19,7 @@ class quickstack::pacemaker::heat(
 
   if (map_params('include_heat') == 'true') {
 
-    include ::quickstack::pacemaker::qpid
+    include ::quickstack::pacemaker::amqp
 
     $heat_db_password        = map_params("heat_db_password")
     $heat_cfn_enabled        = map_params("heat_cfn_enabled")
@@ -65,7 +65,7 @@ class quickstack::pacemaker::heat(
       Exec['all-neutron-nodes-are-up'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']
     }
 
-    Class['::quickstack::pacemaker::qpid']
+    Class['::quickstack::pacemaker::amqp']
     ->
     quickstack::pacemaker::vips { "$heat_group":
       public_vip  => map_params("heat_public_vip"),
@@ -94,10 +94,11 @@ class quickstack::pacemaker::heat(
       db_ssl_ca               => $db_ssl_ca,
       keystone_host           => map_params("keystone_admin_vip"),
       qpid_heartbeat          => $qpid_heartbeat,
-      qpid_host               => map_params("qpid_vip"),
-      qpid_port               => map_params("qpid_port"),
-      qpid_username           => map_params("qpid_username"),
-      qpid_password           => map_params("qpid_password"),
+      amqp_host               => map_params("amqp_vip"),
+      amqp_port               => map_params("amqp_port"),
+      amqp_username           => map_params("amqp_username"),
+      amqp_password           => map_params("amqp_password"),
+      amqp_provider           => map_params("amqp_provider"),
       cfn_host                => map_params("heat_cfn_admin_vip"),
       cloudwatch_host         => map_params("heat_admin_vip"),
       use_syslog              => $use_syslog,
@@ -136,7 +137,7 @@ class quickstack::pacemaker::heat(
     }
 
     if str2bool_i($heat_cfn_enabled) {
-      Class['::quickstack::pacemaker::qpid']
+      Class['::quickstack::pacemaker::amqp']
       ->
       quickstack::pacemaker::vips {"$heat_cfn_group":
         public_vip  => map_params("heat_cfn_public_vip"),

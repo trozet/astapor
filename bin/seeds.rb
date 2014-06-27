@@ -439,6 +439,7 @@ hostgroups = [
               "quickstack::pacemaker::load_balancer",
               "quickstack::pacemaker::memcached",
               "quickstack::pacemaker::qpid",
+              "quickstack::pacemaker::rabbitmq",
               "quickstack::pacemaker::glance",
               "quickstack::pacemaker::nova",
               "quickstack::pacemaker::heat",

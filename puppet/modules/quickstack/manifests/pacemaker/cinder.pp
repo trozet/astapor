@@ -42,7 +42,7 @@ class quickstack::pacemaker::cinder(
   $db_ssl                 = false,
   $db_ssl_ca              = undef,
 
-  $rpc_backend            = 'cinder.openstack.common.rpc.impl_qpid',
+  $rpc_backend            = 'cinder.openstack.common.rpc.impl_kombu',
   $qpid_heartbeat         = '60',
 
   $use_syslog             = false,
@@ -57,7 +57,7 @@ class quickstack::pacemaker::cinder(
 
   if (map_params('include_cinder') == 'true') {
 
-    include ::quickstack::pacemaker::qpid
+    include ::quickstack::pacemaker::amqp
 
     $cinder_user_password = map_params("cinder_user_password")
     $cinder_private_vip   = map_params("cinder_private_vip")
@@ -66,10 +66,6 @@ class quickstack::pacemaker::cinder(
     $db_password          = map_params("cinder_db_password")
     $glance_host          = map_params("glance_admin_vip")
     $keystone_host        = map_params("keystone_admin_vip")
-    $qpid_host            = map_params("qpid_vip")
-    $qpid_port            = map_params("qpid_port")
-    $qpid_username        = map_params("qpid_username")
-    $qpid_password        = map_params("qpid_password")
 
     Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec['cinder-manage db_sync']
     if (map_params('include_mysql') == 'true') {
@@ -96,7 +92,7 @@ class quickstack::pacemaker::cinder(
       backend_server_addrs => map_params("lb_backend_server_addrs"),
     }
 
-    Class['::quickstack::pacemaker::qpid']
+    Class['::quickstack::pacemaker::amqp']
     ->
     # assuming openstack-cinder-api and openstack-cinder-scheduler
     # always have same vip's for now
@@ -125,11 +121,11 @@ class quickstack::pacemaker::cinder(
       db_ssl_ca      => $db_ssl_ca,
       glance_host    => $glance_host,
       keystone_host  => $keystone_host,
-      rpc_backend    => $rpc_backend,
-      amqp_host      => $qpid_host,
-      amqp_port      => $qpid_port,
-      amqp_username  => $qpid_username,
-      amqp_password  => $qpid_password,
+      rpc_backend    => amqp_backend('cinder', map_params('amqp_provider')),
+      amqp_host      => map_params('amqp_vip'),
+      amqp_port      => map_params('amqp_port'),
+      amqp_username  => map_params('amqp_username'),
+      amqp_password  => map_params('amqp_password'),
       qpid_heartbeat => $qpid_heartbeat,
       use_syslog     => $use_syslog,
       log_facility   => $log_facility,

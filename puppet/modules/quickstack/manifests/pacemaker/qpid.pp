@@ -6,7 +6,7 @@ class quickstack::pacemaker::qpid (
   $service_ensure        = running,
   $service_enable        = true,
   $manage_service        = true,
-  $backend_port          = '5672',
+  $backend_port          = '15672',
   $max_connections       = '65535',
   $worker_threads        = '17',
   $connection_backlog    = '65535',
@@ -31,12 +31,12 @@ class quickstack::pacemaker::qpid (
   include quickstack::pacemaker::common
 
   if (map_params('include_qpid') == 'true') {
-    $qpid_group = map_params("qpid_group")
-    $qpid_username = map_params("qpid_username")
-    $qpid_password = map_params("qpid_password")
+    $amqp_group = map_params("amqp_group")
+    $amqp_username = map_params("amqp_username")
+    $amqp_password = map_params("amqp_password")
 
-    class {'::quickstack::firewall::qpid':
-      ports => [ $backend_port, map_params("qpid_port") ]
+    class {'::quickstack::firewall::amqp':
+      ports => [ $backend_port, map_params("amqp_port") ]
     }
 
     class {'::qpid::server':
@@ -51,7 +51,7 @@ class quickstack::pacemaker::qpid (
       max_connections       => $max_connections,
       worker_threads        => $worker_threads,
       connection_backlog    => $connection_backlog,
-      auth => $qpid_username ? {
+      auth => $amqp_username ? {
         ''      => 'no',
         default => 'yes',
       },
@@ -63,9 +63,9 @@ class quickstack::pacemaker::qpid (
 
     # quoth the puppet language reference,
     # "Empty strings are false; all other strings are true."
-    if $qpid_username {
-      qpid_user { $qpid_username:
-        password  => $qpid_password,
+    if $amqp_username {
+      qpid_user { $amqp_username:
+        password  => $amqp_password,
         file      => '/var/lib/qpidd/qpidd.sasldb',
         realm     => 'QPID',
         provider  => 'saslpasswd2',
@@ -73,24 +73,24 @@ class quickstack::pacemaker::qpid (
       }
     }
 
-    class {'::quickstack::load_balancer::qpid':
-      frontend_host        => map_params("qpid_vip"),
+    class {'::quickstack::load_balancer::amqp':
+      frontend_host        => map_params("amqp_vip"),
       backend_server_names => map_params("lb_backend_server_names"),
       backend_server_addrs => map_params("lb_backend_server_addrs"),
-      port                 => map_params("qpid_port"),
+      port                 => map_params("amqp_port"),
       backend_port         => $backend_port,
       timeout              => $haproxy_timeout,
     }
 
-    Class['::quickstack::firewall::qpid'] ->
+    Class['::quickstack::firewall::amqp'] ->
     Class['::qpid::server'] ->
     Class['::quickstack::pacemaker::common'] ->
 
     # below creates just one vip (not three)
-    quickstack::pacemaker::vips { "$qpid_group":
-      public_vip  => map_params("qpid_vip"),
-      private_vip => map_params("qpid_vip"),
-      admin_vip   => map_params("qpid_vip"),
+    quickstack::pacemaker::vips { "$amqp_group":
+      public_vip  => map_params("amqp_vip"),
+      private_vip => map_params("amqp_vip"),
+      admin_vip   => map_params("amqp_vip"),
     } ->
 
     exec {"pcs-qpid-server-set-up-on-this-node":

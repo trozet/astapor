@@ -35,12 +35,12 @@ class quickstack::neutron::all (
   $ovs_tunnel_types              = [],
   $provider_vlan_auto_create     = '',
   $provider_vlan_auto_trunk      = '',
-  $qpid_host                     = '127.0.0.1',
-  $qpid_port                     = '5672',
-  $qpid_ssl_port                 = '5671',
-  $qpid_username                 = '',
-  $qpid_password                 = '',
-  $rpc_backend                   = 'neutron.openstack.common.rpc.impl_qpid',
+  $amqp_host                     = '127.0.0.1',
+  $amqp_port                     = '5672',
+  $amqp_ssl_port                 = '5671',
+  $amqp_username                 = '',
+  $amqp_password                 = '',
+  $rpc_backend                   = 'neutron.openstack.common.rpc.impl_kombu',
   $tenant_network_type           = 'vlan',
   $verbose                       = 'false',
   $ssl                           = 'false',
@@ -48,11 +48,11 @@ class quickstack::neutron::all (
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
-    $real_qpid_port = $qpid_ssl_port
+    $real_amqp_port = $amqp_ssl_port
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron?ssl_ca=${mysql_ca}"
   } else {
     $qpid_protocol = 'tcp'
-    $real_qpid_port = $qpid_port
+    $real_amqp_port = $amqp_port
     $sql_connection = "mysql://neutron:${neutron_db_password}@${mysql_host}/neutron"
   }
 
@@ -62,11 +62,15 @@ class quickstack::neutron::all (
     core_plugin           => $neutron_core_plugin,
     enabled               => str2bool_i("$enabled"),
     rpc_backend           => $rpc_backend,
-    qpid_hostname         => $qpid_host,
-    qpid_port             => $real_qpid_port,
+    qpid_hostname         => $amqp_host,
+    qpid_port             => $real_amqp_port,
     qpid_protocol         => $qpid_protocol,
-    qpid_username         => $qpid_username,
-    qpid_password         => $qpid_password,
+    qpid_username         => $amqp_username,
+    qpid_password         => $amqp_password,
+    rabbit_host           => $amqp_host,
+    rabbit_port           => $real_amqp_port,
+    rabbit_user           => $amqp_username,
+    rabbit_password       => $amqp_password,
     verbose               => $verbose,
   }
   ->
