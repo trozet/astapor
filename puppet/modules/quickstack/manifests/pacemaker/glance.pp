@@ -124,10 +124,11 @@ class quickstack::pacemaker::glance (
       log_facility             => $log_facility,
       enabled                  => $enabled,
       filesystem_store_datadir => $filesystem_store_datadir,
-      qpid_host                => map_params("qpid_vip"),
-      qpid_port                => map_params("qpid_port"),
-      qpid_username            => map_params("qpid_username"),
-      qpid_password            => map_params("qpid_password"),
+      amqp_host                => map_params("amqp_vip"),
+      amqp_port                => map_params("amqp_port"),
+      amqp_username            => map_params("amqp_username"),
+      amqp_password            => map_params("amqp_password"),
+      amqp_provider            => map_params("amqp_provider"),
     }
 
     Class['::quickstack::glance']

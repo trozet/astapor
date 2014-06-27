@@ -1,4 +1,4 @@
-class quickstack::load_balancer::qpid (
+class quickstack::load_balancer::amqp (
   $frontend_host        = '',
   $backend_server_names = [],
   $backend_server_addrs = [],
@@ -11,7 +11,7 @@ class quickstack::load_balancer::qpid (
 
   include quickstack::load_balancer::common
 
-  quickstack::load_balancer::proxy { 'qpid':
+  quickstack::load_balancer::proxy { 'amqp':
     addr                 => "$frontend_host",
     port                 => "$port",
     mode                 => "$mode",

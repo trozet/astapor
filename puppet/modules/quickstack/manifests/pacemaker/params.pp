@@ -45,7 +45,8 @@ class quickstack::pacemaker::params (
   $include_mysql             = 'true',
   $include_neutron           = 'true',
   $include_nova              = 'true',
-  $include_qpid              = 'true',
+  $include_qpid              = 'false',
+  $include_rabbitmq          = 'true',
   $include_swift             = 'true',
   $loadbalancer_vip          = '',
   $loadbalancer_group        = 'loadbalancer',
@@ -74,11 +75,11 @@ class quickstack::pacemaker::params (
   $private_ip                = '',
   $private_iface             = '',
   $private_network           = '',
-  $qpid_port                 = '15672',
-  $qpid_vip                  = '',
-  $qpid_group                = 'qpid',
-  $qpid_username             = '',
-  $qpid_password             = '',
+  $amqp_port                 = '5672',
+  $amqp_vip                  = '',
+  $amqp_group                = 'amqp',
+  $amqp_username             = '',
+  $amqp_password             = '',
   $swift_public_vip          = '',
   $swift_user_password       = '',
   $swift_group               = 'swift',
@@ -86,6 +87,17 @@ class quickstack::pacemaker::params (
   $local_bind_addr = find_ip("$private_network",
                             "$private_iface",
                             "$private_ip")
+
+  if ($include_rabbitmq == 'true' and
+      $include_qpid     == 'true') {
+    fail("include_rabbitmq and include_qpid cannot both be set")
+  }
+
+  if ($include_qpid == 'true') {
+    $amqp_provider = 'qpid'
+  } else {
+    $amqp_provider = 'rabbitmq'
+  }
 
   include quickstack::pacemaker::common
   include quickstack::pacemaker::load_balancer

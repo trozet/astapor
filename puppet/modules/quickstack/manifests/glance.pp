@@ -32,10 +32,11 @@ class quickstack::glance (
   $log_facility             = 'LOG_USER',
   $enabled                  = true,
   $filesystem_store_datadir = '/var/lib/glance/images/',
-  $qpid_host                = '127.0.0.1',
-  $qpid_port                = '5672',
-  $qpid_username           = '',
-  $qpid_password           = '',
+  $amqp_host                = '127.0.0.1',
+  $amqp_port                = '5672',
+  $amqp_username            = '',
+  $amqp_password            = '',
+  $amqp_provider            = 'rabbitmq',
 ) {
 
   # Configure the db string
@@ -82,12 +83,21 @@ class quickstack::glance (
     enabled           => $enabled,
   }
 
-  class { 'glance::notify::qpid':
-    qpid_password => $qpid_password,
-    qpid_username => $qpid_username,
-    qpid_hostname => $qpid_host,
-    qpid_port     => $qpid_port,
-    qpid_protocol => 'tcp',
+  if ($amqp_provider == 'qpid') {
+    class { 'glance::notify::qpid':
+      qpid_password => $amqp_password,
+      qpid_username => $amqp_username,
+      qpid_hostname => $amqp_host,
+      qpid_port     => $amqp_port,
+      qpid_protocol => 'tcp',
+    }
+  } else {
+    class { 'glance::notify::rabbitmq':
+      rabbit_password => $amqp_password,
+      rabbit_userid   => $amqp_username,
+      rabbit_host     => $amqp_host,
+      rabbit_port     => $amqp_port,
+    }
   }
 
   # Configure file storage backend
