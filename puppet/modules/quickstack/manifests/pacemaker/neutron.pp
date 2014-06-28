@@ -7,7 +7,8 @@ class quickstack::pacemaker::neutron (
   $ml2_tenant_network_types   = ['vxlan', 'vlan', 'gre', 'flat'],
   $ml2_mechanism_drivers      = ['openvswitch','l2population'],
   $ml2_flat_networks          = ['*'],
-  $ml2_network_vlan_ranges    = ['10:50'],
+  $ml2_network_vlan_ranges    = ['yourphysnet:10:50'],
+  $ml2_security_group         = 'True',
   $ml2_tunnel_id_ranges       = ['20:100'],
   $ml2_vxlan_group            = '224.0.0.1',
   $ovs_bridge_mappings        = [],
@@ -103,7 +104,6 @@ class quickstack::pacemaker::neutron (
       qpid_username                 => map_params("qpid_username"),
       qpid_password                 => map_params("qpid_password"),
       tenant_network_type           => $tenant_network_type,
-      tunnel_id_ranges              => $tunnel_id_ranges,
       verbose                       => $verbose,
     }
     ->
