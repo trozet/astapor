@@ -145,12 +145,49 @@ class quickstack::pacemaker::glance (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
-    quickstack::pacemaker::resource::service {'openstack-glance-api':
-      clone => true,
-    }
-    ->
     quickstack::pacemaker::resource::service {'openstack-glance-registry':
       clone => true,
+      options => 'start-delay=10s',
+    } ->
+    quickstack::pacemaker::resource::service {'openstack-glance-api':
+      clone => true,
+      options => 'start-delay=10s',
+    }
+
+    if str2bool_i("$pcmk_fs_manage") {
+      $glance_fs_resource_name = delete("fs-${$pcmk_fs_dir}", '/')
+      quickstack::pacemaker::constraint::base { 'glance-fs-registry-constr' :
+        constraint_type => "order",
+        first_resource  => "${glance_fs_resource_name}-clone",
+        second_resource => "openstack-glance-registry-clone",
+        first_action    => "start",
+        second_action   => "start",
+      }
+      ->
+      quickstack::pacemaker::constraint::colocation { 'glance-fs-registry-colo' :
+        source => "openstack-glance-registry-clone",
+        target => "${glance_fs_resource_name}-clone",
+        score => "INFINITY",
+      }
+      Quickstack::Pacemaker::Resource::Filesystem['glance-fs'] ->
+      Quickstack::Pacemaker::Resource::Service['openstack-glance-registry'] ->
+      Quickstack::Pacemaker::Constraint::Base['glance-fs-registry-constr']
+    }
+
+    Quickstack::Pacemaker::Resource::Service['openstack-glance-api']
+    ->
+    quickstack::pacemaker::constraint::base { 'glance-registry-api-constr' :
+      constraint_type => "order",
+      first_resource  => "openstack-glance-registry-clone",
+      second_resource => "openstack-glance-api-clone",
+      first_action    => "start",
+      second_action   => "start",
+    }
+    ->
+    quickstack::pacemaker::constraint::colocation { 'glance-registry-api-colo' :
+      source => "openstack-glance-api-clone",
+      target => "openstack-glance-registry-clone",
+      score => "INFINITY",
     }
   }
 }
