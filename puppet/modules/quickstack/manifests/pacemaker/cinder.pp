@@ -151,10 +151,26 @@ class quickstack::pacemaker::cinder(
     ->
     quickstack::pacemaker::resource::service {'openstack-cinder-api':
       clone => true,
+      options => 'start-delay=10s',
     }
     ->
     quickstack::pacemaker::resource::service {'openstack-cinder-scheduler':
       clone => true,
+      options => 'start-delay=10s',
+    }
+    ->
+    quickstack::pacemaker::constraint::base { 'cinder-api-scheduler-constr' :
+      constraint_type => "order",
+      first_resource  => "openstack-cinder-api-clone",
+      second_resource => "openstack-cinder-scheduler-clone",
+      first_action    => "start",
+      second_action   => "start",
+    }
+    ->
+    quickstack::pacemaker::constraint::colocation { 'cinder-api-scheduler-colo' :
+      source => "openstack-cinder-scheduler-clone",
+      target => "openstack-cinder-api-clone",
+      score => "INFINITY",
     }
 
     if str2bool_i("$volume") {
@@ -200,6 +216,21 @@ class quickstack::pacemaker::cinder(
       ->
       quickstack::pacemaker::resource::service {'openstack-cinder-volume':
         clone => true,
+        options => 'start-delay=10s',
+      }
+      ->
+      quickstack::pacemaker::constraint::base { 'cinder-scheduler-volume-constr' :
+        constraint_type => "order",
+        first_resource  => "openstack-cinder-scheduler-clone",
+        second_resource => "openstack-cinder-volume-clone",
+        first_action    => "start",
+        second_action   => "start",
+      }
+      ->
+      quickstack::pacemaker::constraint::colocation { 'cinder-scheduler-volume-colo' :
+        source => "openstack-cinder-volume-clone",
+        target => "openstack-cinder-scheduler-clone",
+        score => "INFINITY",
       }
     }
   }

@@ -129,11 +129,13 @@ class quickstack::pacemaker::heat(
     ->
     quickstack::pacemaker::resource::service {'openstack-heat-api':
       clone => true,
+      options => 'start-delay=10s',
     }
     ->
     quickstack::pacemaker::resource::service {'openstack-heat-engine':
       group => "$heat_group",
       clone => false,
+      options => 'start-delay=10s',
     }
 
     if str2bool_i($heat_cfn_enabled) {
@@ -151,6 +153,21 @@ class quickstack::pacemaker::heat(
       ->
       quickstack::pacemaker::resource::service {"openstack-heat-api-cfn":
         clone => true,
+        options => 'start-delay=10s',
+      }
+      ->
+      quickstack::pacemaker::constraint::base { 'heat-api-cfn-constr' :
+        constraint_type => "order",
+        first_resource  => "openstack-heat-api-clone",
+        second_resource => "openstack-heat-api-cfn-clone",
+        first_action    => "start",
+        second_action   => "start",
+      }
+      ->
+      quickstack::pacemaker::constraint::colocation { 'heat-api-cfn-colo' :
+        source => "openstack-heat-api-cfn-clone",
+        target => "openstack-heat-api-clone",
+        score => "INFINITY",
       }
     }
 
@@ -159,6 +176,32 @@ class quickstack::pacemaker::heat(
       ->
       quickstack::pacemaker::resource::service {"openstack-heat-api-cloudwatch":
         clone => true,
+        options => 'start-delay=10s',
+      }
+      if str2bool_i($heat_cfn_enabled) {
+        Quickstack::Pacemaker::Resource::Service['openstack-heat-api-cfn'] ->
+        Quickstack::Pacemaker::Resource::Service['openstack-heat-api-cloudwatch'] ->
+        quickstack::pacemaker::constraint::base { 'heat-cfn-cloudwatch-constr' :
+          constraint_type => "order",
+          first_resource  => "openstack-heat-api-cfn-clone",
+          second_resource => "openstack-heat-api-cloudwatch-clone",
+          first_action    => "start",
+          second_action   => "start",
+        }
+        ->
+        quickstack::pacemaker::constraint::colocation { 'heat-cfn-cloudwatch-colo' :
+          source => "openstack-heat-api-cloudwatch-clone",
+          target => "openstack-heat-api-cfn-clone",
+          score => "INFINITY",
+        }
+        ->
+        quickstack::pacemaker::constraint::base { 'heat-cloudwatch-engine-constr' :
+          constraint_type => "order",
+          first_resource  => "openstack-heat-api-cloudwatch-clone",
+          second_resource => "openstack-heat-engine",
+          first_action    => "start",
+          second_action   => "start",
+        }
       }
     }
   }
