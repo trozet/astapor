@@ -34,7 +34,6 @@ class quickstack::nova_network::compute (
   $verbose                      = $quickstack::params::verbose,
   $ssl                          = $quickstack::params::ssl,
   $mysql_ca                     = $quickstack::params::mysql_ca,
-  $use_qemu_for_poc             = $quickstack::params::use_qemu_for_poc,
 ) inherits quickstack::params {
 
   # Configure Nova
@@ -90,6 +89,5 @@ class quickstack::nova_network::compute (
     verbose                    => $verbose,
     ssl                        => $ssl,
     mysql_ca                   => $mysql_ca,
-    use_qemu_for_poc           => $use_qemu_for_poc,
   }
 }

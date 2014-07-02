@@ -372,7 +372,6 @@ params = {
   "horizon_key"                   => "/etc/pki/tls/private/PUB_HOST-horizon.key",
   "amqp_nssdb_password"           => SecureRandom.hex,
   "fence_xvm_key_file_password"   => SecureRandom.hex,
-  "use_qemu_for_poc"              => "false",
   "secret_key"                    => SecureRandom.hex,
   "admin_token"                   => SecureRandom.hex,
   "gluster_device1"               => '/dev/vdb',
