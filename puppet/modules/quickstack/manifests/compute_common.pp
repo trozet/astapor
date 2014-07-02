@@ -21,7 +21,6 @@ class quickstack::compute_common (
   $verbose                     = $quickstack::params::verbose,
   $ssl                         = $quickstack::params::ssl,
   $mysql_ca                    = $quickstack::params::mysql_ca,
-  $use_qemu_for_poc            = $quickstack::params::use_qemu_for_poc,
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -58,16 +57,16 @@ class quickstack::compute_common (
     'DEFAULT/libvirt_inject_partition':     value => '-1';
   }
 
-    if str2bool_i("$ssl") {
-      $qpid_protocol = 'ssl'
-      $real_amqp_port = $amqp_ssl_port
-      $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
+  if str2bool_i("$ssl") {
+    $qpid_protocol = 'ssl'
+    $real_amqp_port = $amqp_ssl_port
+    $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova?ssl_ca=${mysql_ca}"
 
-    } else {
-      $qpid_protocol = 'tcp'
-      $real_amqp_port = $amqp_port
-      $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
-    }
+  } else {
+    $qpid_protocol = 'tcp'
+    $real_amqp_port = $amqp_port
+    $nova_sql_connection = "mysql://nova:${nova_db_password}@${mysql_host}/nova"
+  }
 
   class { '::nova':
     sql_connection     => $nova_sql_connection,
@@ -86,10 +85,11 @@ class quickstack::compute_common (
     verbose            => $verbose,
   }
 
-  if str2bool_i("$use_qemu_for_poc") {
-    $libvirt_type = 'qemu'
-  } else {
+  if str2bool_i($kvm_capable) {
     $libvirt_type = 'kvm'
+  } else {
+    include quickstack::compute::qemu
+    $libvirt_type = 'qemu'
   }
 
   class { '::nova::compute::libvirt':
@@ -125,10 +125,6 @@ class quickstack::compute_common (
     class { 'ceilometer::agent::compute':
       enabled => true,
     }
-  }
-
-  if str2bool_i("$use_qemu_for_poc")  {
-    include quickstack::compute::qemu
   }
 
   include quickstack::tuned::virtual_host
