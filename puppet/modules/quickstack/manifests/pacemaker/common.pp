@@ -47,7 +47,7 @@ class quickstack::pacemaker::common (
 ) {
   include quickstack::pacemaker::params
 
-  if (map_params("cluster_control_ip") == map_params("local_bind_addr")) {
+  if has_interface_with("ipaddress", map_params("cluster_control_ip")) {
     $setup_cluster = true
   } else {
     $setup_cluster = false
