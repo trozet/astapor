@@ -21,7 +21,7 @@ class quickstack::nova_network::compute (
   $network_manager              = 'FlatDHCPManager',
   $network_create_networks      = true,
   $network_num_networks         = 1,
-  $network_network_size         = 255,
+  $network_network_size         = '',
   $network_overrides            = {"force_dhcp_release" => false},
   $network_fixed_range          = '10.0.0.0/24',
   $network_floating_range       = '10.0.0.0/24',
