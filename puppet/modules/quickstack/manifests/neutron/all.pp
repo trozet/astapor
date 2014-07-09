@@ -8,6 +8,7 @@ class quickstack::neutron::all (
   $enabled                       = true,
   $external_network_bridge       = '',
   $database_max_retries          = '',
+  $manage_service                = true,
   $ml2_type_drivers              = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
   $ml2_tenant_network_types      = ['vxlan', 'vlan', 'gre', 'flat'],
   $ml2_mechanism_drivers         = ['openvswitch','l2population'],
@@ -95,6 +96,8 @@ class quickstack::neutron::all (
     auth_user            => $auth_user,
     connection           => $sql_connection,
     database_max_retries => $database_max_retries,
+    enabled              => str2bool_i("$enabled"),
+    manage_service       => str2bool_i("$manage_service"),
   }
   contain neutron::server
 
@@ -152,25 +155,34 @@ class quickstack::neutron::all (
   $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
 
   class { '::neutron::agents::ovs':
-    bridge_uplinks   => $ovs_bridge_uplinks,
-    local_ip         => $local_ip,
     bridge_mappings  => $ovs_bridge_mappings,
+    bridge_uplinks   => $ovs_bridge_uplinks,
+    enabled          => str2bool_i("$enabled"),
     enable_tunneling => str2bool_i("$enable_tunneling"),
+    local_ip         => $local_ip,
+    manage_service   => str2bool_i("$manage_service"),
     tunnel_types     => $ovs_tunnel_types,
     vxlan_udp_port   => $ovs_vxlan_udp_port,
   }
 
-  class { '::neutron::agents::dhcp': }
+  class { '::neutron::agents::dhcp':
+    enabled        => str2bool_i("$enabled"),
+    manage_service => str2bool_i("$manage_service"),
+  }
 
   class { '::neutron::agents::l3':
+    enabled                 => str2bool_i("$enabled"),
     external_network_bridge => $external_network_bridge,
+    manage_service          => str2bool_i("$manage_service"),
   }
 
   class { 'neutron::agents::metadata':
-    auth_password => $neutron_user_password,
-    shared_secret => $neutron_metadata_proxy_secret,
-    auth_url      => "http://${auth_host}:35357/v2.0",
-    metadata_ip   => $neutron_priv_host,
+    auth_password  => $neutron_user_password,
+    auth_url       => "http://${auth_host}:35357/v2.0",
+    enabled        => str2bool_i("$enabled"),
+    manage_service => str2bool_i("$manage_service"),
+    metadata_ip    => $neutron_priv_host,
+    shared_secret  => $neutron_metadata_proxy_secret,
   }
 
   include quickstack::neutron::notifications

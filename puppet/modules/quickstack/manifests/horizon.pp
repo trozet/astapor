@@ -2,6 +2,8 @@ class quickstack::horizon(
     $bind_address          = '0.0.0.0',
     $cache_server_ip       = '127.0.0.1',
     $cache_server_port     = '11211',
+    $enabled               = true,
+    $ensure                = 'running',
     $fqdn                  = $::fqdn,
     $horizon_cert          = undef,
     $horizon_key           = undef,
@@ -36,7 +38,9 @@ class quickstack::horizon(
 
   # needed for https://bugzilla.redhat.com/show_bug.cgi?id=1111656
   class { 'apache':
-    default_vhost => false,
+    default_vhost  => false,
+    service_enable => str2bool_i("$enabled"),
+    service_ensure => $ensure,
   }
 
   class {'::horizon':

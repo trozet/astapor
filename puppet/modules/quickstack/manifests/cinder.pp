@@ -22,6 +22,7 @@ class quickstack::cinder(
   $qpid_protocol  = 'tcp',
 
   $enabled        = true,
+  $manage_service = true,
   $debug          = false,
   $verbose        = false,
 ) {
@@ -66,6 +67,7 @@ class quickstack::cinder(
     use_syslog      => str2bool_i("$use_syslog"),
     log_facility    => $log_facility,
   }
+  contain cinder
 
   class {'::cinder::api':
     keystone_password  => $user_password,
@@ -73,10 +75,12 @@ class quickstack::cinder(
     keystone_user      => "cinder",
     keystone_auth_host => $keystone_host,
     enabled            => str2bool_i("$enabled"),
+    manage_service     => str2bool_i("$manage_service"),
     bind_host          => $bind_host,
   }
 
   class {'::cinder::scheduler':
-    enabled => str2bool_i("$enabled"),
+    enabled        => str2bool_i("$enabled"),
+    manage_service => str2bool_i("$manage_service"),
   }
 }

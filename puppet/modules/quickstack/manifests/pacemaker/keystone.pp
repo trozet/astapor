@@ -34,9 +34,18 @@ class quickstack::pacemaker::keystone (
     $keystone_group = map_params("keystone_group")
     $keystone_private_vip = map_params("keystone_private_vip")
 
-    # because the dep on openstack::keystone is not enough for some reason...
+    # TODO: extract this into a helper function
+    if ($::pcs_setup_keystone ==  undef or
+        !str2bool_i("$::pcs_setup_keystone")) {
+      $_enabled = true
+    } else {
+      $_enabled = false
+    }
+
+    # because the dep on stack::keystone is not enough for some reason...
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Service['keystone'] -> Exec['pcs-keystone-server-set-up']
-    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage db_sync'] -> Exec['pcs-keystone-server-set-up']
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] ~> Exec<| title == 'keystone-manage db_sync'|> ->
+    Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup'] -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_user<| |> -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_user_role<| |> -> Exec['pcs-keystone-server-set-up']
@@ -75,13 +84,7 @@ class quickstack::pacemaker::keystone (
       command   => "/tmp/ha-all-in-one-util.bash i_am_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
       unless   => "/tmp/ha-all-in-one-util.bash i_am_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
     } ->
-    class { "::quickstack::pacemaker::rsync::keystone":
-      keystone_private_vip => map_params("keystone_private_vip"),
-    } ->
-    class {"::openstack::keystone":
-      admin_email                 => "$admin_email",
-      admin_password              => "$admin_password",
-      admin_tenant                => "$admin_tenant",
+    class {"::quickstack::keystone::common":
       admin_token                 => "$admin_token",
       bind_host                   => map_params("local_bind_addr"),
       db_host                     => map_params("db_vip"),
@@ -92,48 +95,40 @@ class quickstack::pacemaker::keystone (
       db_type                     => "$db_type",
       db_user                     => "$db_user",
       debug                       => str2bool_i("$debug"),
-      enabled                     => str2bool_i("$enabled"),
+      enabled                     => $_enabled,
       idle_timeout                => "$idle_timeout",
-      public_protocol             => "$public_protocol",
-      region                      => "$region",
+      log_facility                => "$log_facility",
+      manage_service              => $_enabled,
       token_driver                => "$token_driver",
       token_format                => "$token_format",
+      use_syslog                  => str2bool_i("$use_syslog"),
       verbose                     => str2bool_i("$verbose"),
-      public_address              => map_params("keystone_public_vip"),
-      internal_address            => map_params("keystone_private_vip"),
+    } ->
+    class {"::quickstack::keystone::endpoints":
       admin_address               => map_params("keystone_admin_vip"),
-      nova                        => str2bool_i("$nova"),
-      nova_user_password          => map_params("nova_user_password"),
-      nova_public_address         => map_params("nova_public_vip"),
-      nova_internal_address       => map_params("nova_private_vip"),
-      nova_admin_address          => map_params("nova_admin_vip"),
-      glance                      => str2bool_i("$glance"),
-      glance_user_password        => map_params("glance_user_password"),
-      glance_public_address       => map_params("glance_public_vip"),
-      glance_internal_address     => map_params("glance_private_vip"),
-      glance_admin_address        => map_params("glance_admin_vip"),
-      cinder                      => str2bool_i("$cinder"),
-      cinder_user_password        => map_params("cinder_user_password"),
-      cinder_public_address       => map_params("cinder_public_vip"),
-      cinder_internal_address     => map_params("cinder_private_vip"),
-      cinder_admin_address        => map_params("cinder_admin_vip"),
-      neutron                     => str2bool_i(map_params("neutron")),
-      neutron_user_password       => map_params("neutron_user_password"),
-      neutron_public_address      => map_params("neutron_public_vip"),
-      neutron_internal_address    => map_params("neutron_private_vip"),
-      neutron_admin_address       => map_params("neutron_admin_vip"),
+      admin_email                 => "$admin_email",
+      admin_password              => "$admin_password",
+      admin_tenant                => "$admin_tenant",
+      enabled                     => $_enabled,
+      internal_address            => map_params("keystone_private_vip"),
+      public_address              => map_params("keystone_public_vip"),
+      public_protocol             => "$public_protocol",
+      region                      => "$region",
       ceilometer                  => str2bool_i("$ceilometer"),
       ceilometer_user_password    => map_params("ceilometer_user_password"),
       ceilometer_public_address   => map_params("ceilometer_public_vip"),
       ceilometer_internal_address => map_params("ceilometer_private_vip"),
       ceilometer_admin_address    => map_params("ceilometer_admin_vip"),
-      swift                       => str2bool_i("$swift"),
-      swift_user_password         => map_params("swift_user_password"),
-      swift_public_address        => map_params("swift_public_vip"),
-      swift_internal_address      => map_params("swift_public_vip"),
-      swift_admin_address         => map_params("swift_public_vip"),
-      use_syslog                  => str2bool_i("$use_syslog"),
-      log_facility                => "$log_facility",
+      cinder                      => str2bool_i("$cinder"),
+      cinder_user_password        => map_params("cinder_user_password"),
+      cinder_public_address       => map_params("cinder_public_vip"),
+      cinder_internal_address     => map_params("cinder_private_vip"),
+      cinder_admin_address        => map_params("cinder_admin_vip"),
+      glance                      => str2bool_i("$glance"),
+      glance_user_password        => map_params("glance_user_password"),
+      glance_public_address       => map_params("glance_public_vip"),
+      glance_internal_address     => map_params("glance_private_vip"),
+      glance_admin_address        => map_params("glance_admin_vip"),
       heat                        => str2bool_i("$heat"),
       heat_user_password          => map_params("heat_user_password"),
       heat_public_address         => map_params("heat_public_vip"),
@@ -144,6 +139,24 @@ class quickstack::pacemaker::keystone (
       heat_cfn_public_address     => map_params("heat_cfn_public_vip"),
       heat_cfn_internal_address   => map_params("heat_cfn_private_vip"),
       heat_cfn_admin_address      => map_params("heat_cfn_admin_vip"),
+      neutron                     => str2bool_i(map_params("neutron")),
+      neutron_user_password       => map_params("neutron_user_password"),
+      neutron_public_address      => map_params("neutron_public_vip"),
+      neutron_internal_address    => map_params("neutron_private_vip"),
+      neutron_admin_address       => map_params("neutron_admin_vip"),
+      nova                        => str2bool_i("$nova"),
+      nova_user_password          => map_params("nova_user_password"),
+      nova_public_address         => map_params("nova_public_vip"),
+      nova_internal_address       => map_params("nova_private_vip"),
+      nova_admin_address          => map_params("nova_admin_vip"),
+      swift                       => str2bool_i("$swift"),
+      swift_user_password         => map_params("swift_user_password"),
+      swift_public_address        => map_params("swift_public_vip"),
+      swift_internal_address      => map_params("swift_public_vip"),
+      swift_admin_address         => map_params("swift_public_vip"),
+    } ->
+    class { "::quickstack::pacemaker::rsync::keystone":
+      keystone_private_vip => map_params("keystone_private_vip"),
     } ->
     exec {"pcs-keystone-server-set-up":
       command => "/usr/sbin/pcs property set keystone=running --force",

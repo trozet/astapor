@@ -25,6 +25,7 @@ class quickstack::heat(
   $log_facility            = 'LOG_USER',
 
   $enabled                 = true,
+  $manage_service          = true,
   $heat_cfn_enabled        = true,
   $heat_cloudwatch_enabled = true,
   $heat_engine_enabled     = true,
@@ -75,9 +76,11 @@ class quickstack::heat(
   contain heat
 
   class { '::heat::api':
-    bind_host         => $bind_host,
-    enabled           => str2bool_i("$enabled"),
+    bind_host      => $bind_host,
+    enabled        => str2bool_i("$enabled"),
+    manage_service => str2bool_i("$manage_service"),
   }
+  contain heat::api
 
   class { '::heat::api_cfn':
     # Currently api_cfn module doesn't support setting these
@@ -85,12 +88,16 @@ class quickstack::heat(
     # keystone_user     => "heat-cfn",
     bind_host         => $bind_host,
     enabled           => str2bool_i("$heat_cfn_enabled"),
+    manage_service    => str2bool_i("$manage_service"),
   }
+  contain heat::api_cfn
 
   class { '::heat::api_cloudwatch':
     bind_host         => $bind_host,
     enabled           => str2bool_i("$heat_cloudwatch_enabled"),
+    manage_service    => str2bool_i("$manage_service"),
   }
+  contain heat::api_cloudwatch
 
   class { '::heat::engine':
     auth_encryption_key           => $auth_encryption_key,
@@ -98,6 +105,7 @@ class quickstack::heat(
     heat_waitcondition_server_url => "http://${cfn_host}:8000/v1/waitcondition",
     heat_watch_server_url         => "http://${cloudwatch_host}:8003",
     enabled                       => str2bool_i("$heat_engine_enabled"),
+    manage_service                => str2bool_i("$manage_service"),
   }
   contain heat::engine
 }

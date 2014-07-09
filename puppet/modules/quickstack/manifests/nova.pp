@@ -50,6 +50,10 @@
 #
 # [*default_floating_pool*]
 #
+# [*enabled*]
+#   (optional) Whether to enable the service unit. Setting 'false' is required
+#   when using pacemaker to manage services.
+#   Defaults to 'true'.
 # [*force_dhcp_release*]
 #   Defaults to 'false'.
 #
@@ -66,7 +70,8 @@
 #   Defaults to 'nova.image.glance.GlanceImageService'.
 #
 # [*manage_service*]
-#   (optional) Whether to start/stop the service
+#   (optional) Whether to start/stop the service. Setting 'false' is required
+#   when using pacemaker to manage services.
 #   Defaults to true
 #
 # [*max_retries*]
@@ -116,6 +121,7 @@ class quickstack::nova (
   $db_password,
   $db_user                      = 'nova',
   $default_floating_pool,
+  $enabled                      = 'true',
   $force_dhcp_release           = 'false',
   $glance_host                  = 'localhost',
   $glance_port                  = '9292',
@@ -171,7 +177,7 @@ class quickstack::nova (
         api_bind_address                     => $bind_address,
         auth_host                            => $auth_host,
         metadata_listen                      => $bind_address,
-        enabled                              => true,
+        enabled                              => str2bool_i("$enabled"),
         manage_service                       => str2bool_i("$manage_service"),
         neutron_metadata_proxy_shared_secret => $neutron_metadata_proxy_secret,
       }
@@ -184,7 +190,7 @@ class quickstack::nova (
       }
 
       class { '::nova::api':
-        enabled          => true,
+        enabled          => str2bool_i("$enabled"),
         admin_password   => $admin_password,
         api_bind_address => $bind_address,
         auth_host        => $auth_host,
@@ -193,28 +199,28 @@ class quickstack::nova (
       }
     }
     class {'::nova::scheduler':
-      enabled        => true,
+      enabled        => str2bool_i("$enabled"),
       manage_service => str2bool_i("$manage_service"),
     }
     class {'::nova::scheduler::filter':
       scheduler_host_subset_size => $scheduler_host_subset_size,
     }
     class {'::nova::cert':
-      enabled => true,
+      enabled => str2bool_i("$enabled"),
       manage_service => str2bool_i("$manage_service"),
     }
     class {'::nova::consoleauth':
-      enabled => true,
+      enabled => str2bool_i("$enabled"),
       manage_service => str2bool_i("$manage_service"),
     }
     class {'::nova::conductor':
-      enabled => true,
+      enabled => str2bool_i("$enabled"),
       manage_service => str2bool_i("$manage_service"),
     }
 
     class { '::nova::vncproxy':
       host    => $bind_address,
-      enabled => true,
+      enabled => str2bool_i("$enabled"),
       manage_service => str2bool_i("$manage_service"),
     }
     class {'::quickstack::firewall::nova':}

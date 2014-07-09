@@ -22,6 +22,16 @@ class quickstack::pacemaker::horizon (
         ','
     )
 
+    # TODO: extract this into a helper function
+    if ($::pcs_setup_horizon ==  undef or
+        !str2bool_i("$::pcs_setup_horizon")) {
+      $_enabled = true
+      $_ensure = 'running'
+    } else {
+      $_enabled = false
+      $_ensure = undef
+    }
+
     Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip'] -> Service['httpd']
     if (str2bool_i(map_params('include_mysql'))) {
       Exec['galera-online'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
@@ -74,6 +84,8 @@ class quickstack::pacemaker::horizon (
     ->
     class { '::quickstack::horizon':
       bind_address          => map_params("local_bind_addr"),
+      enabled               => $_enabled,
+      ensure                => $_ensure,
       fqdn                  => ["$horizon_public_vip",
                                 "$horizon_private_vip",
                                 "$horizon_admin_vip",
@@ -89,6 +101,8 @@ class quickstack::pacemaker::horizon (
       memcached_servers     => $memcached_servers,
       secret_key            => $secret_key,
     }
+    ->
+    Service['httpd']
     ->
     exec {"pcs-horizon-server-set-up":
       command => "/usr/sbin/pcs property set horizon=running --force",

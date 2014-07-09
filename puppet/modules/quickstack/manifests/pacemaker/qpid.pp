@@ -5,7 +5,7 @@ class quickstack::pacemaker::qpid (
   $service_name          = 'qpidd',
   $service_ensure        = running,
   $service_enable        = true,
-  $manage_service        = true,
+  $manage_service        = false,
   $backend_port          = '15672',
   $max_connections       = '65535',
   $worker_threads        = '17',
