@@ -121,8 +121,6 @@ class quickstack::pacemaker::neutron (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include neutron",
     }
     ->
-    class {"quickstack::pacemaker::neutron_db_check":}
-    ->
     quickstack::pacemaker::resource::service {'neutron-server':
       clone => true,
       monitor_params => { 'start-delay' => '10s' },
@@ -152,20 +150,6 @@ class quickstack::pacemaker::neutron (
     quickstack::pacemaker::resource::service {'neutron-metadata-agent':
       clone => false,
       monitor_params => { 'start-delay' => '10s' },
-    }
-    ->
-    quickstack::pacemaker::constraint::base { 'neutron-pre-openvswitch-constr' :
-      constraint_type => "order",
-      first_resource  => "neutron-agents-pre",
-      second_resource => "neutron-openvswitch-agent",
-      first_action    => "start",
-      second_action   => "start",
-    }
-    ->
-    quickstack::pacemaker::constraint::colocation { 'neutron-openvswitch-pre-colo' :
-      source => "neutron-openvswitch-agent",
-      target => "neutron-agents-pre",
-      score  => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'neutron-openvswitch-dhcp-constr' :
