@@ -3,7 +3,7 @@
 # - get/set Foreman smart class parameters
 # - get/set Foreman hostgroups
 # - generates site.pp manifest from hostgroups
-# Version 1.2
+# Version 1.3
 # Requires Foreman 1.6.0.15+
 
 require 'rubygems'
@@ -139,15 +139,20 @@ class Foreman
   end
 
   def key_type_get(value)
-    # To Do - Fetch key_list via ForemanAPI
-    key_list = %w( string boolean integer real array hash yaml json )
-    value_type = value.class.to_s.downcase
-    if key_list.include?(value_type)
-      return value_type
-    elsif [FalseClass, TrueClass].include? value.class
-      return 'boolean'
+    # To Do - Fetch key_list via ForemanAPI when available?
+    key_list = %w(string boolean integer real array hash yaml json)
+
+    case value.class
+    when Fixnum
+      value_type = integer
+    when Float
+      value_type = real
+    when FalseClass, TrueClass
+      value_type = boolean
+    else
+      value_type = value.class.to_s.downcase
     end
-    # If we need to handle actual number classes like Fixnum, add those here
+    return value_type if key_list.include?(value_type)
   end
 
   def puppet_class_get(name)
@@ -248,13 +253,21 @@ class Hostgroups
     @log.info('Pushing parameters to Foreman smart class parameters')
     smart_params_each do |hg, pclass, param|
       if params.include?(param['parameter'])
+        default_value  = params.get(param['parameter'])
+        parameter_type = @foreman.key_type_get(default_value)
+
+        if parameter_type == 'array' && default_value.empty?
+          default_value  = ['']
+        end
+
         data = { 'id' => param['id'],
           'smart_class_parameter' => {
-            'default_value'  => params.get(param['parameter']),
-            'parameter_type' => @foreman.key_type_get(param['parameter'])}
+            'default_value'  => default_value,
+            'parameter_type' => parameter_type
+          }
         }
         @foreman.smart_params.update(data)
-        @log.info("'#{hg}' #{pclass['name']} #{param['parameter']} [UPDATED]")
+        @log.info("'#{hg}' #{pclass['name']} #{param['parameter']} [UPDATE]")
       end
     end
   end

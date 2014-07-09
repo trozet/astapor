@@ -4,11 +4,7 @@
 <%  require 'facter'
     require 'securerandom'
 
-    if Facter.version  =~ /2.*/
-      mail_auto = "admin@#{Facter.value('domain')}"
-    else
-      mail_auto = "admin@#{Facter.domain}"
-    end
+    mail_auto = "admin@#{Facter.value('domain')}"
 
     def passwd_auto
       SecureRandom.hex
