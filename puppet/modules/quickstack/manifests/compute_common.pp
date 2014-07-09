@@ -29,6 +29,7 @@ class quickstack::compute_common (
     if defined('gluster::client') {
       class { 'gluster::client': }
     } else {
+      include ::puppet::vardir
       class { 'gluster::mount::base': repo => false }
     }
 
