@@ -67,7 +67,7 @@ class quickstack::pacemaker::cinder(
     $glance_host          = map_params("glance_admin_vip")
     $keystone_host        = map_params("keystone_admin_vip")
 
-    Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec['cinder-manage db_sync']
+    Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec['cinder-manage db_sync'] -> Exec['pcs-cinder-server-set-up']
     if (map_params('include_mysql') == 'true') {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }

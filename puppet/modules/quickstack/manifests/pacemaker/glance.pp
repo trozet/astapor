@@ -38,7 +38,7 @@ class quickstack::pacemaker::glance (
 
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-api']
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-registry']
-    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec['glance-manage db_sync']
+    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec['glance-manage db_sync'] -> Exec['pcs-glance-server-set-up']
 
     if (map_params('include_mysql') == 'true') {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
