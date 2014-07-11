@@ -64,9 +64,11 @@ define quickstack::pacemaker::rsync::get (
   $rsync_options = "-${override_options} ${MyPurge} ${MyExclude} ${MyUser}${source} ${MyPath}"
 
   exec { "rsync ${name}":
-    command => "rsync -q ${rsync_options}",
-    path    => [ '/bin', '/usr/bin' ],
-    timeout => $timeout,
-    unless  => "$unless",
+    command   => "rsync -q ${rsync_options}",
+    path      => [ '/bin', '/usr/bin' ],
+    timeout   => $timeout,
+    tries     => 360,
+    try_sleep => 10,
+    unless    => "$unless",
   }
 }
