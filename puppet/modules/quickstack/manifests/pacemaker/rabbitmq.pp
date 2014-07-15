@@ -10,6 +10,7 @@ class quickstack::pacemaker::rabbitmq (
     $amqp_group = map_params("amqp_group")
     $amqp_username = map_params("amqp_username")
     $amqp_password = map_params("amqp_password")
+    $cluster_nodes = regsubst(map_params("lb_backend_server_names"), '\..*', '')
 
     class {'::quickstack::firewall::amqp':
       ports => [ map_params("amqp_port"), "${inet_dist_listen}", 4369 ]
@@ -20,7 +21,7 @@ class quickstack::pacemaker::rabbitmq (
                                    'inet_dist_listen_max' => "${inet_dist_listen}"},
       wipe_db_on_cookie_change => true,
       config_cluster           => true,
-      cluster_nodes            => map_params("lb_backend_server_names"),
+      cluster_nodes            => $cluster_nodes,
       node_ip_address          => map_params("local_bind_addr"),
       port                     => map_params("amqp_port"),
       default_user             => $amqp_username,
