@@ -107,6 +107,7 @@ class quickstack::pacemaker::horizon (
     quickstack::pacemaker::resource::service {"$::horizon::params::http_service":
       clone => true,
       options => 'start-delay=10s',
+      monitor_params => {'start-delay' => '20s'},
     }
   }
 }
