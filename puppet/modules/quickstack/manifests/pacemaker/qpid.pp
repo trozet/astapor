@@ -30,7 +30,8 @@ class quickstack::pacemaker::qpid (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_qpid') == 'true') {
+  if (map_params('include_amqp') == 'true' and
+      map_params('amqp_provider') == 'qpid') {
     $amqp_group = map_params("amqp_group")
     $amqp_username = map_params("amqp_username")
     $amqp_password = map_params("amqp_password")
