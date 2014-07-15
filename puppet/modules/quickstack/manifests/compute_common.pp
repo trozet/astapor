@@ -126,6 +126,7 @@ class quickstack::compute_common (
     class { 'ceilometer::agent::compute':
       enabled => true,
     }
+    Package['openstack-nova-common'] -> Package['ceilometer-common']
   }
 
   include quickstack::tuned::virtual_host
