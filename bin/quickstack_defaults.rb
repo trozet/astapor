@@ -257,7 +257,7 @@ class Hostgroups
         parameter_type = @foreman.key_type_get(default_value)
 
         if parameter_type == 'array' && default_value.empty?
-          default_value  = ['']
+          default_value  = [].to_json
         end
 
         data = { 'id' => param['id'],
