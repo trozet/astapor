@@ -10,6 +10,7 @@ class quickstack::pacemaker::rabbitmq (
     $amqp_group = map_params("amqp_group")
     $amqp_username = map_params("amqp_username")
     $amqp_password = map_params("amqp_password")
+    $amqp_vip = map_params("amqp_vip")
     $cluster_nodes = regsubst(map_params("lb_backend_server_names"), '\..*', '')
 
     class {'::quickstack::firewall::amqp':
@@ -33,7 +34,7 @@ class quickstack::pacemaker::rabbitmq (
     }
 
     class {'::quickstack::load_balancer::amqp':
-      frontend_host        => map_params("amqp_vip"),
+      frontend_host        => $amqp_vip,
       backend_server_names => map_params("lb_backend_server_names"),
       backend_server_addrs => map_params("lb_backend_server_addrs"),
       port                 => map_params("amqp_port"),
@@ -42,22 +43,31 @@ class quickstack::pacemaker::rabbitmq (
     }
 
     Class['::quickstack::firewall::amqp'] ->
+    Class['::quickstack::pacemaker::common'] ->
+    # below creates just one vip (not three)
+    quickstack::pacemaker::vips { "$amqp_group":
+      public_vip  => $amqp_vip,
+      private_vip => $amqp_vip,
+      admin_vip   => $amqp_vip,
+    } ->
+    exec {"i-am-rabbitmq-vip-OR-rabbitmq-is-up-on-vip":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/tmp/ha-all-in-one-util.bash i_am_vip $amqp_vip || /tmp/ha-all-in-one-util.bash property_exists rabbitmq",
+      unless    => "/tmp/ha-all-in-one-util.bash i_am_vip $amqp_vip || /tmp/ha-all-in-one-util.bash property_exists rabbitmq",
+    } ->
     Class['::rabbitmq'] ->
 
     exec {"rabbit-mirrored-queues":
       command => '/usr/sbin/rabbitmqctl set_policy HA \'^(?!amq\.).*\' \'{"ha-mode": "all"}\'',
       unless  => '/usr/sbin/rabbitmqctl list_policies | grep -q HA'
     } ->
-    Class['::quickstack::pacemaker::common'] ->
-
-    # below creates just one vip (not three)
-    quickstack::pacemaker::vips { "$amqp_group":
-      public_vip  => map_params("amqp_vip"),
-      private_vip => map_params("amqp_vip"),
-      admin_vip   => map_params("amqp_vip"),
-    } ->
     Class['::quickstack::load_balancer::amqp'] ->
 
+    exec {"pcs-rabbitmq-server-set-up":
+      command => "/usr/sbin/pcs property set rabbitmq=running --force",
+    } ->
     exec {"pcs-rabbitmq-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property rabbitmq"
     } ->
