@@ -80,6 +80,12 @@ class quickstack::pacemaker::galera (
     exec {"pcs-galera-server-setup":
       command => "/usr/sbin/pcs property set galera=running --force",
     } ->
+    exec {"clustercheck-sync":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/usr/bin/clustercheck >/dev/null",
+    } ->
     exec {"pcs-galera-server-set-up-on-this-node":
       command => "/tmp/ha-all-in-one-util.bash update_my_node_property galera"
     } ->
