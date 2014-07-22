@@ -27,12 +27,13 @@
   - quickstack::pacemaker::load_balancer
   - quickstack::pacemaker::memcached
   - quickstack::pacemaker::qpid
+  - quickstack::pacemaker::rabbitmq
   - quickstack::pacemaker::glance
   - quickstack::pacemaker::nova
   - quickstack::pacemaker::heat
   - quickstack::pacemaker::cinder
   - quickstack::pacemaker::horizon
-  - quickstack::pacemaker::mysql
+  - quickstack::pacemaker::galera
   - quickstack::pacemaker::neutron
 - :name: Gluster Server
   :class:
