@@ -50,13 +50,7 @@ class quickstack::pacemaker::rabbitmq (
       private_vip => $amqp_vip,
       admin_vip   => $amqp_vip,
     } ->
-    exec {"i-am-rabbitmq-vip-OR-rabbitmq-is-up-on-vip":
-      timeout   => 3600,
-      tries     => 360,
-      try_sleep => 10,
-      command   => "/tmp/ha-all-in-one-util.bash i_am_vip $amqp_vip || /tmp/ha-all-in-one-util.bash property_exists rabbitmq",
-      unless    => "/tmp/ha-all-in-one-util.bash i_am_vip $amqp_vip || /tmp/ha-all-in-one-util.bash property_exists rabbitmq",
-    } ->
+
     Class['::rabbitmq'] ->
 
     exec {"rabbit-mirrored-queues":
@@ -80,6 +74,47 @@ class quickstack::pacemaker::rabbitmq (
     quickstack::pacemaker::resource::service { 'rabbitmq-server':
       monitor_params => {"start-delay" => "35s"},
       clone          => true,
+    }
+
+    $_nodes = map_params('lb_backend_server_addrs')
+    $first_node = $_nodes[0]
+    unless has_interface_with("ipaddress", $first_node) {
+      # This is very subtle but important.  The node that is first in
+      # lb_backend_server_names needs to come up first.  The names
+      # array and the addrs array are ordered the same, e.g. names[i]
+      # is the same host as addrs[i] for all i.  So the IP we pull off
+      # the front of addrs will be on the first host in names.  This
+      # matters because the names array is what generates the
+      # cluster_nodes value in the rabbitmq config.  When a node
+      # starts the first time and it is configured to cluster, it
+      # tries to join each node in cluster_nodes in succession.
+      # Whichever node is first to start will try to join a cluster
+      # with the others, time out against each, and then start a new
+      # cluster with only itself as a member.  Each additional host to
+      # start will then try each host in order until it get to a node
+      # which has already been started, and join the cluster.
+      #
+      # However, there is a problem if the first node to start is not
+      # the first node in the list.  Suppose the third node in the
+      # list starts first, and then the first two nodes in the list
+      # start up in parallel.  The first node will attempt to cluster
+      # with the second node (it realizes that the first node is
+      # itself and skips it).  The second node tries to cluster with
+      # the first node.  Because neither host has an initialized
+      # cluster, the clustering operation will fail on both nodes.
+      #
+      # By forcing the first node in the config to come up first, the
+      # others can be started in parallel and be guaranteed to join
+      # the cluster via the first node and its running cluster.
+      exec {"i-am-first-rabbitmq-node-OR-rabbitmq-is-up-on-first-node":
+        timeout   => 3600,
+        tries     => 360,
+        try_sleep => 10,
+        command   => "/tmp/ha-all-in-one-util.bash property_exists rabbitmq",
+        unless    => "/tmp/ha-all-in-one-util.bash property_exists rabbitmq",
+        require   => Quickstack::Pacemaker::Vips ["$amqp_group"],
+        before    => Class['::rabbitmq'],
+      }
     }
   }
 }
