@@ -4,6 +4,7 @@ class quickstack::load_balancer::galera (
   $backend_server_addrs,
   $public_port = '3306',
   $public_mode = 'tcp',
+  $timeout = '60s',
   $log = 'tcplog',
 ) {
 
@@ -14,6 +15,8 @@ class quickstack::load_balancer::galera (
     port                 => "$public_port",
     mode                 => "$public_mode",
     listen_options       => { 'option' => [ "$log", 'httpchk' ],
+                              'timeout' => [ "client $timeout",
+                                             "server $timeout", ],
                               'stick-table' => 'type ip size 2',
                               'stick' => 'on dst', },
     member_options       => [ 'check', 'port 9200' ],
