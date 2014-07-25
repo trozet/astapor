@@ -283,7 +283,7 @@ params = {
   "cinder_rbd_flatten_volume_from_snapshot" \
                                   => 'false',
   "cinder_rbd_max_clone_depth"    => '5',
-  "cinder_rbd_user"               => 'cinder',
+  "cinder_rbd_user"               => 'volumes',
   "cinder_rbd_secret_uuid"        => '',
   "glance_db_password"            => SecureRandom.hex,
   "glance_user_password"          => SecureRandom.hex,
@@ -291,7 +291,7 @@ params = {
   "glance_gluster_volume"         => "glance",
   "glance_gluster_replica_count"  => '3',
   "glance_backend"                => 'file',
-  "glance_rbd_store_user"         => 'glance',
+  "glance_rbd_store_user"         => 'images',
   "glance_rbd_store_pool"         => 'images',
   "gluster_open_port_count"       => '10',
   "heat_auth_encryption_key"      => SecureRandom.hex,

@@ -17,7 +17,7 @@ class quickstack::pacemaker::glance (
   # if $backend is 'swift' *and* swift is run on the same local
   # pacemaker cluster (as opposed to swift proxies being remote)
   $pcmk_swift_is_local      = true,
-  $rbd_store_user           = '',
+  $rbd_store_user           = 'images',
   $rbd_store_pool           = 'images',
   $swift_store_user         = '',
   $swift_store_key          = '',

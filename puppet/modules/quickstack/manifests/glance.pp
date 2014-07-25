@@ -21,7 +21,7 @@ class quickstack::glance (
   $db_user                  = 'glance',
   $db_name                  = 'glance',
   $backend                  = 'file',
-  $rbd_store_user           = '',
+  $rbd_store_user           = 'images',
   $rbd_store_pool           = 'images',
   $swift_store_user         = '',
   $swift_store_key          = '',
@@ -46,23 +46,29 @@ class quickstack::glance (
     $sql_connection = "mysql://${db_user}:${db_password}@${db_host}/${db_name}"
   }
 
+  $show_image_direct_url = $backend ? {
+    'rbd' => true,
+    default => false,
+  }
+
   # Install and configure glance-api
   class { 'glance::api':
-    verbose           => $verbose,
-    debug             => $debug,
-    registry_host     => $registry_host,
-    bind_host         => $bind_host,
-    auth_type         => 'keystone',
-    auth_port         => '35357',
-    auth_host         => $keystone_host,
-    keystone_tenant   => 'services',
-    keystone_user     => 'glance',
-    keystone_password => $user_password,
-    sql_connection    => $sql_connection,
-    sql_idle_timeout  => $sql_idle_timeout,
-    use_syslog        => $use_syslog,
-    log_facility      => $log_facility,
-    enabled           => $enabled,
+    verbose               => $verbose,
+    debug                 => $debug,
+    registry_host         => $registry_host,
+    bind_host             => $bind_host,
+    auth_type             => 'keystone',
+    auth_port             => '35357',
+    auth_host             => $keystone_host,
+    keystone_tenant       => 'services',
+    keystone_user         => 'glance',
+    keystone_password     => $user_password,
+    sql_connection        => $sql_connection,
+    sql_idle_timeout      => $sql_idle_timeout,
+    use_syslog            => $use_syslog,
+    log_facility          => $log_facility,
+    enabled               => $enabled,
+    show_image_direct_url => $show_image_direct_url,
   }
 
   # Install and configure glance-registry

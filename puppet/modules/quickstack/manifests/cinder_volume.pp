@@ -34,10 +34,16 @@ class quickstack::cinder_volume(
   $rbd_flatten_volume_from_snapshot
                           = false,
   $rbd_max_clone_depth    = '5',
-  $rbd_user               = 'cinder',
+  $rbd_user               = 'volumes',
   $rbd_secret_uuid        = '',
 ) {
   class { '::cinder::volume': }
+
+  if str2bool_i("$backend_rbd") {
+    cinder_config {
+      'DEFAULT/glance_api_version':         value => '2',
+    }
+  }
 
   if !str2bool_i("$multiple_backends") {
     # single backend

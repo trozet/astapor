@@ -1,26 +1,33 @@
 # Quickstack compute node
 class quickstack::compute_common (
-  $admin_password              = $quickstack::params::admin_password,
-  $ceilometer                  = 'true',
-  $auth_host                   = '127.0.0.1',
-  $ceilometer_metering_secret  = $quickstack::params::ceilometer_metering_secret,
-  $ceilometer_user_password    = $quickstack::params::ceilometer_user_password,
-  $cinder_backend_gluster      = $quickstack::params::cinder_backend_gluster,
-  $cinder_backend_nfs          = 'false',
-  $glance_host                 = '127.0.0.1',
-  $mysql_host                  = $quickstack::params::mysql_host,
-  $nova_host                   = '127.0.0.1',
-  $nova_db_password            = $quickstack::params::nova_db_password,
-  $nova_user_password          = $quickstack::params::nova_user_password,
-  $amqp_provider               = $quickstack::params::amqp_provider,
-  $amqp_host                   = $quickstack::params::amqp_host,
-  $amqp_port                   = '5672',
-  $amqp_ssl_port               = '5671',
-  $amqp_username               = $quickstack::params::amqp_username,
-  $amqp_password               = $quickstack::params::amqp_password,
-  $verbose                     = $quickstack::params::verbose,
-  $ssl                         = $quickstack::params::ssl,
-  $mysql_ca                    = $quickstack::params::mysql_ca,
+  $admin_password               = $quickstack::params::admin_password,
+  $ceilometer                   = 'true',
+  $auth_host                    = '127.0.0.1',
+  $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
+  $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
+  $cinder_backend_gluster       = $quickstack::params::cinder_backend_gluster,
+  $cinder_backend_nfs           = 'false',
+  $cinder_backend_rbd           = 'false',
+  $glance_host                  = '127.0.0.1',
+  $mysql_host                   = $quickstack::params::mysql_host,
+  $nova_host                    = '127.0.0.1',
+  $nova_db_password             = $quickstack::params::nova_db_password,
+  $nova_user_password           = $quickstack::params::nova_user_password,
+  $amqp_provider                = $quickstack::params::amqp_provider,
+  $amqp_host                    = $quickstack::params::amqp_host,
+  $amqp_port                    = '5672',
+  $amqp_ssl_port                = '5671',
+  $amqp_username                = $quickstack::params::amqp_username,
+  $amqp_password                = $quickstack::params::amqp_password,
+  $verbose                      = $quickstack::params::verbose,
+  $ssl                          = $quickstack::params::ssl,
+  $mysql_ca                     = $quickstack::params::mysql_ca,
+  $libvirt_images_rbd_pool      = 'volumes',
+  $libvirt_images_rbd_ceph_conf = '/etc/ceph/ceph.conf',
+  $libvirt_inject_password      = 'false',
+  $libvirt_inject_key           = 'false',
+  $rbd_user                     = 'volumes',
+  $rbd_secret_uuid              = '',
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -54,8 +61,20 @@ class quickstack::compute_common (
     }
   }
 
-  nova_config {
-    'DEFAULT/libvirt_inject_partition':     value => '-1';
+  if str2bool_i("$cinder_backend_rbd") {
+    nova_config {
+      'DEFAULT/libvirt_images_rbd_pool':      value => $libvirt_images_rbd_pool;
+      'DEFAULT/libvirt_images_rbd_ceph_conf': value => $libvirt_images_rbd_ceph_conf;
+      'DEFAULT/libvirt_inject_password':      value => $libvirt_inject_password;
+      'DEFAULT/libvirt_inject_key':           value => $libvirt_inject_key;
+      'DEFAULT/libvirt_inject_partition':     value => '-2';
+      'DEFAULT/rbd_user':                     value => $rbd_user;
+      'DEFAULT/rbd_secret_uuid':              value => $rbd_secret_uuid;
+    }
+  } else {
+    nova_config {
+      'DEFAULT/libvirt_inject_partition':     value => '-1';
+    }
   }
 
   if str2bool_i("$ssl") {

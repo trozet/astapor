@@ -65,7 +65,7 @@ class quickstack::params (
   $cinder_rbd_flatten_volume_from_snapshot
                                 = false,
   $cinder_rbd_max_clone_depth   = '5',
-  $cinder_rbd_user              = 'cinder',
+  $cinder_rbd_user              = 'volumes',
   $cinder_rbd_secret_uuid       = '',
 
   # Glance
@@ -74,7 +74,7 @@ class quickstack::params (
   $glance_backend               = 'file',
 
   # Glance RBD
-  $glance_rbd_store_user        = 'glance',
+  $glance_rbd_store_user        = 'images',
   $glance_rbd_store_pool        = 'images',
 
   # Glance_Gluster
