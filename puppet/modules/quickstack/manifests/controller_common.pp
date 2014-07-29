@@ -222,11 +222,7 @@ class quickstack::controller_common (
     admin_address    => $controller_admin_host
   }
 
-  # TODO, replace below two stanzas with quickstack::glance
-  # TODO, openstack::glance does not support show_image_direct_url
-  # yet, will need to add that when transitioning to
-  # quickstack::glance
-  class {'openstack::glance':
+  class {'quickstack::glance':
     db_host        => $mysql_host,
     db_ssl         => str2bool_i("$ssl"),
     db_ssl_ca      => $mysql_ca,

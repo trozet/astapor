@@ -36,7 +36,7 @@ class quickstack::pacemaker::cinder(
   $rbd_flatten_volume_from_snapshot
                           = false,
   $rbd_max_clone_depth    = '5',
-  $rbd_user               = 'cinder',
+  $rbd_user               = 'volumes',
   $rbd_secret_uuid        = '',
 
   $db_ssl                 = false,
