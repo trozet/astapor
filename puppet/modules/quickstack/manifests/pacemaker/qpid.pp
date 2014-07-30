@@ -81,6 +81,8 @@ class quickstack::pacemaker::qpid (
       port                 => map_params("amqp_port"),
       backend_port         => $backend_port,
       timeout              => $haproxy_timeout,
+      extra_listen_options => {'stick-table' => 'type ip size 2',
+                               'stick' => 'on dst'},
     }
 
     Class['::quickstack::firewall::amqp'] ->
