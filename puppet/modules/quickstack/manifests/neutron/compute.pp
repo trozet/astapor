@@ -127,6 +127,7 @@ class quickstack::neutron::compute (
     nova_db_password             => $nova_db_password,
     nova_host                    => $nova_host,
     nova_user_password           => $nova_user_password,
+    amqp_provider                => $amqp_provider,
     amqp_host                    => $amqp_host,
     amqp_port                    => $amqp_port,
     amqp_ssl_port                => $amqp_ssl_port,
