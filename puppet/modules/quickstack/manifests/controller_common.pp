@@ -232,15 +232,11 @@ class quickstack::controller_common (
     rbd_store_user => $glance_rbd_store_user,
     rbd_store_pool => $glance_rbd_store_pool,
     require        => Class['quickstack::db::mysql'],
-  }
-  if $amqp_provider == 'qpid' {
-    class { 'glance::notify::qpid':
-      qpid_password => $amqp_password,
-      qpid_username => $amqp_username,
-      qpid_hostname => $amqp_host,
-      qpid_port     => $amqp_port,
-      qpid_protocol => 'tcp',
-    }
+    amqp_host      => $amqp_host,
+    amqp_port      => $amqp_port,
+    amqp_username  => $amqp_username,
+    amqp_password  => $amqp_password,
+    amqp_provider  => $amqp_provider,
   }
 
 
