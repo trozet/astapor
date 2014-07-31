@@ -172,5 +172,11 @@ class quickstack::pacemaker::nova (
       first_action    => "start",
       second_action   => "start",
     }
+    ->
+    quickstack::pacemaker::constraint::colocation { 'nova-conductor-scheduler-colo' :
+      source => "openstack-nova-scheduler-clone",
+      target => "openstack-nova-conductor-clone",
+      score => "INFINITY",
+    }
   }
 }
