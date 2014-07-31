@@ -113,6 +113,14 @@ class quickstack::neutron::all (
       vni_ranges            => $ml2_vni_ranges,
       enable_security_group => $ml2_security_group,
     }
+
+    # If cisco nexus is part of ml2 mechanism drivers,
+    # setup Mech Driver Cisco Neutron plugin class.
+    if ('cisco_nexus' in $ml2_mechanism_drivers) {
+      class { 'neutron::plugins::ml2::cisco::nexus':
+        nexus_config        => $nexus_config,
+      }
+    }
   }
 
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
