@@ -26,6 +26,7 @@ class quickstack::compute_common (
   $libvirt_images_rbd_ceph_conf = '/etc/ceph/ceph.conf',
   $libvirt_inject_password      = 'false',
   $libvirt_inject_key           = 'false',
+  $libvirt_images_type          = 'rbd',
   $rbd_user                     = 'volumes',
   $rbd_secret_uuid              = '',
 ) inherits quickstack::params {
@@ -68,6 +69,7 @@ class quickstack::compute_common (
       'DEFAULT/libvirt_inject_password':      value => $libvirt_inject_password;
       'DEFAULT/libvirt_inject_key':           value => $libvirt_inject_key;
       'DEFAULT/libvirt_inject_partition':     value => '-2';
+      'DEFAULT/libvirt_images_type':          value => $libvirt_images_type;
       'DEFAULT/rbd_user':                     value => $rbd_user;
       'DEFAULT/rbd_secret_uuid':              value => $rbd_secret_uuid;
     }
