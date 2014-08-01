@@ -40,6 +40,7 @@ class quickstack::neutron::compute (
   $libvirt_images_rbd_ceph_conf = '/etc/ceph/ceph.conf',
   $libvirt_inject_password      = 'false',
   $libvirt_inject_key           = 'false',
+  $libvirt_images_type          = 'rbd',
   $rbd_user                     = 'volumes',
   $rbd_secret_uuid              = '',
 ) inherits quickstack::params {
@@ -140,6 +141,7 @@ class quickstack::neutron::compute (
     libvirt_images_rbd_ceph_conf => $libvirt_images_rbd_ceph_conf,
     libvirt_inject_password      => $libvirt_inject_password,
     libvirt_inject_key           => $libvirt_inject_key,
+    libvirt_images_type          => $libvirt_images_type,
     rbd_user                     => $rbd_user,
     rbd_secret_uuid              => $rbd_secret_uuid,
   }
