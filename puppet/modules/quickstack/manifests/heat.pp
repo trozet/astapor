@@ -7,6 +7,7 @@ class quickstack::heat(
   $db_name                 = 'heat',
   $db_user                 = 'heat',
   $db_password             = '',
+  $max_retries             = '',
   $db_ssl                  = false,
   $db_ssl_ca               = '',
   $keystone_host           = '127.0.0.1',
@@ -40,6 +41,12 @@ class quickstack::heat(
   class {'::quickstack::firewall::heat':
     heat_cfn_enabled        => $heat_cfn_enabled,
     heat_cloudwatch_enabled => $heat_cloudwatch_enabled,
+  }
+
+  if $max_retries {
+    heat_config {
+      'DEFAULT/max_retries':      value => $max_retries;
+    }
   }
 
   class { '::heat':

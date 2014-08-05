@@ -112,6 +112,7 @@ class quickstack::pacemaker::glance (
       db_ssl_ca                => $db_ssl_ca,
       db_user                  => $db_user,
       db_name                  => $db_name,
+      max_retries              => '-1',
       backend                  => $backend,
       rbd_store_user           => $rbd_store_user,
       rbd_store_pool           => $rbd_store_pool,

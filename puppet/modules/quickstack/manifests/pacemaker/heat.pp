@@ -90,6 +90,7 @@ class quickstack::pacemaker::heat(
       db_name                 => $db_name,
       db_user                 => $db_user,
       db_password             => $heat_db_password,
+      max_retries             => '-1',
       db_ssl                  => $db_ssl,
       db_ssl_ca               => $db_ssl_ca,
       keystone_host           => map_params("keystone_admin_vip"),

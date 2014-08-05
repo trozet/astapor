@@ -56,6 +56,10 @@ class quickstack::pacemaker::keystone (
       backend_server_addrs => map_params("lb_backend_server_addrs"),
     }
 
+    keystone_config {
+      'DEFAULT/max_retries':      value => '-1';
+    }
+
     Class['::quickstack::pacemaker::common'] ->
 
     quickstack::pacemaker::vips { "$keystone_group":
