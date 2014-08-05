@@ -149,9 +149,5 @@ class quickstack::pacemaker::common (
     exec {"pcs-resource-default":
       command => "/usr/sbin/pcs resource defaults resource-stickiness=100",
     }
-    ->
-    exec {"pcs-property-start-failure-is-false":
-      command => "/usr/sbin/pcs property set start-failure-is-fatal=false",
-    }
   }
 }
