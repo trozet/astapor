@@ -22,7 +22,7 @@ class quickstack::load_balancer::amqp (
     port                 => "$port",
     mode                 => "$mode",
     listen_options       => $listen_options,
-    member_options       => [ 'check' ],
+    member_options       => [ 'check inter 1s' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
     backend_port         => $backend_port,

@@ -18,7 +18,7 @@ class quickstack::load_balancer::neutron (
     port                 => "$api_port",
     mode                 => "$api_mode",
     listen_options       => { 'option' => [ "$api_log" ] },
-    member_options       => [ 'check' ],
+    member_options       => [ 'check inter 1s' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
   }
