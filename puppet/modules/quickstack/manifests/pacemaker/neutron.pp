@@ -77,6 +77,7 @@ class quickstack::pacemaker::neutron (
       enable_tunneling              => $enable_tunneling,
       enabled                       => $enabled,
       external_network_bridge       => $external_network_bridge,
+      database_max_retries          => '-1',
       ml2_type_drivers              => $ml2_type_drivers,
       ml2_tenant_network_types      => $ml2_tenant_network_types,
       ml2_mechanism_drivers         => $ml2_mechanism_drivers,

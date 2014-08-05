@@ -5,6 +5,7 @@ class quickstack::cinder(
   $db_name        = 'cinder',
   $db_user        = 'cinder',
   $db_password    = '',
+  $max_retries    = '',
   $db_ssl         = false,
   $db_ssl_ca      = '',
   $glance_host    = '127.0.0.1',
@@ -35,6 +36,11 @@ class quickstack::cinder(
   cinder_config {
     'DEFAULT/glance_host': value => $glance_host;
     'DEFAULT/notification_driver': value => 'cinder.openstack.common.notifier.rpc_notifier'
+  }
+  if $max_retries {
+    cinder_config {
+      'DEFAULT/max_retries':      value => $max_retries;
+    }
   }
 
   if str2bool_i("$db_ssl") {

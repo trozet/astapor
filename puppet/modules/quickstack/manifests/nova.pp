@@ -69,6 +69,10 @@
 #   (optional) Whether to start/stop the service
 #   Defaults to true
 #
+# [*max_retries*]
+#   (optional) Value for max_retries in /etc/nova/nova.conf
+#   Defaults to ''.
+#
 # [*memcached_servers*]
 #   (optional) Use memcached instead of in-process cache. Supply a list of
 #   memcached server IP's:Memcached Port.
@@ -117,6 +121,7 @@ class quickstack::nova (
   $glance_port                  = '9292',
   $image_service                = 'nova.image.glance.GlanceImageService',
   $manage_service               = 'true',
+  $max_retries                  = '',
   $memcached_servers            = 'false',
   $multi_host                   = 'true',
   $neutron                      = 'false',
@@ -152,6 +157,12 @@ class quickstack::nova (
 
     nova_config { 'DEFAULT/default_floating_pool':
       value => $default_floating_pool;
+    }
+
+    if $max_retries {
+      nova_config {
+        'DEFAULT/max_retries':      value => $max_retries;
+      }
     }
 
     if str2bool_i("$neutron") {

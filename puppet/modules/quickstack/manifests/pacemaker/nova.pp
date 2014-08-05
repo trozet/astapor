@@ -77,6 +77,7 @@ class quickstack::pacemaker::nova (
       db_name                       => $db_name,
       db_password                   => map_params("nova_db_password"),
       db_user                       => $db_user,
+      max_retries                   => '-1',
       default_floating_pool         => $default_floating_pool,
       force_dhcp_release            => $force_dhcp_release,
       glance_host                   => map_params("glance_private_vip"),

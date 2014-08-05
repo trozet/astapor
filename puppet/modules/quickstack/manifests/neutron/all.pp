@@ -7,6 +7,7 @@ class quickstack::neutron::all (
   $enable_tunneling              = true,
   $enabled                       = true,
   $external_network_bridge       = 'br-ex',
+  $database_max_retries          = '',
   $ml2_type_drivers              = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
   $ml2_tenant_network_types      = ['vxlan', 'vlan', 'gre', 'flat'],
   $ml2_mechanism_drivers         = ['openvswitch','l2population'],
@@ -88,11 +89,12 @@ class quickstack::neutron::all (
   File['/etc/neutron/plugin.ini'] -> Exec['neutron-db-manage upgrade']
 
   class { '::neutron::server':
-    auth_host      => $auth_host,
-    auth_password  => $neutron_user_password,
-    auth_tenant    => $auth_tenant,
-    auth_user      => $auth_user,
-    connection     => $sql_connection,
+    auth_host            => $auth_host,
+    auth_password        => $neutron_user_password,
+    auth_tenant          => $auth_tenant,
+    auth_user            => $auth_user,
+    connection           => $sql_connection,
+    database_max_retries => $database_max_retries,
   }
 
   if $neutron_core_plugin == 'neutron.plugins.ml2.plugin.Ml2Plugin' {

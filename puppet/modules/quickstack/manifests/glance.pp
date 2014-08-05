@@ -20,6 +20,7 @@ class quickstack::glance (
   $db_ssl_ca                = '',
   $db_user                  = 'glance',
   $db_name                  = 'glance',
+  $max_retries              = '',
   $backend                  = 'file',
   $rbd_store_user           = 'images',
   $rbd_store_pool           = 'images',
@@ -89,6 +90,14 @@ class quickstack::glance (
     enabled           => $enabled,
   }
 
+  if $max_retries {
+    glance_api_config {
+      'DEFAULT/max_retries':      value => $max_retries;
+    }
+    glance_registry_config {
+      'DEFAULT/max_retries':      value => $max_retries;
+    }
+  }
   if ($amqp_provider == 'qpid') {
     class { 'glance::notify::qpid':
       qpid_password => $amqp_password,
