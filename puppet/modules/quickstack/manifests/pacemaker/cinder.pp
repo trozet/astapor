@@ -234,5 +234,20 @@ class quickstack::pacemaker::cinder(
         score => "INFINITY",
       }
     }
+
+    # the rest is sad puppet hackery to install rbd/ceph packages,
+    # avoiding a "package" re-declaration (for python-ceph)
+    if (str2bool_i($backend_rbd)) {
+      if (str2bool_i(map_params('include_glance'))) {
+        include ::quickstack::pacemaker::glance
+        if ($::quickstack::pacemaker::glance::backend != 'rbd') {
+          package {'python-ceph': }
+        }
+      }
+      else {
+        package {'python-ceph': }
+      }
+      include ::quickstack::ceph::client_packages
+    }
   }
 }
