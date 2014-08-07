@@ -96,6 +96,7 @@ class quickstack::neutron::all (
     connection           => $sql_connection,
     database_max_retries => $database_max_retries,
   }
+  contain neutron::server
 
   if $neutron_core_plugin == 'neutron.plugins.ml2.plugin.Ml2Plugin' {
 
