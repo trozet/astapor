@@ -37,6 +37,8 @@ define quickstack::pacemaker::rsync::get (
   $unless = '/bin/false',
 ) {
 
+  include '::quickstack::rsync::common'
+
   if $keyfile {
     $Mykeyfile = $keyfile
   } else {
