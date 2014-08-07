@@ -32,7 +32,7 @@ class quickstack::pacemaker::glance (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_glance') == 'true') {
+  if (str2bool_i(map_params('include_glance'))) {
     $glance_private_vip = map_params("glance_private_vip")
     $pcmk_glance_group = map_params("glance_group")
 
@@ -40,13 +40,13 @@ class quickstack::pacemaker::glance (
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-registry']
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec['glance-manage db_sync'] -> Exec['pcs-glance-server-set-up']
 
-    if (map_params('include_mysql') == 'true') {
+    if (str2bool_i(map_params('include_mysql'))) {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
     }
-    if (map_params('include_keystone') == 'true') {
+    if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
     }
-    if (map_params('include_swift') == 'true') {
+    if (str2bool_i(map_params('include_swift'))) {
       Exec['all-swift-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
     }
 

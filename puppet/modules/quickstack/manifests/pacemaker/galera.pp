@@ -14,7 +14,7 @@ class quickstack::pacemaker::galera (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_mysql') == 'true') {
+  if (str2bool_i(map_params('include_mysql'))) {
     $galera_vip = map_params("db_vip")
 
     Exec['all-memcached-nodes-are-up'] -> Service['galera']

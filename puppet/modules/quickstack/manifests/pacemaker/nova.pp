@@ -16,7 +16,7 @@ class quickstack::pacemaker::nova (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_nova') == 'true') {
+  if (str2bool_i(map_params('include_nova'))) {
     $nova_private_vip = map_params("nova_private_vip")
     $pcmk_nova_group = map_params("nova_group")
     $memcached_ips =  map_params("lb_backend_server_addrs")
@@ -26,16 +26,16 @@ class quickstack::pacemaker::nova (
         ','
     )
     Exec['i-am-nova-vip-OR-nova-is-up-on-vip'] -> Exec['nova-db-sync']
-    if (map_params('include_mysql') == 'true') {
+    if (str2bool_i(map_params('include_mysql'))) {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
     }
-    if (map_params('include_keystone') == 'true') {
+    if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
     }
-    if (map_params('include_swift') == 'true') {
+    if (str2bool_i(map_params('include_swift'))) {
       Exec['all-swift-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
     }
-    if (map_params('include_glance') == 'true') {
+    if (str2bool_i(map_params('include_glance'))) {
       Exec['all-glance-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
     }
     if ($scheduler_host_subset_size == '1') {

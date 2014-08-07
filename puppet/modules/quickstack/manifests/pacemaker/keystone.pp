@@ -30,7 +30,7 @@ class quickstack::pacemaker::keystone (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_keystone') == 'true') {
+  if (str2bool_i(map_params('include_keystone'))) {
     $keystone_group = map_params("keystone_group")
     $keystone_private_vip = map_params("keystone_private_vip")
 
@@ -44,7 +44,7 @@ class quickstack::pacemaker::keystone (
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_tenant<| |> -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_service<| |> -> Exec['pcs-keystone-server-set-up']
 
-    if (map_params('include_mysql') == 'true') {
+    if (str2bool_i(map_params('include_mysql'))) {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }
 

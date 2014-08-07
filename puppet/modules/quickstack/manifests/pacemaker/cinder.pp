@@ -55,7 +55,7 @@ class quickstack::pacemaker::cinder(
 
   include ::quickstack::pacemaker::common
 
-  if (map_params('include_cinder') == 'true') {
+  if (str2bool_i(map_params('include_cinder'))) {
 
     include ::quickstack::pacemaker::amqp
 
@@ -68,19 +68,19 @@ class quickstack::pacemaker::cinder(
     $keystone_host        = map_params("keystone_admin_vip")
 
     Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec['cinder-manage db_sync'] -> Exec['pcs-cinder-server-set-up']
-    if (map_params('include_mysql') == 'true') {
+    if (str2bool_i(map_params('include_mysql'))) {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
-    if (map_params('include_keystone') == 'true') {
+    if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
-    if (map_params('include_swift') == 'true') {
+    if (str2bool_i(map_params('include_swift'))) {
       Exec['all-swift-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
-    if (map_params('include_glance') == 'true') {
+    if (str2bool_i(map_params('include_glance'))) {
       Exec['all-glance-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
-    if (map_params('include_nova') == 'true') {
+    if (str2bool_i(map_params('include_nova'))) {
       Exec['all-nova-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
 

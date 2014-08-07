@@ -10,7 +10,7 @@ class quickstack::pacemaker::horizon (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_horizon') == 'true') {
+  if (str2bool_i(map_params('include_horizon'))) {
     $pcmk_horizon_group = map_params("horizon_group")
     $horizon_public_vip  = map_params("horizon_public_vip")
     $horizon_private_vip = map_params("horizon_private_vip")
@@ -23,28 +23,28 @@ class quickstack::pacemaker::horizon (
     )
 
     Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip'] -> Service['httpd']
-    if (map_params('include_mysql') == 'true') {
+    if (str2bool_i(map_params('include_mysql'))) {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
-    if (map_params('include_keystone') == 'true') {
+    if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
-    if (map_params('include_swift') == 'true') {
+    if (str2bool_i(map_params('include_swift'))) {
       Exec['all-swift-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
-    if (map_params('include_glance') == 'true') {
+    if (str2bool_i(map_params('include_glance'))) {
       Exec['all-glance-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
-    if (map_params('include_cinder') == 'true') {
+    if (str2bool_i(map_params('include_cinder'))) {
       Exec['all-cinder-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
-    if (map_params('include_nova') == 'true') {
+    if (str2bool_i(map_params('include_nova'))) {
       Exec['all-nova-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
-    if (map_params('include_neutron') == 'true') {
+    if (str2bool_i(map_params('include_neutron'))) {
       Exec['all-neutron-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
-    if (map_params('include_heat') == 'true') {
+    if (str2bool_i(map_params('include_heat'))) {
       Exec['all-heat-nodes-are-up'] -> Exec['i-am-horizon-vip-OR-horizon-is-up-on-vip']
     }
 

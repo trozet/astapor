@@ -24,27 +24,27 @@ class quickstack::pacemaker::neutron (
 ) {
   include quickstack::pacemaker::common
 
-  if (map_params('include_neutron') == 'true') {
+  if (str2bool_i(map_params('include_neutron'))) {
     $neutron_group = map_params("neutron_group")
     $neutron_public_vip = map_params("neutron_public_vip")
     $ovs_nic = find_nic("$ovs_tunnel_network","$ovs_tunnel_iface","")
 
-    if (map_params('include_mysql') == 'true') {
+    if (str2bool_i(map_params('include_mysql'))) {
       Exec['all-galera-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
-    if (map_params('include_keystone') == 'true') {
+    if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
-    if (map_params('include_swift') == 'true') {
+    if (str2bool_i(map_params('include_swift'))) {
       Exec['all-swift-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
-    if (map_params('include_cinder') == 'true') {
+    if (str2bool_i(map_params('include_cinder'))) {
       Exec['all-cinder-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
-    if (map_params('include_glance') == 'true') {
+    if (str2bool_i(map_params('include_glance'))) {
       Exec['all-glance-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
-    if (map_params('include_nova') == 'true') {
+    if (str2bool_i(map_params('include_nova'))) {
       Exec['all-nova-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
 
