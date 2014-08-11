@@ -27,7 +27,7 @@ class quickstack::load_balancer::heat (
     port                 => "$heat_port",
     mode                 => "$heat_mode",
     listen_options       => { 'option' => [ "$log" ] },
-    member_options       => [ 'check' ],
+    member_options       => [ 'check inter 1s' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
   }
@@ -40,7 +40,7 @@ class quickstack::load_balancer::heat (
       port                 => "$heat_cfn_port",
       mode                 => "$heat_cfn_mode",
       listen_options       => { 'option' => [ "$log" ] },
-      member_options       => [ 'check' ],
+      member_options       => [ 'check inter 1s' ],
       backend_server_addrs => $backend_server_addrs,
       backend_server_names => $backend_server_names,
     }
@@ -54,7 +54,7 @@ class quickstack::load_balancer::heat (
       port                 => "$heat_cloudwatch_port",
       mode                 => "$heat_cloudwatch_mode",
       listen_options       => { 'option' => [ "$log" ] },
-      member_options       => [ 'check' ],
+      member_options       => [ 'check inter 1s' ],
       backend_server_addrs => $backend_server_addrs,
       backend_server_names => $backend_server_names,
     }

@@ -19,7 +19,7 @@ class quickstack::load_balancer::galera (
                                              "server $timeout", ],
                               'stick-table' => 'type ip size 2',
                               'stick' => 'on dst', },
-    member_options       => [ 'check', 'port 9200' ],
+    member_options       => [ 'check inter 1s', 'port 9200' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
   }

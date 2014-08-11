@@ -21,7 +21,7 @@ class quickstack::load_balancer::horizon (
       'option'     => [ "$log" ],
       'cookie'     => 'SERVERID insert indirect nocache',
     },
-    member_options       => [ 'check' ],
+    member_options       => [ 'check inter 1s' ],
     define_cookies       => true,
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
