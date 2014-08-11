@@ -137,6 +137,7 @@ class quickstack::pacemaker::heat(
       group => "$heat_group",
       clone => false,
       options => 'start-delay=10s',
+      interval => '60s',
     }
 
     if str2bool_i($heat_cfn_enabled) {
