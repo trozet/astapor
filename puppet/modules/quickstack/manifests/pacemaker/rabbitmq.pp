@@ -5,7 +5,7 @@ class quickstack::pacemaker::rabbitmq (
 
   include quickstack::pacemaker::common
 
-  if (map_params('include_amqp') == 'true' and
+  if (str2bool_i(map_params('include_amqp')) and
       map_params('amqp_provider') == 'rabbitmq') {
     $amqp_group = map_params("amqp_group")
     $amqp_username = map_params("amqp_username")

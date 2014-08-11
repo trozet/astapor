@@ -7,7 +7,7 @@ class quickstack::pacemaker::swift (
 ) {
   include quickstack::pacemaker::common
 
-  if (map_params('include_swift') == 'true') {
+  if (str2bool_i(map_params('include_swift'))) {
     $swift_group = map_params("swift_group")
     $swift_public_vip = map_params("swift_public_vip")
     $memcached_ips =  map_params("lb_backend_server_addrs")
@@ -15,7 +15,7 @@ class quickstack::pacemaker::swift (
         |x| x+":"+@memcached_port }.join(",") %>')
 
     Exec['i-am-swift-vip-OR-swift-is-up-on-vip'] -> Service['swift-proxy']
-    if (map_params('include_keystone') == 'true') {
+    if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-swift-vip-OR-swift-is-up-on-vip']
     }
 
