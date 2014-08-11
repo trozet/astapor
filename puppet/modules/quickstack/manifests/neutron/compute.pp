@@ -43,6 +43,9 @@ class quickstack::neutron::compute (
   $libvirt_images_type          = 'rbd',
   $rbd_user                     = 'volumes',
   $rbd_secret_uuid              = '',
+  $private_iface                = '',
+  $private_ip                   = '',
+  $private_network              = '',
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -144,6 +147,9 @@ class quickstack::neutron::compute (
     libvirt_images_type          => $libvirt_images_type,
     rbd_user                     => $rbd_user,
     rbd_secret_uuid              => $rbd_secret_uuid,
+    private_iface                => $private_iface,
+    private_ip                   => $private_ip,
+    private_network              => $private_network,
   }
 
   class {'quickstack::neutron::firewall::gre':}
