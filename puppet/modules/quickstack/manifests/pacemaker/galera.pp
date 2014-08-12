@@ -97,7 +97,7 @@ class quickstack::pacemaker::galera (
     } ->
     quickstack::pacemaker::resource::service {'mysqld':
       group          => "$pcmk_galera_group",
-      monitor_params => { 'start-delay' => '60s' },
+      options        => 'start timeout=300s meta ordered=true',
       clone          => true,
     }
   }
