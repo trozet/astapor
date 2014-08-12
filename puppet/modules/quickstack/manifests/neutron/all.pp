@@ -6,7 +6,7 @@ class quickstack::neutron::all (
   $cisco_vswitch_plugin          = '',
   $enable_tunneling              = true,
   $enabled                       = true,
-  $external_network_bridge       = 'br-ex',
+  $external_network_bridge       = '',
   $database_max_retries          = '',
   $ml2_type_drivers              = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
   $ml2_tenant_network_types      = ['vxlan', 'vlan', 'gre', 'flat'],

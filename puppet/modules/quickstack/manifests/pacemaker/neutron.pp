@@ -2,7 +2,7 @@ class quickstack::pacemaker::neutron (
   $core_plugin                = 'neutron.plugins.ml2.plugin.Ml2Plugin',
   $enable_tunneling           = false,
   $enabled                    = true,
-  $external_network_bridge    = 'br-ex',
+  $external_network_bridge    = '',
   $ml2_type_drivers           = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
   $ml2_tenant_network_types   = ['vxlan', 'vlan', 'gre', 'flat'],
   $ml2_mechanism_drivers      = ['openvswitch','l2population'],
