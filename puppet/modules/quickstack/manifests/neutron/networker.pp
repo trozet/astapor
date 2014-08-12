@@ -13,7 +13,7 @@ class quickstack::neutron::networker (
   $mysql_host                    = $quickstack::params::mysql_host,
   $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
-  $external_network_bridge       = 'br-ex',
+  $external_network_bridge       = '',
   $amqp_username                 = $quickstack::params::amqp_username,
   $amqp_password                 = $quickstack::params::amqp_password,
   $tenant_network_type           = $quickstack::params::tenant_network_type,
