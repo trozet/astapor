@@ -151,7 +151,7 @@ class quickstack::pacemaker::heat(
       ->
       Exec["i-am-heat-vip-OR-heat-is-up-on-vip"]
 
-      Exec["all-heat-nodes-are-up"]
+      Quickstack::Pacemaker::Resource::Service['openstack-heat-engine']
       ->
       quickstack::pacemaker::resource::service {"openstack-heat-api-cfn":
         clone => true,
@@ -174,7 +174,7 @@ class quickstack::pacemaker::heat(
     }
 
     if str2bool_i($heat_cloudwatch_enabled) {
-      Exec["all-heat-nodes-are-up"]
+      Quickstack::Pacemaker::Resource::Service['openstack-heat-engine']
       ->
       quickstack::pacemaker::resource::service {"openstack-heat-api-cloudwatch":
         clone => true,
