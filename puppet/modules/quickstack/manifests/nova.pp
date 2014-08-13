@@ -170,6 +170,7 @@ class quickstack::nova (
         admin_password                       => $admin_password,
         api_bind_address                     => $bind_address,
         auth_host                            => $auth_host,
+        metadata_listen                      => $bind_address,
         enabled                              => true,
         manage_service                       => str2bool_i("$manage_service"),
         neutron_metadata_proxy_shared_secret => $neutron_metadata_proxy_secret,
@@ -187,6 +188,7 @@ class quickstack::nova (
         admin_password   => $admin_password,
         api_bind_address => $bind_address,
         auth_host        => $auth_host,
+        metadata_listen  => $bind_address,
         manage_service   => str2bool_i("$manage_service"),
       }
     }
