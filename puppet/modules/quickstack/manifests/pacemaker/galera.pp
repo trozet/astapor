@@ -20,7 +20,7 @@ class quickstack::pacemaker::galera (
     Exec['all-memcached-nodes-are-up'] -> Service['galera']
     Class['::quickstack::pacemaker::rsync::galera'] -> Service['galera']
 
-    if (has_interface_with("ipaddress", map_params("cluster_control_ip")) and $galera_bootstrap_ok) {
+    if (has_interface_with("ipaddress", map_params("cluster_control_ip")) and str2bool_i($::galera_bootstrap_ok)) {
       $galera_bootstrap = true
       $galera_test      = "/bin/true"
     } else {
@@ -94,7 +94,28 @@ class quickstack::pacemaker::galera (
       tries     => 360,
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include galera",
-    } ->
+    }
+
+    if str2bool_i($::galera_bootstrap_ok) {
+      Exec['all-galera-nodes-are-up'] ->
+      exec {"shutdown-galera-after-bootstrap":
+        command   => "/usr/bin/systemctl stop mariadb.service",
+      } ->
+      exec {"pcs-galera-server-stopped-after-bootstrap":
+        command => "/tmp/ha-all-in-one-util.bash update_my_node_property galera-post-bootstrap"
+      } ->
+      exec {"all-galera-finished-post-bootstrap":
+        timeout   => 3600,
+        tries     => 360,
+        try_sleep => 10,
+        command   => "/tmp/ha-all-in-one-util.bash all_members_include galera-post-bootstrap",
+      } ->
+      Quickstack::Pacemaker::Resource::Service['mysqld']
+    } else {
+      Exec['all-galera-nodes-are-up'] ->
+      Quickstack::Pacemaker::Resource::Service['mysqld']
+    }
+
     quickstack::pacemaker::resource::service {'mysqld':
       group          => "$pcmk_galera_group",
       options        => 'start timeout=300s meta ordered=true',
