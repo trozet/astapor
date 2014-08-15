@@ -72,6 +72,7 @@ class quickstack::heat(
     verbose           => $verbose,
     debug             => $debug,
   }
+  contain heat
 
   class { '::heat::api':
     bind_host         => $bind_host,
@@ -98,4 +99,5 @@ class quickstack::heat(
     heat_watch_server_url         => "http://${cloudwatch_host}:8003",
     enabled                       => str2bool_i("$heat_engine_enabled"),
   }
+  contain heat::engine
 }
