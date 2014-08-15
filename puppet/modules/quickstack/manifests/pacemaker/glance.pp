@@ -58,6 +58,10 @@ class quickstack::pacemaker::glance (
       }
     } elsif ($backend == 'file') {
       if str2bool_i("$pcmk_fs_manage") {
+        if ($pcmk_fs_type == 'nfs') {
+          include ::quickstack::nfs_common
+          Package['nfs-utils'] -> Exec['stonith-setup-complete']
+        }
         Exec['stonith-setup-complete']
         ->
         quickstack::pacemaker::resource::filesystem { "glance-fs":
