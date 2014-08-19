@@ -1,0 +1,16 @@
+[global]
+fsid = <%= @fsid %>
+<% if @mon_initial_members.length > 0 %>mon_initial_members = <%= @mon_initial_members.to_a.join(', ')%><% end %>
+<% if @mon_host.length > 0 %>mon_host = <%= @mon_host.to_a.join(', ')%><% end %>
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
+filestore_xattr_use_omap = true
+<% if @public_network.length > 0 %>public_network =  <%= @public_network %><% end %>
+<% if @cluster_network.length > 0 %>cluster_network =  <%= @cluster_network %><% end %>
+<% if @images_key.length > 0 %>
+[client.images]
+keyring = /etc/ceph/ceph.client.images.keyring<% end %>
+<% if @volumes_key.length > 0 %>
+[client.volumes]
+keyring = /etc/ceph/ceph.client.volumes.keyring<% end %>

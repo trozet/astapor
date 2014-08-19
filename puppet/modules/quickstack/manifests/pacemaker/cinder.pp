@@ -235,19 +235,25 @@ class quickstack::pacemaker::cinder(
       }
     }
 
-    # the rest is sad puppet hackery to install rbd/ceph packages,
-    # avoiding a "package" re-declaration (for python-ceph)
     if (str2bool_i($backend_rbd)) {
+      include ::quickstack::ceph::client_packages
+      include ::quickstack::pacemaker::ceph_config
+
+    # this block just some puppet hackery to install rbd/ceph
+    # packages, avoiding a "package" re-declaration (for python-ceph)
       if (str2bool_i(map_params('include_glance'))) {
         include ::quickstack::pacemaker::glance
         if ($::quickstack::pacemaker::glance::backend != 'rbd') {
-          package {'python-ceph': }
+          package {'python-ceph': } -> Class['quickstack::ceph::client_packages']
         }
       }
       else {
-        package {'python-ceph': }
+        package {'python-ceph': } -> Class['quickstack::ceph::client_packages']
       }
-      include ::quickstack::ceph::client_packages
+
+      Class['quickstack::pacemaker::ceph_config'] ->
+      Class['quickstack::ceph::client_packages'] ->
+      Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
   }
 }

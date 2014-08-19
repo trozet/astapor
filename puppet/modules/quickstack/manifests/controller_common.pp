@@ -4,6 +4,13 @@ class quickstack::controller_common (
   $admin_password                = $quickstack::params::admin_password,
   $ceilometer_metering_secret    = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password      = $quickstack::params::ceilometer_user_password,
+  $ceph_cluster_network          = '',
+  $ceph_public_network           = '',
+  $ceph_fsid                     = '',
+  $ceph_images_key               = '',
+  $ceph_volumes_key              = '',
+  $ceph_mon_host                 = [ ],
+  $ceph_mon_initial_members      = [ ],
   $cinder_backend_eqlx           = $quickstack::params::cinder_backend_eqlx,
   $cinder_backend_eqlx_name      = $quickstack::params::cinder_backend_eqlx_name,
   $cinder_backend_gluster        = $quickstack::params::cinder_backend_gluster,
@@ -85,6 +92,7 @@ class quickstack::controller_common (
   $horizon_cert                  = $quickstack::params::horizon_cert,
   $horizon_key                   = $quickstack::params::horizon_key,
   $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
+
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -338,13 +346,24 @@ class quickstack::controller_common (
   } else {
     $cinder_backend_iscsi_with_fallback = $cinder_backend_iscsi
   }
- 
+
   if (str2bool_i("$cinder_backend_rbd") or ($glance_backend == 'rbd')) {
+    include ::quickstack::ceph::client_packages
     # hack around the glance package declaration if needed
     if ($glance_backend != 'rbd') {
-      package {'python-ceph': }
+      package {'python-ceph': } -> Class['quickstack::ceph::client_packages']
     }
-    include ::quickstack::ceph::client_packages
+    if $ceph_fsid {
+      class { '::quickstack::ceph::config':
+        fsid                => $ceph_fsid,
+        cluster_network     => $ceph_cluster_network,
+        public_network      => $ceph_public_network,
+        mon_initial_members => $ceph_mon_initial_members,
+        mon_host            => $ceph_mon_host,
+        images_key          => $ceph_images_key,
+        volumes_key         => $ceph_volumes_key,
+      } -> Class['quickstack::ceph::client_packages']
+    }
   }
 
   class { 'quickstack::cinder_volume':
