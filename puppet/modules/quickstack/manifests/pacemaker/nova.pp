@@ -40,8 +40,10 @@ class quickstack::pacemaker::nova (
     }
     if ($scheduler_host_subset_size == '1') {
       $sched_clone = false
+      $_nova_scheduler_resource = "openstack-nova-scheduler"
     } else {
       $sched_clone = true
+      $_nova_scheduler_resource = "openstack-nova-scheduler-clone"
     }
 
     class {"::quickstack::load_balancer::nova":
@@ -155,27 +157,27 @@ class quickstack::pacemaker::nova (
     quickstack::pacemaker::constraint::base { 'nova-api-scheduler-constr' :
       constraint_type => "order",
       first_resource  => "openstack-nova-api-clone",
-      second_resource => "openstack-nova-scheduler-clone",
+      second_resource => $_nova_scheduler_resource,
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-api-scheduler-colo' :
-      source => "openstack-nova-scheduler-clone",
+      source => $_nova_scheduler_resource,
       target => "openstack-nova-api-clone",
       score => "INFINITY",
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-scheduler-conductor-constr' :
       constraint_type => "order",
-      first_resource  => "openstack-nova-scheduler-clone",
+      first_resource  => $_nova_scheduler_resource,
       second_resource => "openstack-nova-conductor-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'nova-conductor-scheduler-colo' :
-      source => "openstack-nova-scheduler-clone",
+      source => $_nova_scheduler_resource,
       target => "openstack-nova-conductor-clone",
       score => "INFINITY",
     }
