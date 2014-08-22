@@ -120,6 +120,13 @@ class quickstack::pacemaker::galera (
       group          => "$pcmk_galera_group",
       options        => 'start timeout=300s meta ordered=true',
       clone          => true,
+    } ->
+    # one last clustercheck to make sure service is up
+    exec {"galera-online":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/usr/bin/clustercheck >/dev/null",
     }
   }
 }

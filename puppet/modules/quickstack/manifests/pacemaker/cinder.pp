@@ -69,7 +69,7 @@ class quickstack::pacemaker::cinder(
 
     Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec['cinder-manage db_sync'] -> Exec['pcs-cinder-server-set-up']
     if (str2bool_i(map_params('include_mysql'))) {
-      Exec['all-galera-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
+      Exec['galera-online'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
     if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
