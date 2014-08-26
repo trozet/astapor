@@ -30,6 +30,7 @@ class quickstack::galera::server (
     wsrep_ssl_key         => $wsrep_ssl_key,
     wsrep_ssl_cert        => $wsrep_ssl_cert,
   }
+  contain galera::server
 
   class {'::galera::monitor':
     mysql_username => $galera_monitor_username,
