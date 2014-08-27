@@ -30,7 +30,7 @@ class quickstack::pacemaker::neutron (
     $ovs_nic = find_nic("$ovs_tunnel_network","$ovs_tunnel_iface","")
 
     if (str2bool_i(map_params('include_mysql'))) {
-      Exec['all-galera-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
+      Exec['galera-online'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
     }
     if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
