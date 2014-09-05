@@ -135,6 +135,7 @@ class quickstack::glance (
       filesystem_store_datadir => $filesystem_store_datadir,
     }
   } elsif($backend == 'rbd') {
+    Class['quickstack::ceph::client_packages'] ->
     class { 'glance::backend::rbd':
       rbd_store_user => $rbd_store_user,
       rbd_store_pool => $rbd_store_pool,

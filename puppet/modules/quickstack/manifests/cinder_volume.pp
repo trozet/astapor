@@ -100,6 +100,7 @@ class quickstack::cinder_volume(
         eqlx_chap_password => $eqlx_chap_password[0],
       }
     } elsif str2bool_i("$backend_rbd") {
+      Class['quickstack::ceph::client_packages'] -> Cinder::Backend::Rbd<| |>
       class { '::cinder::volume::rbd':
         rbd_pool            => $rbd_pool,
         rbd_ceph_conf       => $rbd_ceph_conf,
@@ -191,6 +192,7 @@ class quickstack::cinder_volume(
 
     if str2bool_i("$backend_rbd") {
       $rbd_backends = ["rbd"]
+      Class['quickstack::ceph::client_packages'] -> Cinder::Backend::Rbd<| |>
 
       cinder::backend::rbd { 'rbd':
         volume_backend_name => $backend_rbd_name,

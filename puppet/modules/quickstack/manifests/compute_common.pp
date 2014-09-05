@@ -18,10 +18,18 @@ class quickstack::compute_common (
   $ceilometer                   = 'true',
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
+  $ceph_cluster_network         = '', 
+  $ceph_public_network          = '', 
+  $ceph_fsid                    = '',
+  $ceph_images_key              = '',
+  $ceph_volumes_key             = '',
+  $ceph_mon_host                = [ ],
+  $ceph_mon_initial_members     = [ ],
   $cinder_backend_gluster       = $quickstack::params::cinder_backend_gluster,
   $cinder_backend_nfs           = 'false',
   $cinder_backend_rbd           = 'false',
   $glance_host                  = '127.0.0.1',
+  $glance_backend_rbd           = 'false',
   $libvirt_images_rbd_pool      = 'volumes',
   $libvirt_images_rbd_ceph_conf = '/etc/ceph/ceph.conf',
   $libvirt_inject_password      = 'false',
@@ -72,10 +80,24 @@ class quickstack::compute_common (
     }
   }
 
-  if str2bool_i("$cinder_backend_rbd") {
+  if (str2bool_i("$cinder_backend_rbd") or str2bool_i("$glance_backend_rbd")) {
     include ::quickstack::ceph::client_packages
-    package {'python-ceph': }
+    if $ceph_fsid {
+      class { '::quickstack::ceph::config':
+        fsid                => $ceph_fsid,
+        cluster_network     => $ceph_cluster_network,
+        public_network      => $ceph_public_network,
+        mon_initial_members => $ceph_mon_initial_members,
+        mon_host            => $ceph_mon_host,
+        images_key          => $ceph_images_key,
+        volumes_key         => $ceph_volumes_key,
+      } -> Class['quickstack::ceph::client_packages']
+    }
+    package {'python-ceph': } ->
+    Class['quickstack::ceph::client_packages'] -> Package['nova-compute']
+  }
 
+  if str2bool_i("$cinder_backend_rbd") {
     nova_config {
       'DEFAULT/libvirt_images_rbd_pool':      value => $libvirt_images_rbd_pool;
       'DEFAULT/libvirt_images_rbd_ceph_conf': value => $libvirt_images_rbd_ceph_conf;
@@ -85,6 +107,23 @@ class quickstack::compute_common (
       'DEFAULT/libvirt_images_type':          value => $libvirt_images_type;
       'DEFAULT/rbd_user':                     value => $rbd_user;
       'DEFAULT/rbd_secret_uuid':              value => $rbd_secret_uuid;
+    }
+
+    # the rest of this if block is borrowed from ::nova::compute::rbd
+    # which we can't use due to a duplicate package declaration
+    file { '/etc/nova/secret.xml':
+      content => template('quickstack/compute-volumes-rbd-secret-xml.erb')
+    }
+    ->
+    Class['quickstack::ceph::client_packages']
+    ->
+    exec { 'get-or-set virsh secret':
+      command => '/usr/bin/virsh secret-define --file /etc/nova/secret.xml | /usr/bin/awk \'{print $2}\' | sed \'/^$/d\' > /etc/nova/virsh.secret',
+      creates => '/etc/nova/virsh.secret',
+    }
+    ->
+    exec { 'set-secret-value virsh':
+      command => "/usr/bin/virsh secret-set-value --secret \$(cat /etc/nova/virsh.secret) --base64 \$(ceph auth get-key client.${libvirt_images_rbd_pool})",
     }
   } else {
     nova_config {
