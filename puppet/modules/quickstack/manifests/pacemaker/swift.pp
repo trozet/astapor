@@ -66,6 +66,8 @@ class quickstack::pacemaker::swift (
     }
     ->
     class { 'quickstack::swift::proxy':
+      enabled              => false,
+      manage_service       => false,
       swift_proxy_host     => map_params("local_bind_addr"),
       keystone_host        => map_params("keystone_public_vip"),
       swift_admin_password => map_params("swift_user_password"),

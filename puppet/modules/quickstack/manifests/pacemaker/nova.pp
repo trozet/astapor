@@ -25,6 +25,13 @@ class quickstack::pacemaker::nova (
         |x| x+":"+@memcached_port }.join(",") %>'),
         ','
     )
+    # TODO: extract this into a helper function
+    if ($::pcs_setup_nova ==  undef or
+        !str2bool_i("$::pcs_setup_nova")) {
+      $_enabled = true
+    } else {
+      $_enabled = false
+    }
     Exec['i-am-nova-vip-OR-nova-is-up-on-vip'] -> Exec['nova-db-sync']
     if (str2bool_i(map_params('include_mysql'))) {
       Exec['galera-online'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
@@ -38,6 +45,7 @@ class quickstack::pacemaker::nova (
     if (str2bool_i(map_params('include_glance'))) {
       Exec['all-glance-nodes-are-up'] -> Exec['i-am-nova-vip-OR-nova-is-up-on-vip']
     }
+
     if ($scheduler_host_subset_size == '1') {
       $sched_clone = false
       $_nova_scheduler_resource = "openstack-nova-scheduler"
@@ -81,11 +89,12 @@ class quickstack::pacemaker::nova (
       db_user                       => $db_user,
       max_retries                   => '-1',
       default_floating_pool         => $default_floating_pool,
+      enabled                       => $_enabled,
       force_dhcp_release            => $force_dhcp_release,
       glance_host                   => map_params("glance_private_vip"),
       glance_port                   => "${::quickstack::load_balancer::glance::api_port}",
       image_service                 => $image_service,
-      manage_service                => 'false',
+      manage_service                => $_enabled,
       memcached_servers             => $memcached_servers,
       multi_host                    => $multi_host,
       neutron                       => str2bool_i(map_params("neutron")),

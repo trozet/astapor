@@ -17,6 +17,16 @@ class quickstack::pacemaker::galera (
   if (str2bool_i(map_params('include_mysql'))) {
     $galera_vip = map_params("db_vip")
 
+    # TODO: extract this into a helper function
+    if ($::pcs_setup_galera ==  undef or
+        !str2bool_i("$::pcs_setup_galera")) {
+      $_enabled = true
+      $_ensure = 'running'
+    } else {
+      $_enabled = false
+      $_ensure = undef
+    }
+
     Exec['all-memcached-nodes-are-up'] -> Service['galera']
     Class['::quickstack::pacemaker::rsync::galera'] -> Service['galera']
 
@@ -58,6 +68,8 @@ class quickstack::pacemaker::galera (
       galera_bootstrap        => $galera_bootstrap,
       galera_monitor_username => $galera_monitor_username,
       galera_monitor_password => $galera_monitor_password,
+      service_enable          => $_enabled,
+      service_ensure          => $_ensure,
       wsrep_cluster_name      => $wsrep_cluster_name,
       wsrep_cluster_members   => $wsrep_cluster_members,
       wsrep_sst_method        => $wsrep_sst_method,
@@ -111,6 +123,15 @@ class quickstack::pacemaker::galera (
         command   => "/tmp/ha-all-in-one-util.bash all_members_include galera-post-bootstrap",
       } ->
       Quickstack::Pacemaker::Resource::Service['mysqld']
+      if (has_interface_with("ipaddress", map_params("cluster_control_ip"))) {
+        $galera_cluster_members_line = inline_template('wsrep_cluster_address="gcomm://<%= @wsrep_cluster_members.join "," %>"')
+        Exec['galera-online'] ->
+        file_line { 'galera-no-bootstrap':
+          path  => '/etc/my.cnf.d/galera.cnf',
+          line  => $galera_cluster_members_line,
+          match => '^wsrep_cluster_address',
+        }
+      }
     } else {
       Exec['all-galera-nodes-are-up'] ->
       Quickstack::Pacemaker::Resource::Service['mysqld']
@@ -118,7 +139,7 @@ class quickstack::pacemaker::galera (
 
     quickstack::pacemaker::resource::service {'mysqld':
       group          => "$pcmk_galera_group",
-      options        => 'start timeout=300s meta ordered=true',
+      options        => 'start timeout=500s meta ordered=true',
       clone          => true,
     } ->
     # one last clustercheck to make sure service is up

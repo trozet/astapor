@@ -32,6 +32,7 @@ class quickstack::glance (
   $use_syslog               = false,
   $log_facility             = 'LOG_USER',
   $enabled                  = true,
+  $manage_service           = true,
   $filesystem_store_datadir = '/var/lib/glance/images/',
   $amqp_host                = '127.0.0.1',
   $amqp_port                = '5672',
@@ -53,7 +54,7 @@ class quickstack::glance (
   }
 
   # Install and configure glance-api
-  class { 'glance::api':
+  class { '::glance::api':
     verbose               => $verbose,
     debug                 => $debug,
     registry_host         => $registry_host,
@@ -69,11 +70,13 @@ class quickstack::glance (
     use_syslog            => $use_syslog,
     log_facility          => $log_facility,
     enabled               => $enabled,
+    manage_service        => $manage_service,
     show_image_direct_url => $show_image_direct_url,
   }
+  contain glance::api
 
   # Install and configure glance-registry
-  class { 'glance::registry':
+  class { '::glance::registry':
     verbose           => $verbose,
     debug             => $debug,
     bind_host         => $bind_host,
@@ -88,7 +91,9 @@ class quickstack::glance (
     use_syslog        => $use_syslog,
     log_facility      => $log_facility,
     enabled           => $enabled,
+    manage_service    => $manage_service,
   }
+  contain glance::registry
 
   if $max_retries {
     glance_api_config {

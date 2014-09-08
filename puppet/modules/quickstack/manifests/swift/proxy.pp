@@ -1,4 +1,6 @@
 class quickstack::swift::proxy (
+  $enabled        = true,
+  $manage_service = true,
   $swift_proxy_host,
   $keystone_host,
   $swift_admin_password,
@@ -32,7 +34,9 @@ class quickstack::swift::proxy (
         'proxy-server'
       ],
       account_autocreate => true,
-      log_facility => 'LOG_LOCAL1',
+      log_facility       => 'LOG_LOCAL1',
+      enabled            => str2bool_i("$enabled"),
+      manage_service     => str2bool_i("$manage_service"),
     }
 
     # this declaration is needed so that the pipeline loop in

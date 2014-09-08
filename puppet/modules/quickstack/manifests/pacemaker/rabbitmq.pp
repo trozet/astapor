@@ -13,13 +13,20 @@ class quickstack::pacemaker::rabbitmq (
     $amqp_vip = map_params("amqp_vip")
     $cluster_nodes = regsubst(map_params("lb_backend_server_names"), '\..*', '')
 
+    if ($::pcs_setup_rabbitmq ==  undef or
+        !str2bool_i("$::pcs_setup_rabbitmq")) {
+      $_enabled = true
+    } else {
+      $_enabled = false
+    }
+
     class {'::quickstack::firewall::amqp':
       ports => [ map_params("amqp_port"), "${inet_dist_listen}", 4369 ]
     }
 
     class {"::rabbitmq":
       config_kernel_variables  => {'inet_dist_listen_min' => "${inet_dist_listen}",
-                                   'inet_dist_listen_max' => "${inet_dist_listen}"},
+                                  'inet_dist_listen_max' => "${inet_dist_listen}"},
       wipe_db_on_cookie_change => true,
       config_cluster           => true,
       cluster_nodes            => $cluster_nodes,
@@ -31,6 +38,7 @@ class quickstack::pacemaker::rabbitmq (
       package_provider         => "yum",
       package_source           => undef,
       manage_repos             => false,
+      service_manage           => $_enabled,
     }
 
     class {'::quickstack::load_balancer::amqp':
@@ -52,7 +60,6 @@ class quickstack::pacemaker::rabbitmq (
     } ->
 
     Class['::rabbitmq'] ->
-
     exec {"rabbit-mirrored-queues":
       command => '/usr/sbin/rabbitmqctl set_policy HA \'^(?!amq\.).*\' \'{"ha-mode": "all"}\'',
       unless  => '/usr/sbin/rabbitmqctl list_policies | grep -q HA'
@@ -70,6 +77,9 @@ class quickstack::pacemaker::rabbitmq (
       tries     => 360,
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include rabbitmq",
+    } ->
+    quickstack::pacemaker::manual_service { "rabbitmq-server":
+      stop => !$_enabled,
     } ->
     quickstack::pacemaker::resource::service { 'rabbitmq-server':
       monitor_params => {"start-delay" => "35s"},
