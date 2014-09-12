@@ -12,22 +12,31 @@ then
 fi
 
 # create openvswitch bridge
-/usr/bin/ovs-vsctl --may-exist add-br ${BRIDGE_NAME}
+if ! /usr/bin/ovs-vsctl --may-exist add-br ${BRIDGE_NAME}
+then
+  echo ERROR: ovs-vsctl command failed. Is openvswitch installed?
+  exit 1
+fi
 
 # mv physical interface config
 /bin/mv /etc/sysconfig/network-scripts/ifcfg-${PHYSICAL_INTERFACE} /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
 
 # unset HWADDR key if exists
-/bin/sed -i s/HWADDR=.*// /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+/bin/sed -i s/^HWADDR=.*// /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
 
 # unset UUID key if exists
-/bin/sed -i s/UUID=.*// /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+/bin/sed -i s/^UUID=.*// /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
 
 # set bridge name
-/bin/sed -i s/DEVICE=.*/DEVICE=${BRIDGE_NAME}/ /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+/bin/sed -i s/^DEVICE=.*/DEVICE=${BRIDGE_NAME}/ /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
 
 # set bridge type
-/bin/sed -i s/TYPE=.*/TYPE=OVSBridge/ /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+/bin/sed -i s/^TYPE=.*/TYPE=OVSBridge/ /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+if ! grep -q "^TYPE=OVSBridge" /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
+then
+  echo ERROR: Interface TYPE was not set 
+  exit 1
+fi
 
 # set bridge device type
 /bin/echo -e "DEVICETYPE=ovs" >> /etc/sysconfig/network-scripts/ifcfg-${BRIDGE_NAME}
@@ -53,4 +62,3 @@ EOF
 
 # switch on bridge and restart network - atomic operation
 /usr/bin/ovs-vsctl --may-exist add-port ${BRIDGE_NAME} $PHYSICAL_INTERFACE; service network restart  
-
