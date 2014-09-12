@@ -73,7 +73,12 @@ class quickstack::heat(
     verbose           => $verbose,
     debug             => $debug,
   }
-  contain heat
+  # FIXME(jistr): after we drop support for Puppet <= 3.6, we can use
+  # `contain ::heat` instead of the anchors here, and use fully qualified
+  # class names in the rest of `contain` statements too
+  anchor { 'quickstack-heat-first': } ->
+  Class['::heat'] ->
+  anchor { 'quickstack-heat-last': }
 
   class { '::heat::api':
     bind_host      => $bind_host,
