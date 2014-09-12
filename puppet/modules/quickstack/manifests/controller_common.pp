@@ -250,6 +250,7 @@ class quickstack::controller_common (
     amqp_username  => $amqp_username,
     amqp_password  => $amqp_password,
     amqp_provider  => $amqp_provider,
+    rabbit_use_ssl => $ssl,
   }
 
   # Configure Nova
@@ -265,6 +266,7 @@ class quickstack::controller_common (
     rabbit_userid      => $amqp_username,
     rabbit_password    => $amqp_password,
     rabbit_port        => $amqp_port,
+    rabbit_use_ssl     => $ssl,
     verbose            => $verbose,
     qpid_protocol      => $qpid_protocol,
     qpid_port          => $amqp_port,
@@ -311,6 +313,7 @@ class quickstack::controller_common (
     amqp_port                   => $amqp_port,
     amqp_username               => $amqp_username,
     amqp_password               => $amqp_password,
+    rabbit_use_ssl              => $ssl,
     verbose                     => $verbose,
   }
 
@@ -326,19 +329,20 @@ class quickstack::controller_common (
   }
 
   class { 'quickstack::cinder':
-    user_password => $cinder_user_password,
-    db_host       => $mysql_host,
-    db_ssl        => $ssl,
-    db_ssl_ca     => $mysql_ca,
-    db_password   => $cinder_db_password,
-    glance_host   => $controller_priv_host,
-    rpc_backend   => amqp_backend('cinder', $amqp_provider),
-    amqp_host     => $amqp_host,
-    amqp_port     => $amqp_port,
-    amqp_username => $amqp_username,
-    amqp_password => $amqp_password,
-    qpid_protocol => $qpid_protocol,
-    verbose       => $verbose,
+    user_password  => $cinder_user_password,
+    db_host        => $mysql_host,
+    db_ssl         => $ssl,
+    db_ssl_ca      => $mysql_ca,
+    db_password    => $cinder_db_password,
+    glance_host    => $controller_priv_host,
+    rpc_backend    => amqp_backend('cinder', $amqp_provider),
+    amqp_host      => $amqp_host,
+    amqp_port      => $amqp_port,
+    amqp_username  => $amqp_username,
+    amqp_password  => $amqp_password,
+    qpid_protocol  => $qpid_protocol,
+    rabbit_use_ssl => $ssl,
+    verbose        => $verbose,
   }
 
   # preserve original behavior - fall back to iscsi

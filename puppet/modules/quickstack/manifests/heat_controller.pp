@@ -52,6 +52,7 @@ class quickstack::heat_controller(
       rabbit_port       => $amqp_port,
       rabbit_userid     => $amqp_username,
       rabbit_password   => $amqp_password,
+      rabbit_use_ssl    => $ssl,
       verbose           => $verbose,
       sql_connection    => $sql_connection,
   }

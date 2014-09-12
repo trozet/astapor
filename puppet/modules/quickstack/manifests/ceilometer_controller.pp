@@ -10,6 +10,7 @@ class quickstack::ceilometer_controller(
   $qpid_protocol = 'tcp',
   $amqp_username,
   $amqp_password,
+  $rabbit_use_ssl = false,
   $verbose,
 ) {
 
@@ -42,6 +43,7 @@ class quickstack::ceilometer_controller(
         rabbit_port     => $amqp_port,
         rabbit_userid   => $amqp_username,
         rabbit_password => $amqp_password,
+        rabbit_use_ssl  => $rabbit_use_ssl,
         rpc_backend     => amqp_backend('ceilometer', $amqp_provider),
         verbose         => $verbose,
     }

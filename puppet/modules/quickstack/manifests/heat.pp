@@ -17,6 +17,7 @@ class quickstack::heat(
   $amqp_username           = '',
   $amqp_password           = '',
   $amqp_provider           = 'rabbitmq',
+  $rabbit_use_ssl          = false,
 
   $cfn_host                = '127.0.0.1',
   $cloudwatch_host         = '127.0.0.1',
@@ -68,6 +69,7 @@ class quickstack::heat(
     rabbit_port       => $amqp_port,
     rabbit_userid     => $amqp_username,
     rabbit_password   => $amqp_password,
+    rabbit_use_ssl    => $rabbit_use_ssl,
     use_syslog        => str2bool_i("$use_syslog"),
     log_facility      => $log_facility,
     verbose           => $verbose,
