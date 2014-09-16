@@ -208,7 +208,6 @@ class quickstack::pacemaker::glance (
       include ::quickstack::pacemaker::ceph_config
 
       Class['quickstack::pacemaker::ceph_config'] ->
-      Package['python-ceph'] ->
       Class['quickstack::ceph::client_packages'] ->
       Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
     }
