@@ -181,6 +181,12 @@ class quickstack::pacemaker::cinder(
     }
 
     if str2bool_i("$volume") {
+      # FIXME(jistr): remove the host override
+      # https://bugs.launchpad.net/cinder/+bug/1322190
+      cinder_config {
+        'DEFAULT/host': value => 'ha-controller';
+      }
+
       Class['::quickstack::cinder']
       ->
       class {'::quickstack::cinder_volume':
@@ -224,20 +230,21 @@ class quickstack::pacemaker::cinder(
       Exec['all-cinder-nodes-are-up']
       ->
       quickstack::pacemaker::resource::service {'openstack-cinder-volume':
-        clone => true,
+        # FIXME(jistr): set 'clone => true'
+        # https://bugs.launchpad.net/cinder/+bug/1322190
         options => 'start-delay=10s',
       }
       ->
       quickstack::pacemaker::constraint::base { 'cinder-scheduler-volume-constr' :
         constraint_type => "order",
         first_resource  => "openstack-cinder-scheduler-clone",
-        second_resource => "openstack-cinder-volume-clone",
+        second_resource => "openstack-cinder-volume",
         first_action    => "start",
         second_action   => "start",
       }
       ->
       quickstack::pacemaker::constraint::colocation { 'cinder-scheduler-volume-colo' :
-        source => "openstack-cinder-volume-clone",
+        source => "openstack-cinder-volume",
         target => "openstack-cinder-scheduler-clone",
         score => "INFINITY",
       }
