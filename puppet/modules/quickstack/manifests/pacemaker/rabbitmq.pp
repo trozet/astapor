@@ -1,5 +1,5 @@
 class quickstack::pacemaker::rabbitmq (
-  $haproxy_timeout       = '120s',
+  $haproxy_timeout       = '900m',
   $inet_dist_listen      = '35672'
 ) {
 
