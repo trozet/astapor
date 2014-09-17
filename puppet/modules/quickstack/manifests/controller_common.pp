@@ -11,6 +11,8 @@ class quickstack::controller_common (
   $ceph_volumes_key              = '',
   $ceph_mon_host                 = [ ],
   $ceph_mon_initial_members      = [ ],
+  $ceph_osd_pool_default_size    = '',
+  $ceph_osd_journal_size         = '',
   $cinder_backend_eqlx           = $quickstack::params::cinder_backend_eqlx,
   $cinder_backend_eqlx_name      = $quickstack::params::cinder_backend_eqlx_name,
   $cinder_backend_gluster        = $quickstack::params::cinder_backend_gluster,
@@ -355,13 +357,15 @@ class quickstack::controller_common (
     }
     if $ceph_fsid {
       class { '::quickstack::ceph::config':
-        fsid                => $ceph_fsid,
-        cluster_network     => $ceph_cluster_network,
-        public_network      => $ceph_public_network,
-        mon_initial_members => $ceph_mon_initial_members,
-        mon_host            => $ceph_mon_host,
-        images_key          => $ceph_images_key,
-        volumes_key         => $ceph_volumes_key,
+        fsid                  => $ceph_fsid,
+        cluster_network       => $ceph_cluster_network,
+        public_network        => $ceph_public_network,
+        mon_initial_members   => $ceph_mon_initial_members,
+        mon_host              => $ceph_mon_host,
+        images_key            => $ceph_images_key,
+        volumes_key           => $ceph_volumes_key,
+        osd_pool_default_size => $ceph_osd_pool_default_size,
+        osd_journal_size      => $ceph_osd_journal_size,
       } -> Class['quickstack::ceph::client_packages']
     }
   }

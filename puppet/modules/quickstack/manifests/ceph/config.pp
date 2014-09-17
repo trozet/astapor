@@ -1,13 +1,17 @@
 # Class quickstack::ceph::config
 #
 # Parameters:
-#   [*fsid*]                - fsid in /etc/ceph/ceph.conf, e.g. a uuid from uuidgen
-#   [*mon_initial_members*] - mon_initial_members in /etc/ceph/ceph.conf (array of short hostnames)
-#   [*mon_host*]            - mon_host in /etc/ceph/ceph.conf (array of IP's)
-#   [*cluster_network*]     - subnet, e.g. 10.0.0.0/24
-#   [*public_network*]      - subnet, e.g. 10.0.1.0/24
-#   [*images_key*]          - key in /etc/ceph/ceph.client.images.keyring
-#   [*volumes_key*]         - key in /etc/ceph/ceph.client.volumes.keyring
+#   [*fsid*]                  - fsid in /etc/ceph/ceph.conf, e.g. a uuid from uuidgen
+#   [*mon_initial_members*]   - mon_initial_members in /etc/ceph/ceph.conf (array of short hostnames)
+#   [*mon_host*]              - mon_host in /etc/ceph/ceph.conf (array of IP's)
+#   [*cluster_network*]       - subnet, e.g. 10.0.0.0/24
+#   [*public_network*]        - subnet, e.g. 10.0.1.0/24
+#   [*images_key*]            - key in /etc/ceph/ceph.client.images.keyring
+#   [*volumes_key*]           - key in /etc/ceph/ceph.client.volumes.keyring
+#   [*osd_pool_default_size*] - osd_pool_default_size in in /etc/ceph/ceph.conf (effects replicas)
+#                                leave blank to omit from ceph.conf
+#   [*osd_journal_size*]      - osd_journal_size in in /etc/ceph/ceph.conf
+#                                leave blank to omit from ceph.conf
 #
 # Usage:
 #
@@ -22,13 +26,15 @@
 
 
 class quickstack::ceph::config (
-  $fsid                = '',
-  $mon_initial_members = [ ],
-  $mon_host            = [ ],
-  $cluster_network     = '',
-  $public_network      = '',
-  $images_key          = '',
-  $volumes_key         = '',
+  $fsid                  = '',
+  $mon_initial_members   = [ ],
+  $mon_host              = [ ],
+  $cluster_network       = '',
+  $public_network        = '',
+  $images_key            = '',
+  $volumes_key           = '',
+  $osd_pool_default_size = '',
+  $osd_journal_size      = '',
 ) {
 
   file { "etc-ceph":
@@ -56,5 +62,5 @@ class quickstack::ceph::config (
     ::quickstack::ceph::keyring_config{ "volumes":
       key => $volumes_key,
     }
-  }  
+  }
 }

@@ -18,13 +18,15 @@ class quickstack::compute_common (
   $ceilometer                   = 'true',
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
   $ceilometer_user_password     = $quickstack::params::ceilometer_user_password,
-  $ceph_cluster_network         = '', 
-  $ceph_public_network          = '', 
+  $ceph_cluster_network         = '',
+  $ceph_public_network          = '',
   $ceph_fsid                    = '',
   $ceph_images_key              = '',
   $ceph_volumes_key             = '',
   $ceph_mon_host                = [ ],
   $ceph_mon_initial_members     = [ ],
+  $ceph_osd_pool_default_size   = '',
+  $ceph_osd_journal_size        = '',
   $cinder_backend_gluster       = $quickstack::params::cinder_backend_gluster,
   $cinder_backend_nfs           = 'false',
   $cinder_backend_rbd           = 'false',
@@ -88,13 +90,15 @@ class quickstack::compute_common (
     include ::quickstack::ceph::client_packages
     if $ceph_fsid {
       class { '::quickstack::ceph::config':
-        fsid                => $ceph_fsid,
-        cluster_network     => $ceph_cluster_network,
-        public_network      => $ceph_public_network,
-        mon_initial_members => $ceph_mon_initial_members,
-        mon_host            => $ceph_mon_host,
-        images_key          => $ceph_images_key,
-        volumes_key         => $ceph_volumes_key,
+        fsid                  => $ceph_fsid,
+        cluster_network       => $ceph_cluster_network,
+        public_network        => $ceph_public_network,
+        mon_initial_members   => $ceph_mon_initial_members,
+        mon_host              => $ceph_mon_host,
+        images_key            => $ceph_images_key,
+        volumes_key           => $ceph_volumes_key,
+        osd_pool_default_size => $ceph_osd_pool_default_size,
+        osd_journal_size      => $ceph_osd_journal_size,
       } -> Class['quickstack::ceph::client_packages']
     }
     package {'python-ceph': } ->

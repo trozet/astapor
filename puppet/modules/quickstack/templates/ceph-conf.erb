@@ -6,9 +6,13 @@ auth_cluster_required = cephx
 auth_service_required = cephx
 auth_client_required = cephx
 filestore_xattr_use_omap = true
-<% if @public_network.length > 0 %>public_network =  <%= @public_network %><% end %>
-<% if @cluster_network.length > 0 %>cluster_network =  <%= @cluster_network %><% end %>
-<% if @images_key.length > 0 %>
+<%
+@chunk = ''
+@chunk = @public_network.length > 0 ? @chunk + "public_network = #{@public_network}\n" : @chunk
+@chunk = @cluster_network.length > 0 ? @chunk + "cluster_network = #{@cluster_network}\n" : @chunk
+@chunk = @osd_pool_default_size.length > 0 ? @chunk + "osd_pool_default_size = #{@osd_pool_default_size}\n" : @chunk
+@chunk = @osd_journal_size.length > 0 ? @chunk + "osd_journal_size = #{@osd_journal_size}\n" : @chunk %>
+<%= @chunk %><% if @images_key.length > 0 %>
 [client.images]
 keyring = /etc/ceph/ceph.client.images.keyring<% end %>
 <% if @volumes_key.length > 0 %>
