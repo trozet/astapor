@@ -121,6 +121,8 @@ class quickstack::compute_common (
     ->
     Class['quickstack::ceph::client_packages']
     ->
+    Service[libvirt]
+    ->
     exec { 'define-virsh-rbd-secret':
       command => '/usr/bin/virsh secret-define --file /etc/nova/secret.xml',
       onlyif => "/usr/bin/ceph --connect-timeout 10 auth get-key client.${libvirt_images_rbd_pool} >/dev/null 2>&1",
