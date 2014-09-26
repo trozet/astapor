@@ -457,7 +457,7 @@ class quickstack::controller_common (
 
   firewall { '001 controller incoming pt2':
     proto    => 'tcp',
-    dport    => ['8000', '8003', '8004'],
+    dport    => ['8000', '8003', '8004','6789'],
     action   => 'accept',
   }
 
