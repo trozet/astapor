@@ -206,6 +206,10 @@ class quickstack::pacemaker::glance (
     if ($backend == 'rbd') {
       include ::quickstack::ceph::client_packages
       include ::quickstack::pacemaker::ceph_config
+      include ::quickstack::firewall::ceph_mon
+
+      Class['quickstack::firewall::ceph_mon'] -> 
+      Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
 
       Class['quickstack::pacemaker::ceph_config'] ->
       Class['quickstack::ceph::client_packages'] ->
