@@ -62,7 +62,8 @@ class quickstack::pacemaker::rabbitmq (
     Class['::rabbitmq'] ->
     exec {"rabbit-mirrored-queues":
       command => '/usr/sbin/rabbitmqctl set_policy HA \'^(?!amq\.).*\' \'{"ha-mode": "all"}\'',
-      unless  => '/usr/sbin/rabbitmqctl list_policies | grep -q HA'
+      unless  => '/usr/sbin/rabbitmqctl list_policies | grep -q HA',
+      require => Service['rabbitmq-server'],
     } ->
     Class['::quickstack::load_balancer::amqp'] ->
 
