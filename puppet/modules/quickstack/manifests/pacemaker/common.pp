@@ -40,8 +40,7 @@ class quickstack::pacemaker::common (
   $fence_ipmilan_host_to_address  = [],
   $fence_ipmilan_expose_lanplus   = "true",
   $fence_ipmilan_lanplus_options  = "",
-  $fence_xvm_clu_iface            = "eth2",
-  $fence_xvm_clu_network          = "",
+  $fence_xvm_port                 = "",
   $fence_xvm_manage_key_file      = "false",
   $fence_xvm_key_file_password    = "",
 ) {
@@ -89,17 +88,19 @@ class quickstack::pacemaker::common (
   }
   elsif $fencing_type =~ /(?i-mx:^fence_xvm$)/ {
     $fencing = true
-    $clu_ip_address = find_ip("$fence_xvm_clu_network",
-                              "$fence_xvm_clu_iface",
-                              "")
     class {'pacemaker::stonith':
       disable => false,
     }
+    $xvm_port = $fence_xvm_port ? {
+      ''      =>  "$::hostname",
+      default =>  "$fence_xvm_port",
+    }
+    class {'::quickstack::firewall::fence_xvm':} ->
     class {'pacemaker::stonith::fence_xvm':
       name              => "$::hostname",
       manage_key_file   => str2bool_i("$fence_xvm_manage_key_file"),
       key_file_password => $fence_xvm_key_file_password,
-      port              => "$::hostname",    # the name of the vm
+      port              => $xvm_port,  # the domname or uuid of the vm
     }
   }
   else {
