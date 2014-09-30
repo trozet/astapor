@@ -83,6 +83,7 @@ class quickstack::controller_common (
   $amqp_password                 = $quickstack::params::amqp_password,
   $verbose                       = $quickstack::params::verbose,
   $ssl                           = $quickstack::params::ssl,
+  $support_profile               = $quickstack::params::support_profile,
   $freeipa                       = $quickstack::params::freeipa,
   $mysql_ca                      = $quickstack::params::mysql_ca,
   $mysql_cert                    = $quickstack::params::mysql_cert,
@@ -449,6 +450,7 @@ class quickstack::controller_common (
     horizon_cert          => $horizon_cert,
     horizon_key           => $horizon_key,
     horizon_ca            => $horizon_ca,
+    neutron_options       => { 'profile_support' => $support_profile },
   }
 
   class {'memcached':}

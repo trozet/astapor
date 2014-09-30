@@ -1,6 +1,7 @@
 # Quickstack compute node configuration for neutron (OpenStack Networking)
 class quickstack::neutron::compute (
   $admin_password               = $quickstack::params::admin_password,
+  $agent_type                   = 'ovs',
   $auth_host                    = '127.0.0.1',
   $ceilometer                   = 'true',
   $ceilometer_metering_secret   = $quickstack::params::ceilometer_metering_secret,
@@ -45,6 +46,7 @@ class quickstack::neutron::compute (
   $ovs_tunnel_types             = $quickstack::params::ovs_tunnel_types,
   $verbose                      = $quickstack::params::verbose,
   $ssl                          = $quickstack::params::ssl,
+  $security_group_api		= 'neutron',
   $mysql_ca                     = $quickstack::params::mysql_ca,
   $libvirt_images_rbd_pool      = 'volumes',
   $libvirt_images_rbd_ceph_conf = '/etc/ceph/ceph.conf',
@@ -100,30 +102,33 @@ class quickstack::neutron::compute (
     'keystone_authtoken/admin_password':    value => $neutron_user_password;
   }
 
-  class { '::neutron::plugins::ovs':
-    sql_connection      => $sql_connection,
-    tenant_network_type => $tenant_network_type,
-    network_vlan_ranges => $ovs_vlan_ranges,
-    tunnel_id_ranges    => $tunnel_id_ranges,
-    vxlan_udp_port      => $ovs_vxlan_udp_port,
-  }
+  if downcase("$agent_type") == 'ovs' {
+    class { '::neutron::plugins::ovs':
+      sql_connection      => $sql_connection,
+      tenant_network_type => $tenant_network_type,
+      network_vlan_ranges => $ovs_vlan_ranges,
+      tunnel_id_ranges    => $tunnel_id_ranges,
+      vxlan_udp_port      => $ovs_vxlan_udp_port,
+    }
 
-  neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
+    neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
 
-  $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
-  class { '::neutron::agents::ovs':
-    bridge_uplinks   => $ovs_bridge_uplinks,
-    bridge_mappings  => $ovs_bridge_mappings,
-    local_ip         => $local_ip,
-    enable_tunneling => str2bool_i("$enable_tunneling"),
-    tunnel_types     => $ovs_tunnel_types,
-    vxlan_udp_port   => $ovs_vxlan_udp_port,
+    $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
+    class { '::neutron::agents::ovs':
+      bridge_uplinks      => $ovs_bridge_uplinks,
+      bridge_mappings     => $ovs_bridge_mappings,
+      local_ip            => $local_ip,
+      enable_tunneling    => str2bool_i("$enable_tunneling"),
+      tunnel_types     => $ovs_tunnel_types,
+      vxlan_udp_port   => $ovs_vxlan_udp_port,
+    }
   }
 
   class { '::nova::network::neutron':
     neutron_admin_password => $neutron_user_password,
     neutron_url            => "http://${neutron_host}:9696",
     neutron_admin_auth_url => "http://${auth_host}:35357/v2.0",
+    security_group_api     => $security_group_api,
   }
 
 
