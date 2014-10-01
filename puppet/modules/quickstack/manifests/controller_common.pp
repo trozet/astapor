@@ -99,6 +99,7 @@ class quickstack::controller_common (
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
+  include ::quickstack::cron::keystone_token
 
   if str2bool_i("$ssl") {
     $qpid_protocol = 'ssl'
