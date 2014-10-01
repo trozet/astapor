@@ -20,6 +20,7 @@ class quickstack::pacemaker::neutron (
   $ovs_tunnel_types           = [],
   $tenant_network_type        = 'vlan',
   $tunnel_id_ranges           = '1:1000',
+  $nexus_config               = {},
   $verbose                    = 'false',
 ) {
   include quickstack::pacemaker::common
@@ -115,6 +116,7 @@ class quickstack::pacemaker::neutron (
       amqp_username                 => map_params("amqp_username"),
       amqp_password                 => map_params("amqp_password"),
       tenant_network_type           => $tenant_network_type,
+      nexus_config                  => $nexus_config,
       verbose                       => $verbose,
     }
     ->
