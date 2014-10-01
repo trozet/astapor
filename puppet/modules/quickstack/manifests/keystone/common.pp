@@ -84,4 +84,6 @@ class quickstack::keystone::common (
     verbose        => $verbose,
   }
   contain keystone
+
+  include ::quickstack::cron::keystone_token
 }
