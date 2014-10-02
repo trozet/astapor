@@ -25,6 +25,7 @@ class quickstack::controller_common (
   $cinder_backend_rbd_name       = $quickstack::params::cinder_backend_rbd_name,
   $cinder_db_password            = $quickstack::params::cinder_db_password,
   $cinder_multiple_backends      = $quickstack::params::cinder_multiple_backends,
+  $cinder_create_volume_types    = true,
   $cinder_gluster_shares         = $quickstack::params::cinder_gluster_shares,
   $cinder_nfs_shares             = $quickstack::params::cinder_nfs_shares,
   $cinder_nfs_mount_options      = $quickstack::params::cinder_nfs_mount_options,
@@ -404,6 +405,27 @@ class quickstack::controller_common (
     rbd_max_clone_depth    => $cinder_rbd_max_clone_depth,
     rbd_user               => $cinder_rbd_user,
     rbd_secret_uuid        => $cinder_rbd_secret_uuid,
+  }
+
+  if str2bool_i("$cinder_create_volume_types") and str2bool_i("$cinder_multiple_backends") {
+    Class['::cinder::keystone::auth'] ->
+    class {'::quickstack::cinder_volume_types':
+      backend_glusterfs      => $cinder_backend_gluster,
+      backend_glusterfs_name => $cinder_backend_gluster_name,
+      backend_iscsi          => $cinder_backend_iscsi,
+      backend_iscsi_name     => $cinder_backend_iscsi_name,
+      backend_nfs            => $cinder_backend_nfs,
+      backend_nfs_name       => $cinder_backend_nfs_name,
+      backend_eqlx           => $cinder_backend_eqlx,
+      backend_eqlx_name      => $cinder_backend_eqlx_name,
+      backend_rbd            => $cinder_backend_rbd,
+      backend_rbd_name       => $cinder_backend_rbd_name,
+      os_username            => 'admin',
+      os_tenant_name         => 'admin',
+      os_password            => $admin_password,
+      os_auth_url            => "http://${controller_admin_host}:35357/v2.0/",
+      cinder_api_host        => $controller_admin_host,
+    }
   }
 
   class { 'quickstack::heat_controller':

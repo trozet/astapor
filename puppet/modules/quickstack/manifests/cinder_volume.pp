@@ -9,6 +9,7 @@ class quickstack::cinder_volume(
   $backend_nfs_name       = 'nfs_backend',
   $backend_rbd            = false,
   $backend_rbd_name       = 'rbd_backend',
+  # when adding a new backend, add a type to cinder_volume_types class
 
   $multiple_backends      = false,
 
