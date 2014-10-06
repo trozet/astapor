@@ -75,7 +75,9 @@ class quickstack::neutron::networker (
 
     neutron_plugin_ovs { 'AGENT/l2_population': value => "$ovs_l2_population"; }
 
-    $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
+    $local_ip = find_ip("$ovs_tunnel_network",
+                        ["$ovs_tunnel_iface","$external_network_bridge"],
+                        "")
 
     class { '::neutron::agents::ovs':
       bridge_uplinks   => $ovs_bridge_uplinks,

@@ -152,7 +152,9 @@ class quickstack::neutron::all (
     neutron_admin_auth_url => "http://${auth_host}:35357/v2.0",
   }
 
-  $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
+  $local_ip = find_ip("$ovs_tunnel_network",
+                      ["$ovs_tunnel_iface","$external_network_bridge"],
+                      "")
 
   class { '::neutron::agents::ovs':
     bridge_mappings  => $ovs_bridge_mappings,
