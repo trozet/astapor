@@ -187,6 +187,10 @@ class quickstack::neutron::all (
     shared_secret  => $neutron_metadata_proxy_secret,
   }
 
+  neutron_config {
+    'DEFAULT/host': value => 'neutron-n-0';
+  }
+
   include quickstack::neutron::notifications
 
   #class { 'neutron::agents::lbaas': }
