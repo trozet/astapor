@@ -40,7 +40,6 @@ class quickstack::neutron::plugins::cisco (
   $mysql_ca                     = $quickstack::params::mysql_ca,
   $n1kv_vsm_ip                  = $quickstack::params::n1kv_vsm_ip,
   $n1kv_vsm_password            = $quickstack::params::n1kv_vsm_password,
-  $n1kv_supplemental_repo       = $quickstack::params::n1kv_supplemental_repo,
   $n1kv_plugin_additional_params = { default_policy_profile => 'default-pp',
                                      network_node_policy_profile => 'default-pp',
                                      poll_duration => '10',
@@ -53,6 +52,8 @@ class quickstack::neutron::plugins::cisco (
   $neutron_user_password        = $quickstack::params::neutron_user_password,
   $nexus_config                 = $quickstack::params::nexus_config,
   $nexus_credentials            = $quickstack::params::nexus_credentials,
+  $neutron_core_plugin          = '',
+  $n1kv_os_ha                   = 'false',
   # ovs config
   $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
   $provider_vlan_auto_create    = $quickstack::params::provider_vlan_auto_create,
@@ -104,27 +105,29 @@ class quickstack::neutron::plugins::cisco (
       vswitch_plugin    => $cisco_vswitch_plugin,
     }
 
-    $listen_ssl                         = str2bool_i("$ssl")
-    $neutron_defaults 			= {'enable_lb' => false, 'enable_firewall' => false, 'enable_quotas' => true, 'enable_security_group' => true, 'enable_vpn' => false, 'profile_support' => 'None' }
-    $neutron_options         		= {'enable_lb' => true, 'enable_firewall' => true, 'enable_quotas' => false, 'enable_security_group' => false, 'enable_vpn' => true, 'profile_support' => 'cisco' }
-    $secret_key                         = $horizon_secret_key
-    $keystone_host                      = $controller_priv_host
-    $fqdn                               = ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost']
-    $openstack_endpoint_type		= undef
-    $compress_offline			= True
-    $file_upload_temp_dir		= '/tmp'
-    $available_regions       		= undef
-    $hypervisor_options 		= {'can_set_mount_point' => false, 'can_set_password' => true }
-    $hypervisor_defaults 		= {'can_set_mount_point' => $can_set_mount_point, 'can_set_password'  => false }
-    file {'/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py':
-      content => template('/usr/share/openstack-puppet/modules/horizon/templates/local_settings.py.erb')
-    } ~> Service['httpd']
+    if $n1kv_os_ha == 'false' {
+      $listen_ssl                  = str2bool_i("$ssl")
+      $neutron_defaults     	   = {'enable_lb' => false, 'enable_firewall' => false, 'enable_quotas' => true, 'enable_security_group' => true, 'enable_vpn' => false, 'profile_support' => 'None' }
+      $neutron_options         	   = {'enable_lb' => true, 'enable_firewall' => true, 'enable_quotas' => false, 'enable_security_group' => false, 'enable_vpn' => true, 'profile_support' => 'cisco' }
+      $secret_key                  = $horizon_secret_key
+      $keystone_host               = $controller_priv_host
+      $fqdn                        = ["$controller_pub_host", "$::fqdn", "$::hostname", 'localhost']
+      $openstack_endpoint_type	   = undef
+      $compress_offline		   = True
+      $file_upload_temp_dir	   = '/tmp'
+      $available_regions       	   = undef
+      $hypervisor_options 	   = {'can_set_mount_point' => false, 'can_set_password' => true }
+      $hypervisor_defaults 	   = {'can_set_mount_point' => $can_set_mount_point, 'can_set_password'  => false }
+      file {'/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py':
+        content => template('/usr/share/openstack-puppet/modules/horizon/templates/local_settings.py.erb')
+      } ~> Service['httpd']
 
-    $disable_router    = 'False'
-    Neutron_plugin_cisco<||> ->
-    file {'/usr/share/openstack-dashboard/openstack_dashboard/enabled/_40_router.py':
-      content => template('quickstack/_40_router.py.erb')
-    } ~> Service['httpd']
+      $disable_router    = 'False'
+      Neutron_plugin_cisco<||> ->
+      file {'/usr/share/openstack-dashboard/openstack_dashboard/enabled/_40_router.py':
+        content => template('quickstack/_40_router.py.erb')
+      } ~> Service['httpd']
+    }
 
     $default_policy_profile      = $n1kv_plugin_additional_params[default_policy_profile]
     $network_node_policy_profile = $n1kv_plugin_additional_params[network_node_policy_profile]
