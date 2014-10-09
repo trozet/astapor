@@ -1,14 +1,15 @@
 class quickstack::cinder_volume(
   $backend_eqlx           = false,
-  $backend_eqlx_name      = ['eqlx_backend'],
+  $backend_eqlx_name      = ['eqlx'],
   $backend_glusterfs      = false,
-  $backend_glusterfs_name = 'glusterfs_backend',
+  $backend_glusterfs_name = 'glusterfs',
   $backend_iscsi          = false,
-  $backend_iscsi_name     = 'iscsi_backend',
+  $backend_iscsi_name     = 'iscsi',
   $backend_nfs            = false,
-  $backend_nfs_name       = 'nfs_backend',
+  $backend_nfs_name       = 'nfs',
   $backend_rbd            = false,
-  $backend_rbd_name       = 'rbd_backend',
+  $backend_rbd_name       = 'rbd',
+  # when adding a new backend, add a type to cinder_volume_types class
 
   $multiple_backends      = false,
 

@@ -4,17 +4,18 @@ class quickstack::pacemaker::cinder(
 
   $volume                 = false,
   $backend_eqlx           = false,
-  $backend_eqlx_name      = ['eqlx_backend'],
+  $backend_eqlx_name      = ['eqlx'],
   $backend_glusterfs      = false,
-  $backend_glusterfs_name = 'glusterfs_backend',
+  $backend_glusterfs_name = 'glusterfs',
   $backend_iscsi          = false,
-  $backend_iscsi_name     = 'iscsi_backend',
+  $backend_iscsi_name     = 'iscsi',
   $backend_nfs            = false,
-  $backend_nfs_name       = 'nfs_backend',
+  $backend_nfs_name       = 'nfs',
   $backend_rbd            = false,
-  $backend_rbd_name       = 'rbd_backend',
+  $backend_rbd_name       = 'rbd',
 
   $multiple_backends      = false,
+  $create_volume_types    = true,
 
   $glusterfs_shares       = [],
 
@@ -61,6 +62,7 @@ class quickstack::pacemaker::cinder(
 
     $cinder_user_password = map_params("cinder_user_password")
     $cinder_private_vip   = map_params("cinder_private_vip")
+    $cinder_admin_vip     = map_params("cinder_admin_vip")
     $pcmk_cinder_group    = map_params("cinder_group")
     $db_host              = map_params("db_vip")
     $db_password          = map_params("cinder_db_password")
@@ -248,6 +250,30 @@ class quickstack::pacemaker::cinder(
         target => "openstack-cinder-scheduler-clone",
         score => "INFINITY",
       }
+    }
+
+    if str2bool_i("$create_volume_types") and str2bool_i("$multiple_backends") {
+      Class['::quickstack::cinder']
+      ->
+      class {'::quickstack::cinder_volume_types':
+        backend_glusterfs      => $backend_glusterfs,
+        backend_glusterfs_name => $backend_glusterfs_name,
+        backend_iscsi          => $backend_iscsi,
+        backend_iscsi_name     => $backend_iscsi_name,
+        backend_nfs            => $backend_nfs,
+        backend_nfs_name       => $backend_nfs_name,
+        backend_eqlx           => $backend_eqlx,
+        backend_eqlx_name      => $backend_eqlx_name,
+        backend_rbd            => $backend_rbd,
+        backend_rbd_name       => $backend_rbd_name,
+        os_username            => 'admin',
+        os_tenant_name         => $::quickstack::pacemaker::keystone::admin_tenant,
+        os_password            => $::quickstack::pacemaker::keystone::admin_password,
+        os_auth_url            => "http://${keystone_host}:35357/v2.0/",
+        cinder_api_host        => $cinder_admin_vip,
+      }
+      ->
+      Exec['pcs-cinder-server-set-up']
     }
 
     if (str2bool_i($backend_rbd)) {
