@@ -21,6 +21,7 @@ class quickstack::galera::server (
       bind_address   => $mysql_bind_address,
       root_password  => $mysql_root_password,
       default_engine => 'InnoDB',
+      restart => false,
     },
     service_enable        => $service_enable,
     service_ensure        => $service_ensure,

@@ -37,7 +37,6 @@ class quickstack::pacemaker::galera (
       $galera_bootstrap = false
       $galera_test     = "/tmp/ha-all-in-one-util.bash property_exists galera"
     }
-
     class {"::quickstack::load_balancer::galera":
       frontend_pub_host    => map_params("db_vip"),
       backend_server_names => map_params("lb_backend_server_names"),
@@ -79,16 +78,23 @@ class quickstack::pacemaker::galera (
       wsrep_ssl_key           => $wsrep_ssl_key,
       wsrep_ssl_cert          => $wsrep_ssl_cert,
     } ->
-    class {"::mysql::server::account_security": } ->
-    class {"::quickstack::galera::db":
-      keystone_db_password => map_params("keystone_db_password"),
-      glance_db_password   => map_params("glance_db_password"),
-      nova_db_password     => map_params("nova_db_password"),
-      cinder_db_password   => map_params("cinder_db_password"),
-      heat_db_password     => map_params("heat_db_password"),
-      neutron_db_password  => map_params("neutron_db_password"),
-      require              => File['/root/.my.cnf'],
-    } ->
+    class {"::mysql::server::account_security": }
+    if (has_interface_with("ipaddress", map_params("cluster_control_ip")) and str2bool_i($::galera_bootstrap_ok)) {
+      Class ['::mysql::server::account_security'] ->
+      class {"::quickstack::galera::db":
+        keystone_db_password => map_params("keystone_db_password"),
+        glance_db_password   => map_params("glance_db_password"),
+        nova_db_password     => map_params("nova_db_password"),
+        cinder_db_password   => map_params("cinder_db_password"),
+        heat_db_password     => map_params("heat_db_password"),
+        neutron_db_password  => map_params("neutron_db_password"),
+        require              => File['/root/.my.cnf'],
+      } ->
+      Exec['pcs-galera-server-setup']
+    } else {
+      Class ['::mysql::server::account_security'] ->
+      Exec['pcs-galera-server-setup']
+    }
     exec {"pcs-galera-server-setup":
       command => "/usr/sbin/pcs property set galera=running --force",
     } ->
@@ -96,6 +102,7 @@ class quickstack::pacemaker::galera (
       timeout   => 3600,
       tries     => 360,
       try_sleep => 10,
+      environment => ["AVAILABLE_WHEN_READONLY=0"],
       command   => "/usr/bin/clustercheck >/dev/null",
     } ->
     exec {"pcs-galera-server-set-up-on-this-node":
@@ -139,15 +146,32 @@ class quickstack::pacemaker::galera (
 
     quickstack::pacemaker::resource::service {'mysqld':
       group          => "$pcmk_galera_group",
-      options        => 'start timeout=500s meta ordered=true',
+      options        => 'start timeout=500s',
       clone          => true,
     } ->
     # one last clustercheck to make sure service is up
     exec {"galera-online":
       timeout   => 3600,
-      tries     => 360,
-      try_sleep => 10,
-      command   => "/usr/bin/clustercheck >/dev/null",
+      tries     => 60,
+      try_sleep => 60,
+      environment => ["AVAILABLE_WHEN_READONLY=0"],
+      # if clustercheck fails, it may be that we need to allow
+      #  pacemaker to re-attempt to start mysqld on a node, which we
+      #  can acheive by cleaning up the resource
+      command   => '/usr/bin/clustercheck || (/usr/sbin/pcs resource cleanup mysqld-clone && /bin/false)',
+    }
+
+    # in the bootstrap case, make sure pacemaker galera resource
+    # has been created before the final "galera-online" check
+    if str2bool_i($::galera_bootstrap_ok) {
+      Quickstack::Pacemaker::Resource::Service['mysqld'] ->
+      exec {"wait-for-pacemaker-galera-resource-existence":
+        timeout   => 3600,
+        tries     => 59,
+        try_sleep => 60,
+        command    => '/usr/sbin/pcs resource show mysqld-clone && /bin/sleep 60',
+      } ->
+      Exec['galera-online']
     }
   }
 }
