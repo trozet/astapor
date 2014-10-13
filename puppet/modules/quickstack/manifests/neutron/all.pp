@@ -232,11 +232,11 @@ class quickstack::neutron::all (
 
   class {'::quickstack::firewall::neutron':}
 
-  class {'quickstack::neutron::plugins::neutron_config':
+  class {'::quickstack::neutron::plugins::neutron_config':
     neutron_conf_additional_params => $neutron_conf_additional_params,
   }
  
-  class {'quickstack::neutron::plugins::nova_config':
+  class {'::quickstack::neutron::plugins::nova_config':
     nova_conf_additional_params => $nova_conf_additional_params,
   }
 
