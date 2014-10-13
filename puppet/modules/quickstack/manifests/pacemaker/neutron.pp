@@ -134,6 +134,8 @@ class quickstack::pacemaker::neutron (
       neutron_url                   => map_params("neutron_public_vip"),
       neutron_user_password         => map_params("neutron_user_password"),
       neutron_metadata_proxy_secret => map_params("neutron_metadata_proxy_secret"),
+      neutron_conf_additional_params=> $neutron_conf_additional_params,
+      nova_conf_additional_params   => $nova_conf_additional_params,
       n1kv_vsm_ip                  => $n1kv_vsm_ip,
       n1kv_vsm_password            => $n1kv_vsm_password,
       n1kv_plugin_additional_params => $n1kv_plugin_additional_params,
@@ -149,6 +151,7 @@ class quickstack::pacemaker::neutron (
       amqp_username                 => map_params("amqp_username"),
       amqp_password                 => map_params("amqp_password"),
       tenant_network_type           => $tenant_network_type,
+      security_group_api            => $security_group_api,
       nexus_config                  => $nexus_config,
       verbose                       => $verbose,
     }
