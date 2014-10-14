@@ -1,0 +1,90 @@
+---
+admin_email: 'admin@example.com'
+
+amqp_provider: 'rabbitmq'
+amqp: 'true'
+cinder: 'false'
+glance: 'true'
+fencing: 'disabled'
+heat: 'true'
+horizon: 'true'
+keystone: 'true'
+mysql: 'true'
+neutron: 'true'
+nova: 'true'
+swift: 'false'
+
+network_admin: '192.168.1'
+network_internal: '192.168.2'
+network_public: '192.168.3'
+
+private_iface: 'eth2'
+private_ip: ''
+private_network: "%{hiera('network_internal')}.0"
+public_network: "%{hiera('network_public')}.0"
+tunnel_iface: 'eth2'
+tunnel_network: ''
+
+server1_name: 'controller1'
+server1_ip: "%{hiera('network_admin')}.11"
+server2_name: 'controller2'
+server2_ip: "%{hiera('network_admin')}.12"
+server3_name: 'controller3'
+server3_ip: "%{hiera('network_admin')}.13"
+
+storage1_ip: "%{hiera('network_internal')}.14"
+storage2_ip: "%{hiera('network_internal')}.15"
+storage3_ip: "%{hiera('network_internal')}.16"
+
+cluster_control_ip: "%{hiera('server1_ip')}"
+swift_storage1_ip: "%{hiera('storage1_ip')}"
+glance_device: "%{hiera('storage2_ip')}:/mnt/glance"
+nfs_share1: "%{hiera('storage3_ip')}:/mnt/cinder"
+
+# Infra VIPs
+amqp_vip: "%{hiera('network_admin')}.200"
+db_vip: "%{hiera('network_admin')}.201"
+loadbalancer_vip: "%{hiera('network_admin')}.202"
+
+# Openstack VIPs
+ceilometer_vip: '203'
+cinder_vip: '204'
+glance_vip: '205'
+heat_cfn_vip: '206'
+heat_vip: '207'
+horizon_vip: '208'
+keystone_vip: '209'
+neutron_vip: '210'
+nova_vip: '211'
+swift_vip: '212'
+
+ceilometer_vip_admin: "%{hiera('network_admin')}.%{hiera('ceilometer_vip')}"
+ceilometer_vip_internal: "%{hiera('network_internal')}.%{hiera('ceilometer_vip')}"
+ceilometer_vip_public: "%{hiera('network_public')}.%{hiera('ceilometer_vip')}"
+cinder_vip_admin: "%{hiera('network_admin')}.%{hiera('cinder_vip')}"
+cinder_vip_internal: "%{hiera('network_internal')}.%{hiera('cinder_vip')}"
+cinder_vip_public: "%{hiera('network_public')}.%{hiera('cinder_vip')}"
+glance_vip_admin: "%{hiera('network_admin')}.%{hiera('glance_vip')}"
+glance_vip_internal: "%{hiera('network_internal')}.%{hiera('glance_vip')}"
+glance_vip_public: "%{hiera('network_public')}.%{hiera('glance_vip')}"
+heat_cfn_vip_admin: "%{hiera('network_admin')}.%{hiera('heat_cfn_vip')}"
+heat_cfn_vip_internal: "%{hiera('network_internal')}.%{hiera('heat_cfn_vip')}"
+heat_cfn_vip_public: "%{hiera('network_public')}.%{hiera('heat_cfn_vip')}"
+heat_vip_admin: "%{hiera('network_admin')}.%{hiera('heat_vip')}"
+heat_vip_internal: "%{hiera('network_internal')}.%{hiera('heat_vip')}"
+heat_vip_public: "%{hiera('network_public')}.%{hiera('heat_vip')}"
+horizon_vip_admin: "%{hiera('network_admin')}.%{hiera('horizon_vip')}"
+horizon_vip_internal: "%{hiera('network_internal')}.%{hiera('horizon_vip')}"
+horizon_vip_public: "%{hiera('network_public')}.%{hiera('horizon_vip')}"
+keystone_vip_admin: "%{hiera('network_admin')}.%{hiera('keystone_vip')}"
+keystone_vip_internal: "%{hiera('network_internal')}.%{hiera('keystone_vip')}"
+keystone_vip_public: "%{hiera('network_public')}.%{hiera('keystone_vip')}"
+neutron_vip_admin: "%{hiera('network_admin')}.%{hiera('neutron_vip')}"
+neutron_vip_internal: "%{hiera('network_internal')}.%{hiera('neutron_vip')}"
+neutron_vip_public: "%{hiera('network_public')}.%{hiera('neutron_vip')}"
+nova_vip_admin: "%{hiera('network_admin')}.%{hiera('nova_vip')}"
+nova_vip_internal: "%{hiera('network_internal')}.%{hiera('nova_vip')}"
+nova_vip_public: "%{hiera('network_public')}.%{hiera('nova_vip')}"
+swift_vip_admin: "%{hiera('network_admin')}.%{hiera('swift_vip')}"
+swift_vip_internal: "%{hiera('network_internal')}.%{hiera('swift_vip')}"
+swift_vip_public: "%{hiera('network_admin')}.%{hiera('swift_vip')}"
