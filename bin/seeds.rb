@@ -473,6 +473,8 @@ hostgroups = [
               "quickstack::pacemaker::horizon",
               "quickstack::pacemaker::galera",
               "quickstack::pacemaker::neutron",
+              "quickstack::pacemaker::nosql",
+              "quickstack::pacemaker::ceilometer",
              ]},
     {:name=>"Gluster Server",
      :class=>["puppet::vardir",

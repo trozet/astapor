@@ -46,6 +46,7 @@ class quickstack::pacemaker::params (
   $horizon_private_vip       = '',
   $horizon_admin_vip         = '',
   $horizon_group             = 'horizon',
+  $include_ceilometer        = 'true',
   $include_cinder            = 'true',
   $include_glance            = 'true',
   $include_heat              = 'true',
