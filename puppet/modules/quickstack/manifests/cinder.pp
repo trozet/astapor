@@ -67,7 +67,12 @@ class quickstack::cinder(
     use_syslog      => str2bool_i("$use_syslog"),
     log_facility    => $log_facility,
   }
-  contain cinder
+  # FIXME: after we drop support for Puppet <= 3.6, we can use
+  # `contain ::cinder` instead of the anchors here, and use fully qualified
+  # class names in the rest of `contain` statements too
+  anchor { 'quickstack-cinder-first': } ->
+  Class['::cinder'] ->
+  anchor { 'quickstack-cinder-last': }
 
   class {'::cinder::api':
     keystone_password  => $user_password,
