@@ -100,8 +100,7 @@ class quickstack::db::mysql (
 
   # Install and configure MySQL Server
   class { '::mysql::server':
-    config_hash        => {
-      'root_password'  => $mysql_root_password,
+    override_options   => {
       'bind_address'   => $mysql_bind_address,
       'default_engine' => $mysql_default_engine,
       'ssl'            => $mysql_ssl,
@@ -109,8 +108,9 @@ class quickstack::db::mysql (
       'ssl_cert'       => $mysql_cert,
       'ssl_key'        => $mysql_key,
     },
-    package_name => 'mariadb-galera-server',
-    enabled      => $enabled,
+    root_password => $mysql_root_password,
+    package_name  => 'mariadb-galera-server',
+    enabled       => $enabled,
   }
 
   # This removes default users and guest access
