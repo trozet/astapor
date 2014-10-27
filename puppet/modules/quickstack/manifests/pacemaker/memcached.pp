@@ -2,6 +2,7 @@ class quickstack::pacemaker::memcached {
 
   include ::memcached
   include quickstack::pacemaker::common
+  class {'::quickstack::firewall::memcached':}
 
   Exec['wait-for-settle'] -> Exec['pcs-memcached-server-set-up-on-this-node']
 
