@@ -50,7 +50,7 @@ class quickstack::keystone::common (
   $enabled                     = true,
   $idle_timeout                = '200',
   $log_facility                = 'LOG_USER',
-  $manage_service              = true,
+  $service_provider            = undef,
   $token_driver                = 'keystone.token.backends.sql.Token',
   $token_format                = 'PKI',
   $use_syslog                  = false,
@@ -69,19 +69,19 @@ class quickstack::keystone::common (
   }
 
   class { '::keystone':
-    admin_token    => $admin_token,
-    bind_host      => $bind_host,
-    catalog_type   => 'sql',
-    debug          => $debug,
-    enabled        => $enabled,
-    idle_timeout   => $idle_timeout,
-    log_facility   => $log_facility,
-    manage_service => $manage_service,
-    sql_connection => $sql_conn,
-    token_driver   => $token_driver,
-    token_format   => $token_format,
-    use_syslog     => $use_syslog,
-    verbose        => $verbose,
+    admin_token      => $admin_token,
+    bind_host        => $bind_host,
+    catalog_type     => 'sql',
+    debug            => $debug,
+    enabled          => $enabled,
+    idle_timeout     => $idle_timeout,
+    log_facility     => $log_facility,
+    service_provider => $service_provider,
+    sql_connection   => $sql_conn,
+    token_driver     => $token_driver,
+    token_format     => $token_format,
+    use_syslog       => $use_syslog,
+    verbose          => $verbose,
   }
   contain keystone
 

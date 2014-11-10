@@ -98,7 +98,6 @@ class quickstack::pacemaker::keystone (
       enabled                     => $_enabled,
       idle_timeout                => "$idle_timeout",
       log_facility                => "$log_facility",
-      manage_service              => $_enabled,
       token_driver                => "$token_driver",
       token_format                => "$token_format",
       use_syslog                  => str2bool_i("$use_syslog"),
