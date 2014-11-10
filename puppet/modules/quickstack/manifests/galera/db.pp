@@ -19,101 +19,113 @@ class quickstack::galera::db (
   $neutron_db_password,
 ) {
 
-  database { $keystone_db_dbname:
+  mysql_database { $keystone_db_dbname:
     ensure   => 'present',
     provider => 'mysql',
   }
-  database_user { "$keystone_db_user@%":
+  mysql_user { "$keystone_db_user@%":
     ensure => 'present',
     password_hash => mysql_password("$keystone_db_password"),
     provider      => 'mysql',
-    require => Database[$keystone_db_dbname],
+    require => Mysql_database[$keystone_db_dbname],
   }
-  database_grant { "$keystone_db_user@%/$keystone_db_dbname":
+  mysql_grant { "$keystone_db_user@%/$keystone_db_dbname.*":
     privileges => 'all',
     provider   => 'mysql',
-    require    => Database_user["$keystone_db_user@%"]
+    user       => "$keystone_db_user@%",
+    table      => "$keystone_db_dbname.*",
+    require    => Mysql_user["$keystone_db_user@%"]
   }
 
-  database { $glance_db_dbname:
+  mysql_database { $glance_db_dbname:
     ensure => 'present',
     provider => 'mysql',
   }
-  database_user { "$glance_db_user@%":
+  mysql_user { "$glance_db_user@%":
     ensure => 'present',
     password_hash => mysql_password("$glance_db_password"),
     provider      => 'mysql',
-    require => Database[$glance_db_dbname],
+    require => Mysql_database[$glance_db_dbname],
   }
-  database_grant { "$glance_db_user@%/$glance_db_dbname":
+  mysql_grant { "$glance_db_user@%/$glance_db_dbname.*":
     privileges => 'all',
     provider   => 'mysql',
-    require    => Database_user["$glance_db_user@%"]
+    user       => "$glance_db_user@%",
+    table      => "$glance_db_dbname.*",
+    require    => Mysql_user["$glance_db_user@%"]
   }
 
-  database { $nova_db_dbname:
+  mysql_database { $nova_db_dbname:
     ensure => 'present',
     provider => 'mysql',
   }
-  database_user { "$nova_db_user@%":
+  mysql_user { "$nova_db_user@%":
     ensure => 'present',
     password_hash => mysql_password("$nova_db_password"),
     provider      => 'mysql',
-    require => Database[$nova_db_dbname],
+    require => Mysql_database[$nova_db_dbname],
   }
-  database_grant { "$nova_db_user@%/$nova_db_dbname":
+  mysql_grant { "$nova_db_user@%/$nova_db_dbname.*":
     privileges => 'all',
     provider   => 'mysql',
-    require    => Database_user["$nova_db_user@%"]
+    user       => "$nova_db_user@%",
+    table      => "$nova_db_dbname.*",
+    require    => Mysql_user["$nova_db_user@%"]
   }
-  
-  database { $cinder_db_dbname:
+
+  mysql_database { $cinder_db_dbname:
     ensure => 'present',
     provider => 'mysql',
   }
-  database_user { "$cinder_db_user@%":
+  mysql_user { "$cinder_db_user@%":
     ensure => 'present',
     password_hash => mysql_password("$cinder_db_password"),
     provider      => 'mysql',
-    require => Database[$cinder_db_dbname],
+    require => Mysql_database[$cinder_db_dbname],
   }
-  database_grant { "$cinder_db_user@%/$cinder_db_dbname":
+  mysql_grant { "$cinder_db_user@%/$cinder_db_dbname.*":
     privileges => 'all',
     provider   => 'mysql',
-    require    => Database_user["$cinder_db_user@%"]
+    user       => "$cinder_db_user@%",
+    table      => "$cinder_db_dbname.*",
+    require    => Mysql_user["$cinder_db_user@%"]
   }
 
-  database { $heat_db_dbname:
+  mysql_database { $heat_db_dbname:
     ensure => 'present',
     provider => 'mysql',
   }
-  database_user { "$heat_db_user@%":
+  mysql_user { "$heat_db_user@%":
     ensure => 'present',
     password_hash => mysql_password("$heat_db_password"),
     provider      => 'mysql',
-    require => Database[$heat_db_dbname],
+    require => Mysql_database[$heat_db_dbname],
   }
-  database_grant { "$heat_db_user@%/$heat_db_dbname":
+  mysql_grant { "$heat_db_user@%/$heat_db_dbname.*":
     privileges => 'all',
     provider   => 'mysql',
-    require    => Database_user["$heat_db_user@%"]
+    user       => "$heat_db_user@%",
+    table      => "$heat_db_dbname.*",
+    require    => Mysql_user["$heat_db_user@%"]
   }
-  
-  database { $neutron_db_dbname:
+
+  mysql_database { $neutron_db_dbname:
     ensure => 'present',
     provider => 'mysql',
   }
-  database_user { "$neutron_db_user@%":
+  mysql_user { "$neutron_db_user@%":
     ensure => 'present',
     password_hash => mysql_password("$neutron_db_password"),
     provider      => 'mysql',
-    require => Database[$neutron_db_dbname],
+    require => Mysql_database[$neutron_db_dbname],
   }
-  database_grant { "$neutron_db_user@%/$neutron_db_dbname":
+  mysql_grant { "$neutron_db_user@%/$neutron_db_dbname.*":
     privileges => 'all',
     provider   => 'mysql',
-    require    => Database_user["$neutron_db_user@%"]
+    user       => "$neutron_db_user@%",
+    table      => "$neutron_db_dbname.*",
+    require    => Mysql_user["$neutron_db_user@%"]
   }
 
-  Database_grant <| |> -> Exec["all-galera-nodes-are-up"]  
+  Mysql_grant <| |> -> Exec["all-galera-nodes-are-up"]
 }

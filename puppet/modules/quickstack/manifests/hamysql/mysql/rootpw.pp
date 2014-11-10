@@ -20,7 +20,7 @@ class quickstack::hamysql::mysql::rootpw(
       require => Exec['set_mysql_rootpw'],
       mode => '0600',
     }
-    File["${root_home}/.my.cnf"] -> Database_user <| |>
-    File["${root_home}/.my.cnf"] -> Database <| |>
+    File["${root_home}/.my.cnf"] -> Mysql_user <| |>
+    File["${root_home}/.my.cnf"] -> Mysql_database <| |>
   }
 }
