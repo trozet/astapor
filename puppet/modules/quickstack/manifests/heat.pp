@@ -29,6 +29,7 @@ class quickstack::heat(
   $heat_cfn_enabled        = true,
   $heat_cloudwatch_enabled = true,
   $heat_engine_enabled     = true,
+  $engine_cfg_delegated    = true,
   $debug                   = false,
   $verbose                 = false,
 ) {
@@ -111,6 +112,7 @@ class quickstack::heat(
     heat_watch_server_url         => "http://${cloudwatch_host}:8003",
     enabled                       => str2bool_i("$heat_engine_enabled"),
     manage_service                => str2bool_i("$manage_service"),
+    configure_delegated_roles     => $engine_cfg_delegated,
   }
   contain heat::engine
 }
