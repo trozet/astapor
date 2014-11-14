@@ -30,7 +30,6 @@
 
 class quickstack::pacemaker::common (
   $pacemaker_cluster_name         = "openstack",
-  $pacemaker_cluster_members      = "192.168.200.10 192.168.200.11 192.168.200.12",
   $fencing_type                   = "disabled",
   $fence_ipmilan_address          = "",
   $fence_ipmilan_username         = "",
@@ -51,6 +50,15 @@ class quickstack::pacemaker::common (
   } else {
     $setup_cluster = false
   }
+
+  $pacemaker_cluster_members = join(map_params("lb_backend_server_names")," ")
+
+  $num_hosts_idx = size(map_params("lb_backend_server_names"))-1
+  quickstack::pacemaker::hosts{ "$num_hosts_idx":
+    index            => $num_hosts_idx,
+    ip_address_array => map_params("lb_backend_server_addrs"),
+    hostname_array   => map_params("lb_backend_server_names"),
+  } ->
 
   package {'rpcbind': } ->
   service {'rpcbind':
