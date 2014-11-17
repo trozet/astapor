@@ -13,8 +13,6 @@
   :class: quickstack::storage_backend::cinder
 - :name: Load Balancer
   :class: quickstack::load_balancer
-- :name: HA Mysql Node
-  :class: quickstack::hamysql::node
 - :name: Swift Storage Node
   :class: quickstack::swift::storage
 - :name: HA All In One Controller
