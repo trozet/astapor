@@ -20,6 +20,7 @@ class quickstack::cinder(
   $amqp_password  = '',
   $qpid_heartbeat = '60',
   $qpid_protocol  = 'tcp',
+  $rabbit_use_ssl = false,
 
   $enabled        = true,
   $manage_service = true,
@@ -62,6 +63,7 @@ class quickstack::cinder(
     rabbit_port     => $amqp_port,
     rabbit_userid   => $amqp_username,
     rabbit_password => $amqp_password_safe_for_cinder,
+    rabbit_use_ssl  => $rabbit_use_ssl,
     sql_connection  => $sql_connection,
     verbose         => str2bool_i("$verbose"),
     use_syslog      => str2bool_i("$use_syslog"),

@@ -264,6 +264,7 @@ class quickstack::neutron::controller (
     rabbit_port           => $amqp_port,
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
+    rabbit_use_ssl        => $ssl,
     core_plugin           => $neutron_core_plugin
   }
   ->

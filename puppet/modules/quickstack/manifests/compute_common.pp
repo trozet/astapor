@@ -168,6 +168,7 @@ class quickstack::compute_common (
     rabbit_port        => $real_amqp_port,
     rabbit_userid      => $amqp_username,
     rabbit_password    => $amqp_password,
+    rabbit_use_ssl     => $ssl,
     verbose            => $verbose,
   }
 
@@ -202,6 +203,7 @@ class quickstack::compute_common (
       rabbit_port     => $real_amqp_port,
       rabbit_userid   => $amqp_username,
       rabbit_password => $amqp_password,
+      rabbit_use_ssl  => $ssl,
       rpc_backend     => amqp_backend('ceilometer', $amqp_provider),
       verbose         => $verbose,
     }

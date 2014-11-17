@@ -39,6 +39,7 @@ class quickstack::glance (
   $amqp_username            = '',
   $amqp_password            = '',
   $amqp_provider            = 'rabbitmq',
+  $rabbit_use_ssl           = false,
 ) {
 
   # Configure the db string
@@ -117,6 +118,7 @@ class quickstack::glance (
       rabbit_userid   => $amqp_username,
       rabbit_host     => $amqp_host,
       rabbit_port     => $amqp_port,
+      rabbit_use_ssl  => $rabbit_use_ssl,
     }
   }
 

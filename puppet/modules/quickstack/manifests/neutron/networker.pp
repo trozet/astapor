@@ -55,6 +55,7 @@ class quickstack::neutron::networker (
     rabbit_port           => $amqp_port,
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
+    rabbit_use_ssl        => $ssl,
   }
 
   neutron_config {
