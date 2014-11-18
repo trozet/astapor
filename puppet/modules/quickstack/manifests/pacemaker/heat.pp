@@ -118,6 +118,7 @@ class quickstack::pacemaker::heat(
       heat_cfn_enabled        => $_enabled,
       heat_cloudwatch_enabled => $_enabled,
       heat_engine_enabled     => false,
+      engine_cfg_delegated    => has_interface_with("ipaddress", map_params("cluster_control_ip")),
     }
     ->
     exec {"pcs-heat-server-set-up":
