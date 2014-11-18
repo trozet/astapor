@@ -181,6 +181,13 @@ network_node_policy_profile = <%= @network_node_policy_profile %>
 poll_duration = <%= @poll_duration %>
 # Example: poll_duration = 180
 
+# (BoolOpt) Specify whether tenants are restricted from accessing all the
+# policy profiles.
+# Default value: False, indicating all tenants can access all policy profiles.
+#
+# restrict_policy_profiles =
+restrict_policy_profiles = <%= @restrict_policy_profiles %>
+
 http_pool_size = <%= @http_pool_size %>
 http_timeout = <%= @http_timeout %>
 enable_sync_on_start = <%= @enable_sync_on_start %>
@@ -198,3 +205,8 @@ password = <%= @n1kv_vsm_password %>
 [securitygroup]
 firewall_driver = <%= @firewall_driver %>
 <% end %>
+[PLUGINS]
+vswitch_plugin=neutron.plugins.cisco.n1kv.n1kv_neutron_plugin.N1kvNeutronPluginV2
+ 
+[INVENTORY]
+dummy=dummy

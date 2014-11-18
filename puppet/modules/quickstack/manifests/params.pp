@@ -141,6 +141,10 @@ class quickstack::params (
                                      'quota_port' => 'default',
                                      'quota_security_group' => 'default',
                                      'quota_security_group_rule' => 'default',
+                                     'quota_vip' => 'default',
+                                     'quota_pool' => 'default',
+                                     'quota_router' => 'default',
+                                     'quota_floatingip' => 'default',
                                      'network_auto_schedule' => 'default',
                                    },
   $nova_conf_additional_params   = { 'quota_instances' => 'default',
@@ -157,6 +161,7 @@ class quickstack::params (
                                      'http_timeout' => '30',
                                      'firewall_driver' => 'neutron.agent.firewall.NoopFirewallDriver',
                                      'enable_sync_on_start' => 'True',
+                                     'restrict_policy_profiles' => 'False',
                                      },
   $security_group_api            = 'neutron',
   # Horizon

@@ -5,6 +5,10 @@ class quickstack::neutron::plugins::neutron_config (
                                      quota_port                 => 'default',
                                      quota_security_group       => 'default',
                                      quota_security_group_rule  => 'default',
+                                     quota_vip			=> 'default',
+                                     quota_pool			=> 'default',
+                                     quota_router		=> 'default',
+                                     quota_floatingip		=> 'default',
                                      network_auto_schedule      => 'default',
                                    },
 ) {
@@ -42,6 +46,30 @@ class quickstack::neutron::plugins::neutron_config (
   if $neutron_conf_additional_params[quota_security_group_rule] != 'default' {
     neutron_config {
       'quotas/quota_security_group_rule':      value => $neutron_conf_additional_params[quota_security_group_rule];
+    }
+  }
+
+  if $neutron_conf_additional_params[quota_vip] != 'default' {
+    neutron_config {
+      'quotas/quota_vip':      value => $neutron_conf_additional_params[quota_vip];
+    }
+  }
+
+  if $neutron_conf_additional_params[quota_pool] != 'default' {
+    neutron_config {
+      'quotas/quota_pool':      value => $neutron_conf_additional_params[quota_pool];
+    }
+  }
+
+  if $neutron_conf_additional_params[quota_router] != 'default' {
+    neutron_config {
+      'quotas/quota_router':      value => $neutron_conf_additional_params[quota_router];
+    }
+  }
+
+  if $neutron_conf_additional_params[quota_floatingip] != 'default' {
+    neutron_config {
+      'quotas/quota_floatingip':      value => $neutron_conf_additional_params[quota_floatingip];
     }
   }
 
