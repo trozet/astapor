@@ -127,7 +127,7 @@ class { 'puppet':
 }
 
 class { 'foreman':
-  db_type => 'mysql',
+  db_type => 'postgresql',
   custom_repo => true
 }
 #
