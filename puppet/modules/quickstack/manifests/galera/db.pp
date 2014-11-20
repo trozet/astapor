@@ -18,6 +18,7 @@ class quickstack::galera::db (
   $neutron_db_dbname      = 'neutron',
   $neutron_db_password,
 ) {
+  class { '::mysql::server::account_security': }
 
   mysql_database { $keystone_db_dbname:
     ensure   => 'present',
