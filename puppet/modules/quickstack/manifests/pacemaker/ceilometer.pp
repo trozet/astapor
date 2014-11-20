@@ -161,7 +161,7 @@ class quickstack::pacemaker::ceilometer (
     ->
     quickstack::pacemaker::constraint::base { "notifier-notification-constr":
       constraint_type => "order",
-      first_resource  => "openstack-ceilometer-alarm-notifierr-clone",
+      first_resource  => "openstack-ceilometer-alarm-notifier-clone",
       second_resource => "openstack-ceilometer-notification-clone",
       first_action    => "start",
       second_action   => "start",
