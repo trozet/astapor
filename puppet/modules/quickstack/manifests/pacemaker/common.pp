@@ -6,8 +6,6 @@
 #
 # [*pacemaker_cluster_name*]
 #   The name of your openstack cluster
-# [*pacemaker_cluster_members*]
-#   An array of IPs for the nodes in your cluster
 # [*fencing_type*]
 #   Should be either "disabled", "fence_xvm", "ipmilan", or "". ""
 #   means do not disable stonith, but also don't add any fencing
@@ -51,7 +49,7 @@ class quickstack::pacemaker::common (
     $setup_cluster = false
   }
 
-  $pacemaker_cluster_members = join(map_params("lb_backend_server_names")," ")
+  $pacemaker_members = join(map_params("lb_backend_server_names")," ")
 
   $num_hosts_idx = size(map_params("lb_backend_server_names"))-1
   quickstack::pacemaker::hosts{ "$num_hosts_idx":
@@ -67,7 +65,7 @@ class quickstack::pacemaker::common (
   } ->
   class {'pacemaker::corosync':
     cluster_name    => $pacemaker_cluster_name,
-    cluster_members => $pacemaker_cluster_members,
+    cluster_members => $pacemaker_members,
     setup_cluster   => $setup_cluster,
   }
 
