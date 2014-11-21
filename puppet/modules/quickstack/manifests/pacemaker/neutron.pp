@@ -50,6 +50,8 @@ class quickstack::pacemaker::neutron (
   $tunnel_id_ranges           = '1:1000',
   $nexus_config               = {},
   $verbose                    = 'false',
+  $network_device_mtu         = undef,
+  $veth_mtu                   = undef,
 ) {
   include quickstack::pacemaker::common
 
@@ -112,8 +114,8 @@ class quickstack::pacemaker::neutron (
     class { 'quickstack::neutron::all':
       auth_host                     => map_params("keystone_public_vip"),
       database_max_retries          => '-1',
-      cisco_vswitch_plugin         => $cisco_vswitch_plugin,
-      cisco_nexus_plugin           => $cisco_nexus_plugin,
+      cisco_vswitch_plugin          => $cisco_vswitch_plugin,
+      cisco_nexus_plugin            => $cisco_nexus_plugin,
       enable_tunneling              => $enable_tunneling,
       enabled                       => $_enabled,
       external_network_bridge       => $external_network_bridge,
@@ -136,8 +138,8 @@ class quickstack::pacemaker::neutron (
       neutron_metadata_proxy_secret => map_params("neutron_metadata_proxy_secret"),
       neutron_conf_additional_params=> $neutron_conf_additional_params,
       nova_conf_additional_params   => $nova_conf_additional_params,
-      n1kv_vsm_ip                  => $n1kv_vsm_ip,
-      n1kv_vsm_password            => $n1kv_vsm_password,
+      n1kv_vsm_ip                   => $n1kv_vsm_ip,
+      n1kv_vsm_password             => $n1kv_vsm_password,
       n1kv_plugin_additional_params => $n1kv_plugin_additional_params,
       ovs_bridge_mappings           => $ovs_bridge_mappings,
       ovs_bridge_uplinks            => $ovs_bridge_uplinks,
@@ -154,6 +156,8 @@ class quickstack::pacemaker::neutron (
       security_group_api            => $security_group_api,
       nexus_config                  => $nexus_config,
       verbose                       => $verbose,
+      network_device_mtu            => $network_device_mtu,
+      veth_mtu                      => $veth_mtu,
     }
     ->
     exec {"pcs-neutron-server-set-up":

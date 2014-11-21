@@ -70,6 +70,8 @@ class quickstack::neutron::all (
   $rpc_backend                   = 'neutron.openstack.common.rpc.impl_kombu',
   $security_group_api            = 'neutron',
   $tenant_network_type           = 'vlan',
+  $network_device_mtu            = undef,
+  $veth_mtu                      = undef,
   $verbose                       = 'false',
   $ssl                           = 'false',
 ) {
@@ -101,6 +103,7 @@ class quickstack::neutron::all (
     rabbit_password       => $amqp_password,
     rabbit_use_ssl        => $ssl,
     verbose               => $verbose,
+    network_device_mtu    => $network_device_mtu,
   }
   ->
   # FIXME: This really should be handled by the neutron-puppet module, which has
@@ -189,6 +192,7 @@ class quickstack::neutron::all (
       manage_service   => str2bool_i("$manage_service"),
       tunnel_types     => $ovs_tunnel_types,
       vxlan_udp_port   => $ovs_vxlan_udp_port,
+      veth_mtu         => $veth_mtu,
     }
   }
 

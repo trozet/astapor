@@ -55,7 +55,7 @@ class quickstack::nova_network::compute (
   $private_iface                = '',
   $private_ip                   = '',
   $private_network              = '',
-
+  $network_device_mtu           = undef,
 ) inherits quickstack::params {
 
   # Configure Nova
@@ -133,5 +133,6 @@ class quickstack::nova_network::compute (
     private_iface                => $private_iface,
     private_ip                   => $private_ip,
     private_network              => $private_network,
+    network_device_mtu           => $network_device_mtu,
   }
 }
