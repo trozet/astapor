@@ -28,6 +28,8 @@ class quickstack::neutron::networker (
   $verbose                       = $quickstack::params::verbose,
   $ssl                           = $quickstack::params::ssl,
   $mysql_ca                      = $quickstack::params::mysql_ca,
+  $network_device_mtu            = $quickstack::params::network_device_mtu,
+  $veth_mtu                      = $quickstack::params::veth_mtu,
 ) inherits quickstack::params {
 
   class {'quickstack::openstack_common': }
@@ -56,6 +58,7 @@ class quickstack::neutron::networker (
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
     rabbit_use_ssl        => $ssl,
+    network_device_mtu    => $network_device_mtu,
   }
 
   neutron_config {
@@ -87,6 +90,7 @@ class quickstack::neutron::networker (
       enable_tunneling => str2bool_i("$enable_tunneling"),
       tunnel_types     => $ovs_tunnel_types,
       vxlan_udp_port   => $ovs_vxlan_udp_port,
+      veth_mtu         => $veth_mtu,
     }
   }
 

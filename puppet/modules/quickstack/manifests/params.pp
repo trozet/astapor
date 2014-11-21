@@ -115,6 +115,8 @@ class quickstack::params (
   $enable_tunneling              = 'True',
   $ovs_vxlan_udp_port            = '4789',
   $ovs_tunnel_types              = [],
+  $network_device_mtu            = undef,
+  $veth_mtu                      = undef,
 
   # neutron plugin config
   $neutron_core_plugin           = 'neutron.plugins.ml2.plugin.Ml2Plugin',

@@ -46,7 +46,7 @@ class quickstack::neutron::compute (
   $ovs_tunnel_types             = $quickstack::params::ovs_tunnel_types,
   $verbose                      = $quickstack::params::verbose,
   $ssl                          = $quickstack::params::ssl,
-  $security_group_api		= 'neutron',
+  $security_group_api           = 'neutron',
   $mysql_ca                     = $quickstack::params::mysql_ca,
   $libvirt_images_rbd_pool      = 'volumes',
   $libvirt_images_rbd_ceph_conf = '/etc/ceph/ceph.conf',
@@ -58,6 +58,8 @@ class quickstack::neutron::compute (
   $private_iface                = '',
   $private_ip                   = '',
   $private_network              = '',
+  $network_device_mtu           = undef,
+  $veth_mtu                     = undef,
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -84,6 +86,7 @@ class quickstack::neutron::compute (
     rabbit_password       => $amqp_password,
     rabbit_use_ssl        => $ssl,
     verbose               => $verbose,
+    network_device_mtu    => $network_device_mtu,
   }
   ->
   class { '::neutron::server::notifications':
@@ -120,8 +123,9 @@ class quickstack::neutron::compute (
       bridge_mappings     => $ovs_bridge_mappings,
       local_ip            => $local_ip,
       enable_tunneling    => str2bool_i("$enable_tunneling"),
-      tunnel_types     => $ovs_tunnel_types,
-      vxlan_udp_port   => $ovs_vxlan_udp_port,
+      tunnel_types        => $ovs_tunnel_types,
+      vxlan_udp_port      => $ovs_vxlan_udp_port,
+      veth_mtu            => $veth_mtu,
     }
   }
 
@@ -176,6 +180,7 @@ class quickstack::neutron::compute (
     private_iface                => $private_iface,
     private_ip                   => $private_ip,
     private_network              => $private_network,
+    network_device_mtu           => $network_device_mtu,
   }
 
   class {'quickstack::neutron::firewall::gre':}

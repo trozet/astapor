@@ -140,6 +140,8 @@ class quickstack::neutron::controller (
   $horizon_cert                  = $quickstack::params::horizon_cert,
   $horizon_key                   = $quickstack::params::horizon_key,
   $amqp_nssdb_password           = $quickstack::params::amqp_nssdb_password,
+  $network_device_mtu            = $quickstack::params::network_device_mtu,
+  $veth_mtu                      = $quickstack::params::veth_mtu,
 ) inherits quickstack::params {
 
   if str2bool_i("$ssl") {
@@ -265,7 +267,8 @@ class quickstack::neutron::controller (
     rabbit_user           => $amqp_username,
     rabbit_password       => $amqp_password,
     rabbit_use_ssl        => $ssl,
-    core_plugin           => $neutron_core_plugin
+    core_plugin           => $neutron_core_plugin,
+    network_device_mtu    => $network_device_mtu,
   }
   ->
   class { '::nova::network::neutron':

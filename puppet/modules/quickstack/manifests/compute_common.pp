@@ -47,6 +47,7 @@ class quickstack::compute_common (
   $private_ip                   = '',
   $rbd_user                     = 'volumes',
   $rbd_secret_uuid              = '',
+  $network_device_mtu           = $quickstack::params::network_device_mtu,
   $ssl                          = $quickstack::params::ssl,
   $verbose                      = $quickstack::params::verbose,
 ) inherits quickstack::params {
@@ -188,9 +189,10 @@ class quickstack::compute_common (
                         "$private_iface",
                         "$private_ip")
   class { '::nova::compute':
-    enabled => true,
-    vncproxy_host => $nova_host,
+    enabled                       => true,
+    vncproxy_host                 => $nova_host,
     vncserver_proxyclient_address => $compute_ip,
+    network_device_mtu            => $network_device_mtu,
   }
 
   if str2bool_i("$ceilometer") {
