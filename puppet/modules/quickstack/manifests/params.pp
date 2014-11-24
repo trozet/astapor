@@ -53,7 +53,7 @@ class quickstack::params (
   $cinder_san_ip                = ['192.168.124.11'],
   $cinder_san_login             = ['grpadmin'],
   $cinder_san_password          = ['CHANGEME'],
-  $cinder_san_thin_provision    = [false],
+  $cinder_san_thin_provision    = [true],
   $cinder_eqlx_group_name       = ['group-0'],
   $cinder_eqlx_pool             = ['default'],
   $cinder_eqlx_use_chap         = [false],

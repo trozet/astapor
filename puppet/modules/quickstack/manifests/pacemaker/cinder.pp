@@ -25,7 +25,7 @@ class quickstack::pacemaker::cinder(
   $san_ip                 = [''],
   $san_login              = ['grpadmin'],
   $san_password           = [''],
-  $san_thin_provision     = [false],
+  $san_thin_provision     = [true],
   $eqlx_group_name        = ['group-0'],
   $eqlx_pool              = ['default'],
   $eqlx_use_chap          = [false],
