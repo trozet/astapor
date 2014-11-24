@@ -47,6 +47,7 @@ class quickstack::neutron::plugins::cisco (
                                      http_timeout => '120',
                                      firewall_driver => 'neutron.agent.firewall.NoopFirewallDriver',
                                      enable_sync_on_start => 'True'
+                                     restrict_policy_profiles => 'False',
                                    },
   $neutron_db_password          = $quickstack::params::neutron_db_password,
   $neutron_user_password        = $quickstack::params::neutron_user_password,
@@ -136,6 +137,7 @@ class quickstack::neutron::plugins::cisco (
     $http_timeout                = $n1kv_plugin_additional_params[http_timeout]
     $firewall_driver	 	 = $n1kv_plugin_additional_params[firewall_driver]
     $enable_sync_on_start 	 = $n1kv_plugin_additional_params[enable_sync_on_start]
+    $restrict_policy_profiles    = $n1kv_plugin_additional_params[restrict_policy_profiles]
 
     Neutron_plugin_cisco<||> ->
     file {'/etc/neutron/plugins/cisco/cisco_plugins.ini':
