@@ -1,0 +1,276 @@
+---
+quickstack::params::db_ssl: 'false'
+quickstack::params::db_ssl_ca: ''
+quickstack::params::debug: 'false'
+quickstack::params::enabled: 'true'
+quickstack::params::memcached_port: '11211'
+quickstack::params::verbose: 'true'
+quickstack::params::cinder_backend_rbd: 'false'
+quickstack::params::glance_backend_rbd: 'false'
+
+quickstack::ceph::config::fsid: '904c8491-5c16-4dae-9cc3-6ce633a7f4cc'
+quickstack::ceph::config::mon_host:
+  - "%{hiera('server1_ip')}"
+  - "%{hiera('server2_ip')}"
+  - "%{hiera('server3_ip')}"
+quickstack::ceph::config::mon_initial_members:
+  - "%{hiera('server1_name')}"
+  - "%{hiera('server2_name')}"
+  - "%{hiera('server3_name')}"
+quickstack::ceph::config::public_network: "%{hiera('network_public')}.0/24"
+quickstack::ceph::config::cluster_network: "%{hiera('network_internal')}.0/24"
+quickstack::ceph::config::osd_pool_size: '1'
+quickstack::ceph::config::osd_pool_default_size: '1'
+quickstack::ceph::config::osd_journal_size: '1000'
+
+quickstack::nova_network::compute::amqp_host: "%{hiera('amqp_vip')}"
+quickstack::nova_network::compute::amqp_provider: "%{hiera('amqp_provider')}"
+quickstack::nova_network::compute::amqp_ssl_port: '5671'
+quickstack::nova_network::compute::auth_host: "%{hiera('keystone_vip_admin')}"
+
+quickstack::nova_network::compute::cinder_backend_gluster: 'false'
+quickstack::nova_network::compute::cinder_backend_nfs: 'true'
+quickstack::nova_network::compute::glance_host: "%{hiera('glance_vip_admin')}"
+quickstack::nova_network::compute::mysql_ca: /etc/ipa/ca.crt
+
+quickstack::nova_network::compute::mysql_host: "%{hiera('db_vip')}"
+quickstack::nova_network::compute::network_create_networks: 'true'
+quickstack::nova_network::compute::network_fixed_range: '10.0.0.0/24'
+quickstack::nova_network::compute::network_floating_range: '10.0.1.0/24'
+quickstack::nova_network::compute::network_manager: FlatDHCPManager
+quickstack::nova_network::compute::network_network_size: ''
+quickstack::nova_network::compute::network_num_networks: 1
+
+quickstack::nova_network::compute::network_overrides: "{'force_dhcp_release' => false}"
+quickstack::nova_network::compute::network_private_iface: "%{hiera('private_iface')}"
+quickstack::nova_network::compute::network_private_network: "%{hiera('private_network')}"
+quickstack::nova_network::compute::network_public_ip: "%{hiera('private_ip')}"
+quickstack::nova_network::compute::network_public_network: "%{hiera('public+network')}"
+quickstack::nova_network::compute::nova_host: "%{hiera('nova_vip_admin')}"
+quickstack::nova_network::compute::ssl: 'false'
+
+quickstack::pacemaker::cinder::backend_eqlx: 'false'
+quickstack::pacemaker::cinder::backend_eqlx_name: ['eqlx_backend']
+quickstack::pacemaker::cinder::backend_glusterfs: 'false'
+quickstack::pacemaker::cinder::backend_glusterfs_name: glusterfs_backend
+quickstack::pacemaker::cinder::backend_iscsi: 'false'
+quickstack::pacemaker::cinder::backend_iscsi_name: iscsi_backend
+quickstack::pacemaker::cinder::backend_nfs: 'true'
+quickstack::pacemaker::cinder::backend_nfs_name: nfs_backend
+quickstack::pacemaker::cinder::backend_rbd: 'false'
+quickstack::pacemaker::cinder::backend_rbd_name: rbd_backend
+quickstack::pacemaker::cinder::db_ssl: 'false'
+quickstack::pacemaker::cinder::db_ssl_ca: "%{hiera('db_ca')}"
+quickstack::pacemaker::cinder::debug: 'false'
+quickstack::pacemaker::cinder::eqlx_chap_login: ['chapadmin']
+quickstack::pacemaker::cinder::eqlx_group_name: ['group-0']
+quickstack::pacemaker::cinder::eqlx_pool: ['default']
+quickstack::pacemaker::cinder::eqlx_use_chap: [false]
+quickstack::pacemaker::cinder::glusterfs_shares: []
+quickstack::pacemaker::cinder::multiple_backends: 'false'
+quickstack::pacemaker::cinder::nfs_mount_options: ''
+quickstack::pacemaker::cinder::nfs_shares: ["%{hiera('nfs_share1')}"]
+quickstack::pacemaker::cinder::rbd_ceph_conf: /etc/ceph/ceph.conf
+quickstack::pacemaker::cinder::rbd_flatten_volume_from_snapshot: 'false'
+quickstack::pacemaker::cinder::rbd_max_clone_depth: '5'
+quickstack::pacemaker::cinder::rbd_pool: volumes
+quickstack::pacemaker::cinder::rbd_user: volumes
+quickstack::pacemaker::cinder::rpc_backend: cinder.openstack.common.rpc.impl_kombu
+quickstack::pacemaker::cinder::san_ip: ['']
+quickstack::pacemaker::cinder::san_login: ['grpadmin']
+quickstack::pacemaker::cinder::san_thin_provision: [false]
+quickstack::pacemaker::cinder::verbose: 'false'
+quickstack::pacemaker::cinder::volume: 'true'
+
+quickstack::pacemaker::common::fence_ipmilan_address: ''
+quickstack::pacemaker::common::fence_ipmilan_expose_lanplus: 'true'
+quickstack::pacemaker::common::fence_ipmilan_hostlist: ''
+quickstack::pacemaker::common::fence_ipmilan_host_to_address: []
+quickstack::pacemaker::common::fence_ipmilan_interval: 60s
+quickstack::pacemaker::common::fence_ipmilan_lanplus_options: ''
+quickstack::pacemaker::common::fence_ipmilan_username: ''
+quickstack::pacemaker::common::fence_xvm_clu_iface: 'eth2'
+quickstack::pacemaker::common::fence_xvm_clu_network: ''
+quickstack::pacemaker::common::fence_xvm_manage_key_file: 'false'
+quickstack::pacemaker::common::fencing_type: "%{hiera('fencing')}"
+quickstack::pacemaker::common::pacemaker_cluster_members: "%{hiera('server1_ip')} %{hiera('server2_ip')} %{hiera('server3_ip')}"
+quickstack::pacemaker::common::pacemaker_cluster_name: openstackHA
+
+quickstack::pacemaker::galera::galera_monitor_username: monitor_user
+quickstack::pacemaker::galera::wsrep_cluster_members:
+  - "%{hiera('server1_ip')}"
+  - "%{hiera('server2_ip')}"
+  - "%{hiera('server3_ip')}"
+quickstack::pacemaker::galera::wsrep_cluster_name: galera_cluster
+quickstack::pacemaker::galera::wsrep_ssl: 'false'
+quickstack::pacemaker::galera::wsrep_ssl_cert: "%{hiera('db_cert')}"
+quickstack::pacemaker::galera::wsrep_ssl_key: "%{hiera('db_key')}"
+quickstack::pacemaker::galera::wsrep_sst_method: rsync
+quickstack::pacemaker::galera::wsrep_sst_username: 'sst_user'
+
+quickstack::pacemaker::glance::backend: rbd
+quickstack::pacemaker::glance::db_ssl_ca: "%{hiera('quickstack::params::db_ssl_ca')}"
+quickstack::pacemaker::glance::filesystem_store_datadir: /var/lib/glance/images/
+quickstack::pacemaker::glance::pcmk_fs_device: "%{hiera('glance_device')}"
+quickstack::pacemaker::glance::pcmk_fs_dir: /var/lib/glance/images/
+quickstack::pacemaker::glance::pcmk_fs_manage: 'false'
+quickstack::pacemaker::glance::pcmk_fs_options: ''
+quickstack::pacemaker::glance::pcmk_fs_type: nfs
+quickstack::pacemaker::glance::pcmk_swift_is_local: 'false'
+quickstack::pacemaker::glance::rbd_store_pool: images
+quickstack::pacemaker::glance::rbd_store_user: images
+quickstack::pacemaker::glance::sql_idle_timeout: '3600'
+quickstack::pacemaker::glance::swift_store_auth_address: http://127.0.0.1:5000/v2.0/
+quickstack::pacemaker::glance::swift_store_key: ''
+quickstack::pacemaker::glance::swift_store_user: ''
+
+# quickstack::pacemaker::heat:
+
+quickstack::pacemaker::horizon::horizon_ca: "%{hiera('horizon_ca')}"
+quickstack::pacemaker::horizon::horizon_cert: "%{hiera('horizon_cert')}"
+quickstack::pacemaker::horizon::horizon_key: "%{hiera('horizon_key')}"
+quickstack::pacemaker::horizon::keystone_default_role: '_member_'
+
+quickstack::pacemaker::keystone::admin_email: "%{hiera('admin_email')}"
+quickstack::pacemaker::keystone::admin_password: "%{hiera('admin_password')}"
+quickstack::pacemaker::keystone::admin_tenant: admin
+quickstack::pacemaker::keystone::admin_token: "%{hiera('admin_token')}"
+quickstack::pacemaker::keystone::db_ssl: 'false'
+quickstack::pacemaker::keystone::db_ssl_ca: "%{hiera('db_ca')}"
+quickstack::pacemaker::keystone::debug: 'false'
+quickstack::pacemaker::keystone::ceilometer: 'false'
+quickstack::pacemaker::keystone::cinder: 'true'
+quickstack::pacemaker::keystone::glance: 'true'
+quickstack::pacemaker::keystone::heat: 'false'
+quickstack::pacemaker::keystone::heat_cfn: 'false'
+quickstack::pacemaker::keystone::keystonerc: 'true'
+quickstack::pacemaker::keystone::nova: 'true'
+quickstack::pacemaker::keystone::region: 'RegionOne'
+quickstack::pacemaker::keystone::swift: 'false'
+
+# quickstack::pacemaker::load_balancer:
+
+# quickstack::pacemaker::memcached:
+
+quickstack::pacemaker::neutron::core_plugin: neutron.plugins.ml2.plugin.Ml2Plugin
+quickstack::pacemaker::neutron::enable_tunneling: 'true'
+quickstack::pacemaker::neutron::external_network_bridge: br-ex
+quickstack::pacemaker::neutron::ml2_flat_networks: ['*']
+quickstack::pacemaker::neutron::ml2_mechanism_drivers: ['openvswitch', 'l2population']
+quickstack::pacemaker::neutron::ml2_network_vlan_ranges: ['yourphysnet:10:50']
+quickstack::pacemaker::neutron::ml2_security_group: 'true'
+quickstack::pacemaker::neutron::ml2_tenant_network_types: ['vxlan', 'vlan', 'gre', 'flat']
+quickstack::pacemaker::neutron::ml2_tunnel_id_ranges: ['20:100']
+quickstack::pacemaker::neutron::ml2_type_drivers: ['local', 'flat', 'vlan', 'gre', 'vxlan']
+quickstack::pacemaker::neutron::ml2_vxlan_group: 224.0.0.1
+quickstack::pacemaker::neutron::ovs_bridge_mappings: ['ext-vlan:br-ex']
+quickstack::pacemaker::neutron::ovs_bridge_uplinks: ['br-ex:eth0']
+quickstack::pacemaker::neutron::ovs_tunnel_iface: "%{hiera('tunnel_iface')}"
+quickstack::pacemaker::neutron::ovs_tunnel_network: "%{hiera('tunnel_network')}"
+quickstack::pacemaker::neutron::ovs_tunnel_types: ['vxlan']
+quickstack::pacemaker::neutron::ovs_tunnel_types: []
+quickstack::pacemaker::neutron::ovs_vlan_ranges: ext-vlan:1000:2000
+quickstack::pacemaker::neutron::ovs_vxlan_udp_port: '4789'
+quickstack::pacemaker::neutron::tenant_network_type: vlan
+quickstack::pacemaker::neutron::tunnel_id_ranges: 1:1000
+
+quickstack::pacemaker::nova::auto_assign_floating_ip: 'true'
+quickstack::pacemaker::nova::default_floating_pool: nova
+quickstack::pacemaker::nova::force_dhcp_release: 'false'
+quickstack::pacemaker::nova::image_service: nova.image.glance.GlanceImageService
+quickstack::pacemaker::nova::multi_host: 'true'
+quickstack::pacemaker::nova::rpc_backend: nova.openstack.common.rpc.impl_kombu
+quickstack::pacemaker::nova::scheduler_host_subset_size: '30'
+
+quickstack::pacemaker::params::admin_email: "%{hiera('admin_email')}"
+quickstack::pacemaker::params::amqp_group: amqp
+quickstack::pacemaker::params::amqp_port: '5672'
+quickstack::pacemaker::params::amqp_provider: "%{hiera('amqp_provider')}"
+quickstack::pacemaker::params::amqp_username: openstack
+quickstack::pacemaker::params::amqp_vip: "%{hiera('amqp_vip')}"
+quickstack::pacemaker::params::ceilometer_admin_vip: "%{hiera('ceilometer_vip_admin')}"
+quickstack::pacemaker::params::ceilometer_group: ceilometer
+quickstack::pacemaker::params::ceilometer_private_vip: "%{hiera('ceilometer_vip_internal')}"
+quickstack::pacemaker::params::ceilometer_public_vip: "%{hiera('ceilometer_vip_public')}"
+quickstack::pacemaker::params::ceph_fsid: '904c8491-5c16-4dae-9cc3-6ce633a7f4cc'
+quickstack::pacemaker::params::ceph_mon_host:
+  - "%{hiera('server1_ip')}"
+  - "%{hiera('server2_ip')}"
+  - "%{hiera('server3_ip')}"
+quickstack::pacemaker::params::ceph_mon_initial_members: ['c1a1', 'c1a2', 'c1a3']
+quickstack::pacemaker::params::ceph_public_network: "%{hiera('network_public')}.0/24"
+quickstack::pacemaker::params::ceph_cluster_network: "%{hiera('network_internal')}.0/24"
+quickstack::pacemaker::params::ceph_osd_pool_size: '1'
+quickstack::pacemaker::params::ceph_osd_pool_default_size: '1'
+quickstack::pacemaker::params::ceph_osd_journal_size: '1000'
+quickstack::pacemaker::params::cinder_admin_vip: "%{hiera('cinder_vip_admin')}"
+quickstack::pacemaker::params::cinder_group: 'cinder'
+quickstack::pacemaker::params::cinder_private_vip: "%{hiera('cinder_vip_internal')}"
+quickstack::pacemaker::params::cinder_public_vip: "%{hiera('cinder_vip_public')}"
+quickstack::pacemaker::params::cluster_control_ip: "%{hiera('cluster_control_ip')}"
+quickstack::pacemaker::params::db_group: 'db'
+quickstack::pacemaker::params::db_vip: "%{hiera('db_vip')}"
+quickstack::pacemaker::params::glance_admin_vip: "%{hiera('glance_vip_admin')}"
+quickstack::pacemaker::params::glance_group: glance
+quickstack::pacemaker::params::glance_private_vip: "%{hiera('glance_vip_internal')}"
+quickstack::pacemaker::params::glance_public_vip: "%{hiera('glance_vip_public')}"
+quickstack::pacemaker::params::heat_admin_vip: "%{hiera('heat_vip_admin')}"
+quickstack::pacemaker::params::heat_cfn_admin_vip: "%{hiera('heat_cfn_vip_admin')}"
+quickstack::pacemaker::params::heat_cfn_enabled: "%{hiera('heat')}"
+quickstack::pacemaker::params::heat_cfn_group: 'heat_cfn'
+quickstack::pacemaker::params::heat_cfn_private_vip: "%{hiera('heat_cfn_vip_internal')}"
+quickstack::pacemaker::params::heat_cfn_public_vip: "%{hiera('heat_cfn_vip_public')}"
+quickstack::pacemaker::params::heat_cloudwatch_enabled: "%{hiera('heat')}"
+quickstack::pacemaker::params::heat_group: 'heat'
+quickstack::pacemaker::params::heat_private_vip: "%{hiera('heat_vip_internal')}"
+quickstack::pacemaker::params::heat_public_vip: "%{hiera('heat_vip_public')}"
+quickstack::pacemaker::params::horizon_admin_vip: "%{hiera('horizon_vip_admin')}"
+quickstack::pacemaker::params::horizon_group: horizon
+quickstack::pacemaker::params::horizon_private_vip: "%{hiera('horizon_vip_internal')}"
+quickstack::pacemaker::params::horizon_public_vip: "%{hiera('horizon_vip_public')}"
+quickstack::pacemaker::params::include_amqp: "%{hiera('amqp')}"
+quickstack::pacemaker::params::include_cinder: "%{hiera('cinder')}"
+quickstack::pacemaker::params::include_glance: "%{hiera('glance')}"
+quickstack::pacemaker::params::include_heat: "%{hiera('heat')}"
+quickstack::pacemaker::params::include_horizon: "%{hiera('horizon')}"
+quickstack::pacemaker::params::include_keystone: "%{hiera('keystone')}"
+quickstack::pacemaker::params::include_mysql: "%{hiera('mysql')}"
+quickstack::pacemaker::params::include_neutron: "%{hiera('neutron')}"
+quickstack::pacemaker::params::include_nova: "%{hiera('nova')}"
+quickstack::pacemaker::params::include_swift: "%{hiera('swift')}"
+quickstack::pacemaker::params::keystone_admin_vip: "%{hiera('keystone_vip_admin')}"
+quickstack::pacemaker::params::keystone_group: keystone
+quickstack::pacemaker::params::keystone_private_vip: "%{hiera('keystone_vip_internal')}"
+quickstack::pacemaker::params::keystone_public_vip: "%{hiera('keystone_vip_public')}"
+quickstack::pacemaker::params::lb_backend_server_addrs:
+  - "%{hiera('server1_ip')}"
+  - "%{hiera('server2_ip')}"
+  - "%{hiera('server3_ip')}"
+quickstack::pacemaker::params::lb_backend_server_names:
+  - "%{hiera('server1_name')}"
+  - "%{hiera('server2_name')}"
+  - "%{hiera('server3_name')}"
+quickstack::pacemaker::params::loadbalancer_group: 'loadbalancer'
+quickstack::pacemaker::params::loadbalancer_vip: "%{hiera('loadbalancer_vip')}"
+quickstack::pacemaker::params::neutron: "%{hiera('neutron')}"
+quickstack::pacemaker::params::neutron_admin_vip: "%{hiera('neutron_vip_admin')}"
+quickstack::pacemaker::params::neutron_group: 'neutron'
+quickstack::pacemaker::params::neutron_private_vip: "%{hiera('neutron_vip_internal')}"
+quickstack::pacemaker::params::neutron_public_vip: "%{hiera('neutron_vip_public')}"
+quickstack::pacemaker::params::nova_admin_vip: "%{hiera('nova_vip_admin')}"
+quickstack::pacemaker::params::nova_group: 'nova'
+quickstack::pacemaker::params::nova_private_vip: "%{hiera('nova_vip_internal')}"
+quickstack::pacemaker::params::nova_public_vip: "%{hiera('nova_vip_public')}"
+quickstack::pacemaker::params::private_iface: "%{hiera('private_iface')}"
+quickstack::pacemaker::params::private_ip: "%{hiera('private_ip')}"
+quickstack::pacemaker::params::private_network: "%{hiera('private_network')}"
+quickstack::pacemaker::params::swift_group: 'swift'
+quickstack::pacemaker::params::swift_admin_vip: "%{hiera('swift_vip_admin')}"
+quickstack::pacemaker::params::swift_internal_vip: "%{hiera('swift_vip_internal')}"
+quickstack::pacemaker::params::swift_public_vip: "%{hiera('swift_vip_public')}"
+
+quickstack::pacemaker::rabbitmq::inet_dist_listen: '35672'
+
+quickstack::pacemaker::swift::swift_internal_vip: "%{hiera('swift_vip_internal')}"
+quickstack::pacemaker::swift::swift_storage_device: 'device1'
+quickstack::pacemaker::swift::swift_storage_ips: ["%{hiera('swift_storage1_ip')}"]
