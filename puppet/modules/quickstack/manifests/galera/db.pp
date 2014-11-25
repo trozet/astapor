@@ -18,7 +18,6 @@ class quickstack::galera::db (
   $neutron_db_dbname      = 'neutron',
   $neutron_db_password,
 ) {
-  class { '::mysql::server::account_security': }
 
   mysql_database { $keystone_db_dbname:
     ensure   => 'present',
@@ -127,6 +126,4 @@ class quickstack::galera::db (
     table      => "$neutron_db_dbname.*",
     require    => Mysql_user["$neutron_db_user@%"]
   }
-
-  Mysql_grant <| |> -> Exec["all-galera-nodes-are-up"]
 }
