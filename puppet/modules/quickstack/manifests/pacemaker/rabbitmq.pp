@@ -48,6 +48,7 @@ class quickstack::pacemaker::rabbitmq (
       port                 => map_params("amqp_port"),
       backend_port         => map_params("amqp_port"),
       timeout              => $haproxy_timeout,
+      extra_listen_options => {'option' => ['tcpka','tcplog']},
     }
 
     Class['::quickstack::firewall::amqp'] ->
