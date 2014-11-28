@@ -16,7 +16,7 @@ This returns the ip associated with the given network or nic.
       function_get_ip_from_network([the_network])
     elsif (the_nic != '')
       my_ip = nil
-      the_nic.to_a.each do |this_nic|
+      [the_nic].flatten.each do |this_nic|
         if !function_get_ip_from_nic([this_nic]).nil?
           my_ip = function_get_ip_from_nic([this_nic])
           break
