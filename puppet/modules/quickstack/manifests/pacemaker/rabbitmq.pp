@@ -12,6 +12,9 @@ class quickstack::pacemaker::rabbitmq (
     $amqp_password = map_params("amqp_password")
     $amqp_vip = map_params("amqp_vip")
     $cluster_nodes = regsubst(map_params("lb_backend_server_names"), '\..*', '')
+    $server_addrs = map_params("lb_backend_server_addrs")
+    $this_addr = map_params("local_bind_addr")
+    $this_node = inline_template('<%= @cluster_nodes[@server_addrs.index(@this_addr)] %>')
 
     if ($::pcs_setup_rabbitmq ==  undef or
         !str2bool_i("$::pcs_setup_rabbitmq")) {
@@ -38,6 +41,9 @@ class quickstack::pacemaker::rabbitmq (
       package_provider         => "yum",
       package_source           => undef,
       manage_repos             => false,
+      environment_variables   => {
+        'RABBITMQ_NODENAME'     => "rabbit@$this_node",
+      },
       service_manage           => $_enabled,
     }
 
