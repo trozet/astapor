@@ -22,11 +22,40 @@ class quickstack::pacemaker::nosql (
       $_ensure = undef
     }
 
+    if (str2bool_i(map_params('include_mysql'))) {
+      Exec['galera-online'] -> Anchor['nosql cluster start']
+    }
+    if (str2bool_i(map_params('include_keystone'))) {
+      Exec['all-keystone-nodes-are-up'] -> Anchor['nosql cluster start']
+    }
+    if (str2bool_i(map_params('include_swift'))) {
+      Exec['all-swift-nodes-are-up'] -> Anchor['nosql cluster start']
+    }
+    if (str2bool_i(map_params('include_glance'))) {
+      Exec['all-glance-nodes-are-up'] -> Anchor['nosql cluster start']
+    }
+    if (str2bool_i(map_params('include_nova'))) {
+      Exec['all-nova-nodes-are-up'] -> Anchor['nosql cluster start']
+    }
+    if (str2bool_i(map_params('include_cinder'))) {
+      Exec['all-cinder-nodes-are-up'] -> Anchor['nosql cluster start']
+    }
+    if (str2bool_i(map_params('include_neutron'))) {
+      Exec['all-neutron-nodes-are-up'] -> Anchor['nosql cluster start']
+    }
+    if (str2bool_i(map_params('include_heat'))) {
+      Exec['all-heat-nodes-are-up'] -> Anchor['nosql cluster start']
+    }
+    if (str2bool_i(map_params('include_horizon'))) {
+      Exec['all-horizon-nodes-are-up'] -> Anchor['nosql cluster start']
+    }
+
     Class['::quickstack::pacemaker::common']
     ->
     class {'::quickstack::firewall::nosql':
       ports => [$nosql_port],
     } ->
+    anchor{'nosql cluster start':} ->
     class { '::quickstack::db::nosql':
       bind_host       => $_bind_host,
       service_enable  => $_enabled,

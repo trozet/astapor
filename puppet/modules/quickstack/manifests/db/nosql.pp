@@ -36,6 +36,8 @@ class quickstack::db::nosql(
   $service_ensure  = 'running',
 ) {
 
+  anchor {'mongodb setup start': }
+  ->
   class { '::mongodb::globals':
     service_enable => $service_enable,
     service_ensure => $service_ensure,
@@ -61,4 +63,6 @@ class quickstack::db::nosql(
   anchor {'mongodb setup done' :
     require => Exec['check_mongodb'],
   }
+
+  Anchor['mongodb setup start'] -> Service[mongodb] -> Anchor['mongodb setup done']
 }
