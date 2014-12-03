@@ -27,11 +27,35 @@ class quickstack::pacemaker::ceilometer (
       $_ensure = undef
     }
 
-    if (str2bool_i(map_params('include_nosql'))) {
-      Anchor['ha mongo ready'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    if (str2bool_i(map_params('include_mysql'))) {
+      Exec['galera-online'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
     }
     if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    }
+    if (str2bool_i(map_params('include_swift'))) {
+      Exec['all-swift-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    }
+    if (str2bool_i(map_params('include_glance'))) {
+      Exec['all-glance-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    }
+    if (str2bool_i(map_params('include_nova'))) {
+      Exec['all-nova-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    }
+    if (str2bool_i(map_params('include_cinder'))) {
+      Exec['all-cinder-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    }
+    if (str2bool_i(map_params('include_neutron'))) {
+      Exec['all-neutron-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    }
+    if (str2bool_i(map_params('include_heat'))) {
+      Exec['all-heat-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    }
+    if (str2bool_i(map_params('include_horizon'))) {
+      Exec['all-horizon-nodes-are-up'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
+    }
+    if (str2bool_i(map_params('include_nosql'))) {
+      Anchor['ha mongo ready'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
     }
 
     class {"::quickstack::load_balancer::ceilometer":
