@@ -34,17 +34,18 @@ class quickstack::pacemaker::keystone (
     $keystone_group = map_params("keystone_group")
     $keystone_private_vip = map_params("keystone_private_vip")
 
-    # TODO: extract this into a helper function
-    if ($::pcs_setup_keystone ==  undef or
-        !str2bool_i("$::pcs_setup_keystone")) {
-      $_enabled = true
-    } else {
-      $_enabled = false
-    }
+    # TODO: once the keystone class stops incorrectly interpreting
+    # $enabled = true|false as $service_ensure = 'running'|'stopped',
+    # we can revert to relying on the $::pcs_setup_keystone fact
+    # as whether or not the keystone service untouched (i.e.,
+    # what we want to do is assume keystone is under pacemaker
+    # control if $::pcs_setup_keystone is true and leave the
+    # keystone service alone)
+    $_enabled = true
 
     # because the dep on stack::keystone is not enough for some reason...
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Service['keystone'] -> Exec['pcs-keystone-server-set-up']
-    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] ~> Exec<| title == 'keystone-manage db_sync'|> ->
+    Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec<| title == 'keystone-manage db_sync'|> ->
     Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Exec['keystone-manage pki_setup'] -> Exec['pcs-keystone-server-set-up']
     Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip'] -> Keystone_user<| |> -> Exec['pcs-keystone-server-set-up']
