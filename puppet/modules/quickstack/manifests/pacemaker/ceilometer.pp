@@ -58,6 +58,8 @@ class quickstack::pacemaker::ceilometer (
       Anchor['ha mongo ready'] -> Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip']
     }
 
+    Exec['i-am-ceilometer-vip-OR-ceilometer-is-up-on-vip'] -> Exec<| title == 'ceilometer-dbsync' |> -> Exec['pcs-ceilometer-server-set-up']
+
     class {"::quickstack::load_balancer::ceilometer":
       frontend_pub_host    => $ceilometer_public_vip,
       frontend_priv_host   => $ceilometer_private_vip,

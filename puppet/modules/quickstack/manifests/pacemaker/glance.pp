@@ -45,7 +45,7 @@ class quickstack::pacemaker::glance (
 
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-api']
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-registry']
-    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] ~> Exec<| title == 'glance-manage db_sync'|> ->
+    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec<| title == 'glance-manage db_sync'|> ->
     Exec['pcs-glance-server-set-up']
 
     if (str2bool_i(map_params('include_mysql'))) {

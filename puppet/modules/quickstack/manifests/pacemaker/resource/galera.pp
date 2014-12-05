@@ -6,7 +6,10 @@ define quickstack::pacemaker::resource::galera($timeout     = '300s',
 
     $num_nodes = size($gcomm_addrs)
     $gcomm_addresses = inline_template('gcomm://<%= @gcomm_addrs.join "," %>')
-    $create_cmd = "/usr/sbin/pcs resource create galera galera enable_creation=true wsrep_cluster_address=\"$gcomm_addresses\" meta master-max=$num_nodes ordered=true op promote timeout=$timeout on-fail=block --master"
+
+    # once pcs verson >= 0.9.116 is available, we can simplify the below command to be a single
+    # call to pcs without the "-f"
+    $create_cmd = "/usr/sbin/pcs cluster cib /tmp/galera-ra && /usr/sbin/pcs -f /tmp/galera-ra resource create galera galera enable_creation=true wsrep_cluster_address=\"$gcomm_addresses\" op promote timeout=300s on-fail=block --master meta master-max=3 ordered=true && /usr/sbin/pcs cluster cib-push /tmp/galera-ra"
 
     anchor { "qprs start galera": }
     ->
