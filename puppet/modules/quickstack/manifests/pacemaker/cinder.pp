@@ -77,7 +77,7 @@ class quickstack::pacemaker::cinder(
       $_enabled = false
     }
 
-    Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] ~> Exec<| title =='cinder-manage db_sync'|> -> Exec['pcs-cinder-server-set-up']
+    Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec<| title =='cinder-manage db_sync'|> -> Exec['pcs-cinder-server-set-up']
     if (str2bool_i(map_params('include_mysql'))) {
       Exec['galera-online'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
