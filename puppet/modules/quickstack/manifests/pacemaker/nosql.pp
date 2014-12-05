@@ -96,7 +96,7 @@ class quickstack::pacemaker::nosql (
       options        => 'start timeout=10s',
       monitor_params => { 'start-delay' => '10s' },
       clone          => true,
-    }
+    } ->
     anchor {'ha mongo ready':
       require => Quickstack::Pacemaker::Resource::Service['mongod'],
     }
