@@ -53,23 +53,34 @@ class quickstack::ceilometer::control(
   }
 
   class { '::ceilometer::collector':
+    enabled        => $service_enable,
+    manage_service => $service_enable,
     require => Class['::ceilometer::db'],
   }
 
-  class { '::ceilometer::agent::notification':}
+  class { '::ceilometer::agent::notification':
+    enabled        => $service_enable,
+    manage_service => $service_enable,
+  }
+
   class { '::ceilometer::agent::auth':
     auth_url      => "http://${auth_host}:35357/v2.0",
     auth_password => $ceilometer_user_password,
   }
 
   class { '::ceilometer::agent::central':
-    enabled => $service_enable,
+    enabled        => $service_enable,
+    manage_service => $service_enable,
   }
 
   class { '::ceilometer::alarm::notifier':
+    enabled        => $service_enable,
+    manage_service => $service_enable,
   }
 
   class { '::ceilometer::alarm::evaluator':
+    enabled        => $service_enable,
+    manage_service => $service_enable,
   }
 
   class { '::ceilometer::api':
