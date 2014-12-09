@@ -1,4 +1,6 @@
 ---
+scenario: 'HA'
+
 admin_email: 'admin@example.com'
 
 amqp_provider: 'rabbitmq'

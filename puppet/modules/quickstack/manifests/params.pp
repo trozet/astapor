@@ -1,5 +1,6 @@
 class quickstack::params (
-  # This class needs to go away.
+  $scenarii = [],
+  $scenario = '',
 
   # Logs
   $admin_email                = "admin@${::domain}",
