@@ -18,4 +18,4 @@ HA_AIO_classes:
   - quickstack::pacemaker::neutron
 
 compute_classes:
-  - quickstack::compute::neutron
+  - quickstack::neutron::compute
