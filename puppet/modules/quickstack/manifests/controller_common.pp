@@ -19,6 +19,8 @@ class quickstack::controller_common (
   $cinder_backend_gluster_name   = $quickstack::params::cinder_backend_gluster_name,
   $cinder_backend_iscsi          = $quickstack::params::cinder_backend_iscsi,
   $cinder_backend_iscsi_name     = $quickstack::params::cinder_backend_iscsi_name,
+  $cinder_backend_netapp         = $quickstack::params::cinder_backend_netapp,
+  $cinder_backend_netapp_name    = $quickstack::params::cinder_backend_netapp_name,
   $cinder_backend_nfs            = $quickstack::params::cinder_backend_nfs,
   $cinder_backend_nfs_name       = $quickstack::params::cinder_backend_nfs_name,
   $cinder_backend_rbd            = $quickstack::params::cinder_backend_rbd,
@@ -38,6 +40,21 @@ class quickstack::controller_common (
   $cinder_eqlx_use_chap          = $quickstack::params::cinder_eqlx_use_chap,
   $cinder_eqlx_chap_login        = $quickstack::params::cinder_eqlx_chap_login,
   $cinder_eqlx_chap_password     = $quickstack::params::cinder_eqlx_chap_password,
+  $cinder_netapp_hostname          = $quickstack::params::cinder_netapp_hostname,
+  $cinder_netapp_login             = $quickstack::params::cinder_netapp_login,
+  $cinder_netapp_password          = $quickstack::params::cinder_netapp_password,
+  $cinder_netapp_server_port       = $quickstack::params::cinder_netapp_server_port,
+  $cinder_netapp_storage_family    = $quickstack::params::cinder_netapp_storage_family,
+  $cinder_netapp_transport_type    = $quickstack::params::cinder_netapp_transport_type,
+  $cinder_netapp_storage_protocol  = $quickstack::params::cinder_netapp_storage_protocol,
+  $cinder_netapp_nfs_shares        = $quickstack::params::cinder_netapp_nfs_shares,
+  $cinder_netapp_nfs_shares_config = $quickstack::params::cinder_netapp_nfs_shares_config,
+  $cinder_netapp_volume_list       = $quickstack::params::cinder_netapp_volume_list,
+  $cinder_netapp_vfiler            = $quickstack::params::cinder_netapp_vfiler,
+  $cinder_netapp_vserver           = $quickstack::params::cinder_netapp_vserver,
+  $cinder_netapp_controller_ips    = $quickstack::params::cinder_netapp_controller_ips,
+  $cinder_netapp_sa_password       = $quickstack::params::cinder_netapp_sa_password,
+  $cinder_netapp_storage_pools     = $quickstack::params::cinder_netapp_storage_pools,
   $cinder_rbd_pool               = $quickstack::params::cinder_rbd_pool,
   $cinder_rbd_ceph_conf          = $quickstack::params::cinder_rbd_ceph_conf,
   $cinder_rbd_flatten_volume_from_snapshot
@@ -349,6 +366,7 @@ class quickstack::controller_common (
   # https://github.com/redhat-openstack/astapor/blob/7cf25e1022bee08b0c385ae956d4e9e4ade14a9d/puppet/modules/quickstack/manifests/cinder_controller.pp#L85
   if (!str2bool_i("$cinder_backend_gluster") and
       !str2bool_i("$cinder_backend_eqlx") and
+      !str2bool_i("$cinder_backend_netapp") and
       !str2bool_i("$cinder_backend_rbd") and
       !str2bool_i("$cinder_backend_nfs")) {
     $cinder_backend_iscsi_with_fallback = 'true'
@@ -384,6 +402,8 @@ class quickstack::controller_common (
     backend_glusterfs_name => $cinder_backend_gluster_name,
     backend_iscsi          => $cinder_backend_iscsi_with_fallback,
     backend_iscsi_name     => $cinder_backend_iscsi_name,
+    backend_netapp         => $cinder_backend_netapp,
+    backend_netapp_name    => $cinder_backend_netapp_name,
     backend_nfs            => $cinder_backend_nfs,
     backend_nfs_name       => $cinder_backend_nfs_name,
     backend_rbd            => $cinder_backend_rbd,
@@ -402,6 +422,21 @@ class quickstack::controller_common (
     eqlx_use_chap          => $cinder_eqlx_use_chap,
     eqlx_chap_login        => $cinder_eqlx_chap_login,
     eqlx_chap_password     => $cinder_eqlx_chap_password,
+    netapp_hostname          => $cinder_netapp_hostname,
+    netapp_login             => $cinder_netapp_login,
+    netapp_password          => $cinder_netapp_password,
+    netapp_server_port       => $cinder_netapp_server_port,
+    netapp_storage_family    => $cinder_netapp_storage_family,
+    netapp_transport_type    => $cinder_netapp_transport_type,
+    netapp_storage_protocol  => $cinder_netapp_storage_protocol,
+    netapp_nfs_shares        => $cinder_netapp_nfs_shares,
+    netapp_nfs_shares_config => $cinder_netapp_nfs_shares_config,
+    netapp_volume_list       => $cinder_netapp_volume_list,
+    netapp_vfiler            => $cinder_netapp_vfiler,
+    netapp_vserver           => $cinder_netapp_vserver,
+    netapp_controller_ips    => $cinder_netapp_controller_ips,
+    netapp_sa_password       => $cinder_netapp_sa_password,
+    netapp_storage_pools     => $cinder_netapp_storage_pools,
     rbd_pool               => $cinder_rbd_pool,
     rbd_ceph_conf          => $cinder_rbd_ceph_conf,
     rbd_flatten_volume_from_snapshot
@@ -422,6 +457,8 @@ class quickstack::controller_common (
       backend_nfs_name       => $cinder_backend_nfs_name,
       backend_eqlx           => $cinder_backend_eqlx,
       backend_eqlx_name      => $cinder_backend_eqlx_name,
+      backend_netapp         => $cinder_backend_netapp,
+      backend_netapp_name    => $cinder_backend_netapp_name,
       backend_rbd            => $cinder_backend_rbd,
       backend_rbd_name       => $cinder_backend_rbd_name,
       os_username            => 'admin',

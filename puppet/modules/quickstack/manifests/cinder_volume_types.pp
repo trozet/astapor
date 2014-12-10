@@ -5,6 +5,8 @@ class quickstack::cinder_volume_types(
   $backend_glusterfs_name = 'glusterfs',
   $backend_iscsi          = false,
   $backend_iscsi_name     = 'iscsi',
+  $backend_netapp         = false,
+  $backend_netapp_name    = ['netapp'],
   $backend_nfs            = false,
   $backend_nfs_name       = 'nfs',
   $backend_rbd            = false,
@@ -55,6 +57,17 @@ class quickstack::cinder_volume_types(
     cinder::type { $backend_iscsi_name:
       set_key   => 'volume_backend_name',
       set_value => $backend_iscsi_name,
+    }
+  }
+
+  if str2bool_i("$backend_netapp") {
+    $netapp_last_index = size($backend_netapp_name) - 1
+
+    Exec['wait-for-cinder-api-being-reachable'] ->
+    quickstack::cinder::multi_instance_type { "netapp-${netapp_last_index}":
+      index           => $netapp_last_index,
+      resource_prefix => "netapp",
+      backend_names   => $backend_netapp_name,
     }
   }
 
