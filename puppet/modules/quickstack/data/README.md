@@ -1,41 +1,70 @@
-# Hiera built-in data
+# Hiera built-in data for Quicsktack
 
-## Setup
-* Install Puppet and Git RPMs
+## Prerequesites
+* Puppet must be setup with future parser option  
 
+- Add following to /etc/puppet/puppet.conf main section: `parser = future`
+or   
+- run following  
+```
+yum -y install augeas
+augtool set /files/etc/puppet/puppet.conf/main/parser future
+```
+
+## Setup  
+* Install Puppet and Git RPMs  
 `yum install -y puppet git`
 
-* Install openstack-puppet-modules RPM
-
+* Install openstack-puppet-modules RPM  
 `yum -y install openstack-puppet-modules`
 
-* Install Quickstack module from Openstack-Foreman-Installer RPM (RHEL-6-Server-OS-Foreman repo)
-
+* Install Quickstack module from Openstack-Foreman-Installer RPM (RHEL-6-Server-OS-Foreman repo). Or alternatively use github source  
 `yum -y install openstack-foreman-installer`
-Alternatively use github source
 
-* Create following link for Hiera to work with Puppet (BZ#1108039)
-
+* Create following link for Hiera to work with Puppet (BZ#1108039)  
 `ln -sf /etc/hiera.yaml /etc/puppet/hiera.yaml`
 
-* classes should be available at hiera top level
+## Set the scene  
+At installation time, the scenario is defined to 'HA' by default in /usr/share/openstack-foreman-installer/puppet/modules/quickstack/data/defaults.yaml
 
-`cp /usr/share/openstack-foreman-installer/puppet/modules/quickstack/data/classes.yaml /var/lib/hiera/defaults.yaml`
-
-## Masterless Deployment - Neither Puppet master nor Foreman server needed
-
-* Change values in YAML files accordingly
-
-* Run Puppet on each node
-
+* To quickly override the scenario, define a new value using /var/lib/hiera/defaults.yaml:  
 ```
-puppet apply -e "hiera_include(<NODE_TYPE>)"  --modulepath=/usr/share/openstack-puppet/modules:/usr/share/openstack-foreman-installer/puppet/modules
+---
+scenario: '<SCENARIO>'
+```
+Choosing <SCENARIO> from the following list:  
+```
+ HA
+ HA-AIO
+ HA-AIO-Neutron
+ HA-AIO-Neutron-compute
+ HA-Neutron
+ Neutron-agents
+ Neutron-ML2-OVS
+ Nova-compute
+ Nova-compute-Neutron-ML2-OVS
+ NHA
+ NHA-Neutron-agents
+ NHA-Neutron-compute
+ PCS-Neutron
+ custom
 ```
 
-where `<NODE_TYPE> ::= HA_AIO_classes | compute_classes`
+* To check all available scenarios   
+Lookup in modules/quickstack/data/classes.yaml file
+or alternatively run:  
+`puppet apply -e "include quickstack::scene" --modulepath=/usr/share/openstack-puppet/modules:/usr/share/openstack-foreman-installer/puppet/modules`
 
-## Notes
+## Run  
+* Masterless deployments where neither Puppet master nor Foreman server are needed  
+Run Puppet on each node  
+`puppet apply -e "include quickstack"  --modulepath=/usr/share/openstack-puppet/modules:/usr/share/openstack-foreman-installer/puppet/modules`
+
+* Using the Foreman   
+YAML parameters are propagated only when the Foreman setting for ENC parameters is turned off.
+
+## Notes  
 * Tested on RHO5/RHEL7
 * Setenforce 0 - Nova scheduler: missing SELinux AVC (BZ#1149975)
-* Compute class to be added soon
+* Scenarios scaffold in progress
 * The Openstack Puppet Modules includes module-data which allows YAML data to be built-in
