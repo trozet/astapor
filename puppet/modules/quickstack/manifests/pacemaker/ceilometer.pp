@@ -86,7 +86,7 @@ class quickstack::pacemaker::ceilometer (
     ->
     class { '::quickstack::ceilometer::control':
       amqp_provider              => map_params('amqp_provider'),
-      amqp_host                  => map_params('amqp_host'),
+      amqp_host                  => map_params('amqp_vip'),
       amqp_port                  => map_params('amqp_port'),
       amqp_username              => map_params('amqp_username'),
       amqp_password              => map_params('amqp_password'),
