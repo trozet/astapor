@@ -6,6 +6,7 @@ class quickstack::pacemaker::neutron (
   $enable_tunneling           = false,
   $enabled                    = true,
   $external_network_bridge    = '',
+  $l3_ha                      = false,
   $ml2_type_drivers           = ['local', 'flat', 'vlan', 'gre', 'vxlan'],
   $ml2_tenant_network_types   = ['vxlan', 'vlan', 'gre', 'flat'],
   $ml2_mechanism_drivers      = ['openvswitch','l2population'],
@@ -65,12 +66,27 @@ class quickstack::pacemaker::neutron (
     $neutron_group = map_params("neutron_group")
     $neutron_public_vip = map_params("neutron_public_vip")
     $ovs_nic = find_nic("$ovs_tunnel_network","$ovs_tunnel_iface","")
+    $_backend_server_names = map_params("lb_backend_server_names")
+    $_backend_server_addrs = map_params("lb_backend_server_addrs")
     # TODO: extract this into a helper function
     if ($::pcs_setup_neutron ==  undef or
         !str2bool_i("$::pcs_setup_neutron")) {
       $_enabled = true
     } else {
       $_enabled = false
+    }
+    if (str2bool_i("$l3_ha")) {
+      $_dhcp_agents_per_network  = size($_backend_server_addrs)
+      $_max_l3_agents_per_router = 0
+      $_min_l3_agents_per_router = 2
+      $_clone_max                = 3
+    } else {
+      $_dhcp_agents_per_network  = 1
+      $_max_l3_agents_per_router = 3
+      $_min_l3_agents_per_router = 2
+      # NOTE: the min defaults to 2 anyway, so we dont _really_ need this, but
+      # adding for clarity that we set things the same as the HA ref arch here.
+      $_clone_max                = 1
     }
     if (str2bool_i(map_params('include_mysql'))) {
       Anchor['galera-online'] -> Exec['i-am-neutron-vip-OR-neutron-is-up-on-vip']
@@ -97,8 +113,8 @@ class quickstack::pacemaker::neutron (
       frontend_pub_host    => map_params("neutron_public_vip"),
       frontend_priv_host    => map_params("neutron_private_vip"),
       frontend_admin_host    => map_params("neutron_admin_vip"),
-      backend_server_names => map_params("lb_backend_server_names"),
-      backend_server_addrs => map_params("lb_backend_server_addrs"),
+      backend_server_names => $_lb_backend_server_names,
+      backend_server_addrs => $_lb_backend_server_addrs,
     }
 
     Class['::quickstack::pacemaker::common']
@@ -123,12 +139,16 @@ class quickstack::pacemaker::neutron (
       allow_overlapping_ips          => $allow_overlapping_ips,
       auth_host                      => map_params("keystone_public_vip"),
       database_max_retries           => '-1',
+      dhcp_agents_per_network        => $_dhcp_agents_per_network,
       cisco_vswitch_plugin           => $cisco_vswitch_plugin,
       cisco_nexus_plugin             => $cisco_nexus_plugin,
       enable_tunneling               => $enable_tunneling,
       enabled                        => $_enabled,
       external_network_bridge        => $external_network_bridge,
+      l3_ha                          => $l3_ha,
       manage_service                 => $_enabled,
+      max_l3_agents_per_router       => $_max_l3_agents_per_router,
+      min_l3_agents_per_router       => $_min_l3_agents_per_router,
       ml2_type_drivers               => $ml2_type_drivers,
       ml2_tenant_network_types       => $ml2_tenant_network_types,
       ml2_mechanism_drivers          => $ml2_mechanism_drivers,
@@ -194,7 +214,7 @@ class quickstack::pacemaker::neutron (
     # with --clone, so for now pass them as resource params.
     quickstack::pacemaker::resource::generic {'neutron-scale':
       resource_name   => 'neutron:NeutronScale',
-      resource_params => 'clone globally-unique=true clone-max=3 interleave=true',
+      resource_params => "clone globally-unique=true clone-max=${_clone_max} interleave=true",
       resource_type   => 'ocf',
     }
     ->
