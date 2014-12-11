@@ -120,7 +120,6 @@ class quickstack::neutron::controller (
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
   $ml2_security_group            = 'true',
-  $ml2_firewall_driver           = 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver',
   $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -326,7 +325,6 @@ class quickstack::neutron::controller (
       vxlan_group           => $ml2_vxlan_group,
       vni_ranges            => $ml2_vni_ranges,
       enable_security_group => str2bool_i("$ml2_security_group"),
-      firewall_driver       => $ml2_firewall_driver,
     }
 
     # If cisco nexus is part of ml2 mechanism drivers,
