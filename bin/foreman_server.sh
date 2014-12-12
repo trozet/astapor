@@ -66,7 +66,7 @@ if [ ! -f foreman_server.sh ]; then
 fi
 
 if [ ! -f /etc/redhat-release ] || \
-    cat /etc/redhat-release | grep -v -q -P 'release 6.[456789]'; then
+    cat /etc/redhat-release | egrep -v -q 'release [7-9]|release [1-9][0-9]|release 6.[4-9]|release 6.[1-9][0-9]'; then
   echo "This installer is only supported on RHEL 6.4 or greater."
   exit 1
 fi
