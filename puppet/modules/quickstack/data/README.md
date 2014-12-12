@@ -1,16 +1,5 @@
 # Hiera built-in data for Quicsktack
 
-## Prerequesites
-* Puppet must be setup with future parser option  
-
-- Add following to /etc/puppet/puppet.conf main section: `parser = future`
-or   
-- run following  
-```
-yum -y install augeas
-augtool set /files/etc/puppet/puppet.conf/main/parser future
-```
-
 ## Setup  
 * Install Puppet and Git RPMs  
 `yum install -y puppet git`
@@ -18,7 +7,7 @@ augtool set /files/etc/puppet/puppet.conf/main/parser future
 * Install openstack-puppet-modules RPM  
 `yum -y install openstack-puppet-modules`
 
-* Install Quickstack module from Openstack-Foreman-Installer RPM (RHEL-6-Server-OS-Foreman repo). Or alternatively use github source  
+* Install Quickstack module from Openstack-Foreman-Installer RPM (RHEL-6-Server-OS-Foreman repo).
 `yum -y install openstack-foreman-installer`
 
 * Create following link for Hiera to work with Puppet (BZ#1108039)  
@@ -64,7 +53,7 @@ Run Puppet on each node
 YAML parameters are propagated only when the Foreman setting for ENC parameters is turned off.
 
 ## Notes  
-* Tested on RHO5/RHEL7
+* Tested on RHEL7/OSP6
 * Setenforce 0 - Nova scheduler: missing SELinux AVC (BZ#1149975)
 * Scenarios scaffold in progress
 * The Openstack Puppet Modules includes module-data which allows YAML data to be built-in
