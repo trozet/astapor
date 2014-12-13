@@ -61,7 +61,9 @@ class quickstack::pacemaker::params (
   $loadbalancer_vip          = '',
   $loadbalancer_group        = 'loadbalancer',
   $lb_backend_server_names   = '',
-  $lb_backend_server_addrs   = '', # should this and cluster_members be merged?
+  $lb_backend_server_addrs   = '',
+  $pcmk_server_names         = '',
+  $pcmk_server_addrs         = '',
   $keystone_public_vip       = '',
   $keystone_private_vip      = '',
   $keystone_admin_vip        = '',
@@ -84,6 +86,9 @@ class quickstack::pacemaker::params (
   $nova_group                = 'nova',
   $nova_db_password          = '',
   $nova_user_password        = '',
+  $pcmk_ip                   = '',
+  $pcmk_iface                = '',
+  $pcmk_network              = '',
   $private_ip                = '',
   $private_iface             = '',
   $private_network           = '',
@@ -100,6 +105,9 @@ class quickstack::pacemaker::params (
   $local_bind_addr = find_ip("$private_network",
                             "$private_iface",
                             "$private_ip")
+  $pcmk_bind_addr = find_ip("$pcmk_network",
+                            "$pcmk_iface",
+                            "$pcmk_ip")
 
   include quickstack::pacemaker::common
   include quickstack::pacemaker::load_balancer
