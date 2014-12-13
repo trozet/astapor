@@ -221,15 +221,15 @@ class quickstack::pacemaker::neutron (
     ->
     quickstack::pacemaker::constraint::base { 'neutron-ovs-to-netns-cleanup-constr' :
       constraint_type => "order",
-      first_resource  => "neutron-ovs-cleanup",
-      second_resource => "neutron-netns-cleanup",
+      first_resource  => "neutron-ovs-cleanup-clone",
+      second_resource => "neutron-netns-cleanup-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::base { 'neutron-cleanup-to-agents-constr' :
       constraint_type => "order",
-      first_resource  => "neutron-netns-cleanup",
+      first_resource  => "neutron-netns-cleanup-clone",
       second_resource => "neutron-agents",
       first_action    => "start",
       second_action   => "start",
@@ -274,18 +274,6 @@ class quickstack::pacemaker::neutron (
     quickstack::pacemaker::constraint::colocation { 'neutron-openvswitch-metadata-colo' :
       source => "neutron-metadata-agent",
       target => "neutron-openvswitch-agent",
-      score  => "INFINITY",
-    }
-    ->
-    quickstack::pacemaker::constraint::colocation { 'neutron-netns-ovs-cleanup-colo' :
-      source => "neutron-netns-cleanup",
-      target => "neutron-ovs-cleanup",
-      score  => "INFINITY",
-    }
-    ->
-    quickstack::pacemaker::constraint::colocation { 'neutron-agents-with-netns-cleanup-colo' :
-      source => "neutron-agents",
-      target => "neutron-netns-cleanup",
       score  => "INFINITY",
     }
   }

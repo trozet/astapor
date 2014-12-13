@@ -92,7 +92,6 @@ class quickstack::pacemaker::nosql (
     Exec['all-nosql-nodes-are-up'] ->
 
     quickstack::pacemaker::resource::service {'mongod':
-      group          => "$pcmk_nosql_group",
       options        => 'start timeout=10s',
       monitor_params => { 'start-delay' => '10s' },
       clone          => true,
