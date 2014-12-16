@@ -49,6 +49,8 @@ class quickstack::glance (
     $sql_connection = "mysql://${db_user}:${db_password}@${db_host}/${db_name}"
   }
 
+  $_auth_url = "http://${keystone_host}:5000/v2.0"
+
   $show_image_direct_url = $backend ? {
     'rbd' => true,
     default => false,
@@ -63,6 +65,7 @@ class quickstack::glance (
     auth_type             => 'keystone',
     auth_port             => '35357',
     auth_host             => $keystone_host,
+    auth_url              => $_auth_url,
     keystone_tenant       => 'services',
     keystone_user         => 'glance',
     keystone_password     => $user_password,
