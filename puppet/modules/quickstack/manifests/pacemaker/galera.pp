@@ -7,7 +7,7 @@ class quickstack::pacemaker::galera (
   $wsrep_sst_method        = 'rsync',
   $wsrep_sst_username      = 'sst_user',
   $wsrep_sst_password      = 'sst_pass',
-  $wsrep_ssl               = false,
+  $wsrep_ssl               = true,
   $wsrep_ssl_key           = '/etc/pki/galera/galera.key',
   $wsrep_ssl_cert          = '/etc/pki/galera/galera.crt',
 ) {
@@ -30,11 +30,17 @@ class quickstack::pacemaker::galera (
     # defined for galera.cnf template
     $wsrep_provider         = '/usr/lib64/galera/libgalera_smm.so'
     $wsrep_bind_address     = map_params("pcmk_bind_addr")
-    $wsrep_provider_options = wsrep_options({
-      'socket.ssl'      => $wsrep_ssl,
-      'socket.ssl_key'  => $wsrep_ssl_key,
-      'socket.ssl_cert' => $wsrep_ssl_cert,
-    })
+    if $wsrep_ssl {
+      $wsrep_provider_options = wsrep_options({
+        'socket.ssl'      => $wsrep_ssl,
+        'socket.ssl_key'  => $wsrep_ssl_key,
+        'socket.ssl_cert' => $wsrep_ssl_cert,
+      })
+    } else {
+      $wsrep_provider_options = wsrep_options({
+        'socket.ssl'      => $wsrep_ssl,
+      })
+    }
     $wsrep_debug = 0
 
     Exec['all-memcached-nodes-are-up'] -> Class['quickstack::firewall::galera']
