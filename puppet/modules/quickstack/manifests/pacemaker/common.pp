@@ -49,14 +49,25 @@ class quickstack::pacemaker::common (
     $setup_cluster = false
   }
 
-  $pacemaker_members = join(map_params("lb_backend_server_names")," ")
+  $pacemaker_members = join(map_params("pcmk_server_names")," ")
 
   $num_hosts_idx = size(map_params("lb_backend_server_names"))-1
-  quickstack::pacemaker::hosts{ "$num_hosts_idx":
+  quickstack::pacemaker::hosts{ "lb $num_hosts_idx":
     index            => $num_hosts_idx,
     ip_address_array => map_params("lb_backend_server_addrs"),
     hostname_array   => map_params("lb_backend_server_names"),
-  } ->
+  }
+  -> Package['rpcbind']
+
+  if (map_params("pcmk_server_names") != map_params("lb_backend_server_names")) {
+    $clu_num_hosts_idx = size(map_params("pcmk_server_names"))-1
+    quickstack::pacemaker::hosts{ "clu $clu_num_hosts_idx":
+      index            => $clu_num_hosts_idx,
+      ip_address_array => map_params("pcmk_server_addrs"),
+      hostname_array   => map_params("pcmk_server_names"),
+    }
+    -> Package['rpcbind']
+  }
 
   package {'rpcbind': } ->
   service {'rpcbind':

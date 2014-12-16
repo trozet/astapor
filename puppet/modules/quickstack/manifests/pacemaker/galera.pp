@@ -29,7 +29,7 @@ class quickstack::pacemaker::galera (
 
     # defined for galera.cnf template
     $wsrep_provider         = '/usr/lib64/galera/libgalera_smm.so'
-    $wsrep_bind_address     = map_params("local_bind_addr")
+    $wsrep_bind_address     = map_params("pcmk_bind_addr")
     $wsrep_provider_options = wsrep_options({
       'socket.ssl'      => $wsrep_ssl,
       'socket.ssl_key'  => $wsrep_ssl_key,
@@ -41,8 +41,8 @@ class quickstack::pacemaker::galera (
 
     class {"::quickstack::load_balancer::galera":
       frontend_pub_host    => map_params("db_vip"),
-      backend_server_names => map_params("lb_backend_server_names"),
-      backend_server_addrs => map_params("lb_backend_server_addrs"),
+      backend_server_names => map_params("pcmk_server_names"),
+      backend_server_addrs => map_params("pcmk_server_addrs"),
     }
 
     Class['::quickstack::pacemaker::common']
@@ -63,7 +63,7 @@ class quickstack::pacemaker::galera (
         package_name => 'mariadb-galera-server',
         override_options => {
         'mysqld' => {
-          'bind-address' => map_params("local_bind_addr"),
+          'bind-address' => map_params("pcmk_bind_addr"),
           'default_storage_engine' => "InnoDB",
           # maybe below?
           max_connections => "1024",
@@ -142,7 +142,7 @@ class quickstack::pacemaker::galera (
     }
     ->
     quickstack::pacemaker::resource::galera {'galera':
-      gcomm_addrs => map_params("lb_backend_server_names")
+      gcomm_addrs => map_params("pcmk_server_names")
     }
     ->
     # one last clustercheck to make sure service is up

@@ -19,7 +19,7 @@ define quickstack::pacemaker::hosts (
 
     #recurse
     $next = $index -1
-    quickstack::pacemaker::hosts {$next:
+    quickstack::pacemaker::hosts {"$name $next":
       index            => $next,
       ip_address_array => $ip_address_array,
       hostname_array   => $hostname_array
