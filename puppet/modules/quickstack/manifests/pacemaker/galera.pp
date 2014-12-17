@@ -1,5 +1,7 @@
 class quickstack::pacemaker::galera (
+  $max_connections         = "1024",
   $mysql_root_password     = '',
+  $open_files_limit        = '-1',
   $galera_monitor_username = 'monitor_user',
   $galera_monitor_password = 'monitor_pass',
   $wsrep_cluster_name      = 'galera_cluster',
@@ -72,8 +74,8 @@ class quickstack::pacemaker::galera (
           'bind-address' => map_params("pcmk_bind_addr"),
           'default_storage_engine' => "InnoDB",
           # maybe below?
-          max_connections => "1024",
-          open_files_limit => '-1',
+          max_connections => $max_connections ,
+          open_files_limit => $open_files_limit ,
           query_cache_size => '0',
           },
         },
