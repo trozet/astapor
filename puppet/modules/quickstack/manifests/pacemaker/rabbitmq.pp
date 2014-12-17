@@ -45,6 +45,19 @@ class quickstack::pacemaker::rabbitmq (
         'RABBITMQ_NODENAME'     => "rabbit@$this_node",
       },
       service_manage           => $_enabled,
+      # set the parameter tcp_keepalive to false -- but don't be misled!
+      # the parameter is false (but the behaviour is really true) so
+      # that we can set tcp_listen_options correctly within the puppet
+      # template, rabbitmq.config.erb
+      tcp_keepalive         => false,
+      config_variables => {
+        'tcp_listen_options' => "[binary,{packet, raw},
+                                {reuseaddr, true},
+                                {backlog, 128},
+                                {nodelay, true},
+                                {exit_on_close, false},
+                                {keepalive, true}]"
+      },
     }
 
     class {'::quickstack::load_balancer::amqp':
