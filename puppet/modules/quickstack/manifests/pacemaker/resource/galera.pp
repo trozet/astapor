@@ -15,8 +15,10 @@ define quickstack::pacemaker::resource::galera($timeout     = '300s',
     ->
     # probably want to move this to puppet-pacemaker eventually
     exec {"create galera resource":
-      command => $create_cmd,
-      unless => '/usr/sbin/pcs resource show galera'
+      command   => $create_cmd,
+      tries     => 4,
+      try_sleep => 30,
+      unless    => '/usr/sbin/pcs resource show galera',
     }
     ->
     exec {"wait for galera resource":
