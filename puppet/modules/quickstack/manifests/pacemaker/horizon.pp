@@ -119,10 +119,11 @@ class quickstack::pacemaker::horizon (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include horizon",
     }
     ->
-    quickstack::pacemaker::resource::service {"$::horizon::params::http_service":
-      clone => true,
-      options => 'start-delay=10s',
-      monitor_params => {'start-delay' => '20s'},
+    quickstack::pacemaker::resource::generic {"horizon":
+      clone_opts            => "interleave=true",
+      resource_name         => "$::horizon::params::http_service",
+      resource_params       => 'start-delay=10s',
+      #      monitor_params => {'start-delay'     => '20s'},
     }
   }
 }

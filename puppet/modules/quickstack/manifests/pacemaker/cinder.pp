@@ -94,6 +94,14 @@ class quickstack::pacemaker::cinder(
       Exec['all-nova-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
 
+    if (str2bool_i("$backend_nfs")) {
+      $_volume_clone_opts = "interleave=true"
+      $_cinder_volume_resource_name = "cinder-volume-clone"
+    } else {
+      $_volume_clone_opts = undef
+      $_cinder_volume_resource_name = "cinder-volume"
+    }
+
     class {"::quickstack::load_balancer::cinder":
       frontend_pub_host    => map_params("cinder_public_vip"),
       frontend_priv_host   => map_params("cinder_private_vip"),
@@ -161,24 +169,24 @@ class quickstack::pacemaker::cinder(
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include cinder",
     } ->
-    quickstack::pacemaker::resource::service {'openstack-cinder-api':
-      clone => true,
-      options => 'start-delay=10s',
+    quickstack::pacemaker::resource::generic {'cinder-api':
+      clone_opts    => "interleave=true",
+      resource_name => "openstack-cinder-api",
     } ->
-    quickstack::pacemaker::resource::service {'openstack-cinder-scheduler':
-      clone => true,
-      options => 'start-delay=10s',
+    quickstack::pacemaker::resource::generic {'cinder-scheduler':
+      clone_opts    => "interleave=true",
+      resource_name => "openstack-cinder-scheduler",
     } ->
     quickstack::pacemaker::constraint::base { 'cinder-api-scheduler-constr' :
       constraint_type => "order",
-      first_resource  => "openstack-cinder-api-clone",
-      second_resource => "openstack-cinder-scheduler-clone",
+      first_resource  => "cinder-api-clone",
+      second_resource => "cinder-scheduler-clone",
       first_action    => "start",
       second_action   => "start",
     } ->
     quickstack::pacemaker::constraint::colocation { 'cinder-api-scheduler-colo' :
-      source => "openstack-cinder-scheduler-clone",
-      target => "openstack-cinder-api-clone",
+      source => "cinder-scheduler-clone",
+      target => "cinder-api-clone",
       score => "INFINITY",
     }
 
@@ -219,35 +227,39 @@ class quickstack::pacemaker::cinder(
         rbd_pool               => $rbd_pool,
         rbd_ceph_conf          => $rbd_ceph_conf,
         rbd_flatten_volume_from_snapshot
-                               => $rbd_flatten_volume_from_snapshot,
-        rbd_max_clone_depth    => $rbd_max_clone_depth,
-        rbd_user               => $rbd_user,
-        rbd_secret_uuid        => $rbd_secret_uuid,
-        enabled                => $_enabled,
-        manage_service         => $_enabled,
+                                => $rbd_flatten_volume_from_snapshot,
+        rbd_max_clone_depth     => $rbd_max_clone_depth,
+        rbd_user                => $rbd_user,
+        rbd_secret_uuid         => $rbd_secret_uuid,
+        enabled                 => $_enabled,
+        manage_service          => $_enabled,
       }
       ->
       Exec['pcs-cinder-server-set-up']
 
       Exec['all-cinder-nodes-are-up']
       ->
-      quickstack::pacemaker::resource::service {'openstack-cinder-volume':
-        # FIXME(jistr): set 'clone => true'
+      Quickstack::Pacemaker::Resource::Generic['cinder-scheduler']
+      ->
+      quickstack::pacemaker::resource::generic {'cinder-volume':
+        # FIXME(jayg): clone only if backend is nfs
         # https://bugs.launchpad.net/cinder/+bug/1322190
-        options => 'start-delay=10s',
+        clone_opts      => $_volume_clone_opts,
+        resource_name   => "openstack-cinder-volume",
+        resource_params => 'start-delay=10s',
       }
       ->
       quickstack::pacemaker::constraint::base { 'cinder-scheduler-volume-constr' :
         constraint_type => "order",
-        first_resource  => "openstack-cinder-scheduler-clone",
-        second_resource => "openstack-cinder-volume",
+        first_resource  => "cinder-scheduler-clone",
+        second_resource => "$_cinder_volume_resource_name",
         first_action    => "start",
         second_action   => "start",
       }
       ->
       quickstack::pacemaker::constraint::colocation { 'cinder-scheduler-volume-colo' :
-        source => "openstack-cinder-volume",
-        target => "openstack-cinder-scheduler-clone",
+        source => "$_cinder_volume_resource_name",
+        target => "cinder-scheduler-clone",
         score => "INFINITY",
       }
     }

@@ -6,9 +6,14 @@
 # === Parameters
 #
 # [admin_token]. Auth token for keystone admin. Required.
+# [amqp_host]. Address where the amqp server resides.  Currently puppet-keystone
+#   only supports rabbit, but if qpid support is added, this param will be used
+#   for that as well. Optional, Defaults to 'localhost'.
+# [amqp_port]. Port where the amqp server accepts connections.  Optional.
+#   Defaults to '5672'.
 # [bind_host] Address that keystone binds to. Optional. Defaults to  '0.0.0.0'
-# [db_host] Host where DB resides. Optional. Defaults to 127.0.0.1..
-# [db_name] Name of keystone DB. Optional. Defaults to  'keystone'
+# [db_host] Host where DB resides. Optional. Defaults to '127.0.0.1'.
+# [db_name] Name of keystone DB. Optional. Defaults to  'keystone'.
 # [db_password] Password for keystone DB. Required.
 # [db_ssl] Boolean whether to use SSL for database. Defaults to false.
 # [db_ssl_ca] If db_ssl is true, this is used in the connection to define the CA. Default undef.
@@ -38,6 +43,8 @@
 
 class quickstack::keystone::common (
   $admin_token,
+  $amqp_host                   = 'localhost',
+  $amqp_port                   = '5672',
   $bind_host                   = '0.0.0.0',
   $db_host                     = '127.0.0.1',
   $db_name                     = 'keystone',
@@ -76,6 +83,8 @@ class quickstack::keystone::common (
     enabled          => $enabled,
     idle_timeout     => $idle_timeout,
     log_facility     => $log_facility,
+    rabbit_host      => $amqp_host,
+    rabbit_port      => $amqp_port,
     service_provider => $service_provider,
     sql_connection   => $sql_conn,
     token_driver     => $token_driver,

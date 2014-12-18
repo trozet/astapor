@@ -47,10 +47,10 @@ class quickstack::pacemaker::nova (
     }
 
     if ($scheduler_host_subset_size == '1') {
-      $sched_clone = false
+      $sched_clone = ""
       $_nova_scheduler_resource = "openstack-nova-scheduler"
     } else {
-      $sched_clone = true
+      $sched_clone = "interleave=true"
       $_nova_scheduler_resource = "openstack-nova-scheduler-clone"
     }
 
@@ -122,17 +122,17 @@ class quickstack::pacemaker::nova (
       command   => "/tmp/ha-all-in-one-util.bash all_members_include nova",
     }
     ->
-    quickstack::pacemaker::resource::service {['openstack-nova-consoleauth',
+    quickstack::pacemaker::resource::generic {['openstack-nova-consoleauth',
                               'openstack-nova-novncproxy',
                               'openstack-nova-api',
                               'openstack-nova-conductor' ]:
-      clone   => true,
-      options => 'start-delay=10s',
+      clone_opts      => "interleave=true",
+      resource_params => 'start-delay=10s',
     }
     ->
-    quickstack::pacemaker::resource::service {'openstack-nova-scheduler':
-      clone   => $sched_clone,
-      options => 'start-delay=10s',
+    quickstack::pacemaker::resource::generic {'openstack-nova-scheduler':
+      clone_opts      => $sched_clone,
+      resource_params => 'start-delay=10s',
     }
     ->
     quickstack::pacemaker::constraint::base { 'nova-console-vnc-constr' :
