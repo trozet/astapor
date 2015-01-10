@@ -43,13 +43,13 @@ class quickstack::pacemaker::glance (
       $_enabled = false
     }
 
-    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-api']
-    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-registry']
+    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-api']-> Exec['pcs-glance-server-set-up']
+    Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Service['glance-registry'] -> Exec['pcs-glance-server-set-up']
     Exec['i-am-glance-vip-OR-glance-is-up-on-vip'] -> Exec<| title == 'glance-manage db_sync'|> ->
     Exec['pcs-glance-server-set-up']
 
     if (str2bool_i(map_params('include_mysql'))) {
-      Exec['galera-online'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
+      Anchor['galera-online'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
     }
     if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
@@ -144,8 +144,6 @@ class quickstack::pacemaker::glance (
       amqp_password            => map_params("amqp_password"),
       amqp_provider            => map_params("amqp_provider"),
     }
-
-    Class['::quickstack::glance']
     ->
     exec {"pcs-glance-server-set-up":
       command => "/usr/sbin/pcs property set glance=running --force",
@@ -203,6 +201,9 @@ class quickstack::pacemaker::glance (
       target => "glance-registry-clone",
       score => "INFINITY",
     }
+    ->
+    Anchor['pacemaker ordering constraints begin']
+
     if ($backend == 'rbd') {
       include ::quickstack::ceph::client_packages
       include ::quickstack::pacemaker::ceph_config
