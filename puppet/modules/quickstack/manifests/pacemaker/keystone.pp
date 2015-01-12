@@ -86,23 +86,25 @@ class quickstack::pacemaker::keystone (
       unless   => "/tmp/ha-all-in-one-util.bash i_am_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
     } ->
     class {"::quickstack::keystone::common":
-      admin_token                 => "$admin_token",
-      bind_host                   => map_params("local_bind_addr"),
-      db_host                     => map_params("db_vip"),
-      db_name                     => "$db_name",
-      db_password                 => map_params("keystone_db_password"),
-      db_ssl                      => str2bool_i("$db_ssl"),
-      db_ssl_ca                   => "$db_ssl_ca",
-      db_type                     => "$db_type",
-      db_user                     => "$db_user",
-      debug                       => str2bool_i("$debug"),
-      enabled                     => $_enabled,
-      idle_timeout                => "$idle_timeout",
-      log_facility                => "$log_facility",
-      token_driver                => "$token_driver",
-      token_format                => "$token_format",
-      use_syslog                  => str2bool_i("$use_syslog"),
-      verbose                     => str2bool_i("$verbose"),
+      admin_token  => "$admin_token",
+      amqp_host    => map_params("amqp_vip"),
+      amqp_port    => map_params("amqp_port"),
+      bind_host    => map_params("local_bind_addr"),
+      db_host      => map_params("db_vip"),
+      db_name      => "$db_name",
+      db_password  => map_params("keystone_db_password"),
+      db_ssl       => str2bool_i("$db_ssl"),
+      db_ssl_ca    => "$db_ssl_ca",
+      db_type      => "$db_type",
+      db_user      => "$db_user",
+      debug        => str2bool_i("$debug"),
+      enabled      => $_enabled,
+      idle_timeout => "$idle_timeout",
+      log_facility => "$log_facility",
+      token_driver => "$token_driver",
+      token_format => "$token_format",
+      use_syslog   => str2bool_i("$use_syslog"),
+      verbose      => str2bool_i("$verbose"),
     } ->
     class {"::quickstack::keystone::endpoints":
       admin_address               => map_params("keystone_admin_vip"),
@@ -170,9 +172,9 @@ class quickstack::pacemaker::keystone (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include keystone",
     } ->
-    quickstack::pacemaker::resource::service {'openstack-keystone':
-      clone   => true,
-      options => 'start-delay=10s',
+    quickstack::pacemaker::resource::generic {'keystone':
+      clone_opts    => "interleave=true",
+      resource_name => "openstack-keystone",
     }
     # TODO: Consider if we should pre-emptively purge any directories keystone has
     # created in /tmp

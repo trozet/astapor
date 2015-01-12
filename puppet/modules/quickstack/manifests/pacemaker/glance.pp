@@ -159,13 +159,13 @@ class quickstack::pacemaker::glance (
       try_sleep => 10,
       command   => "/tmp/ha-all-in-one-util.bash all_members_include glance",
     } ->
-    quickstack::pacemaker::resource::service {'openstack-glance-registry':
-      clone => true,
-      options => 'start-delay=10s',
+    quickstack::pacemaker::resource::generic {'glance-registry':
+      clone_opts    => "interleave=true",
+      resource_name => "openstack-glance-registry",
     } ->
-    quickstack::pacemaker::resource::service {'openstack-glance-api':
-      clone => true,
-      options => 'start-delay=10s',
+    quickstack::pacemaker::resource::generic {'glance-api':
+      clone_opts    => "interleave=true",
+      resource_name => "openstack-glance-api",
     }
 
     if str2bool_i("$pcmk_fs_manage") {
@@ -173,34 +173,34 @@ class quickstack::pacemaker::glance (
       quickstack::pacemaker::constraint::base { 'glance-fs-registry-constr' :
         constraint_type => "order",
         first_resource  => "${glance_fs_resource_name}-clone",
-        second_resource => "openstack-glance-registry-clone",
+        second_resource => "glance-registry-clone",
         first_action    => "start",
         second_action   => "start",
       }
       ->
       quickstack::pacemaker::constraint::colocation { 'glance-fs-registry-colo' :
-        source => "openstack-glance-registry-clone",
+        source => "glance-registry-clone",
         target => "${glance_fs_resource_name}-clone",
         score => "INFINITY",
       }
       Quickstack::Pacemaker::Resource::Filesystem['glance-fs'] ->
-      Quickstack::Pacemaker::Resource::Service['openstack-glance-registry'] ->
+      Quickstack::Pacemaker::Resource::Generic['glance-registry'] ->
       Quickstack::Pacemaker::Constraint::Base['glance-fs-registry-constr']
     }
 
-    Quickstack::Pacemaker::Resource::Service['openstack-glance-api']
+    Quickstack::Pacemaker::Resource::Generic['glance-api']
     ->
     quickstack::pacemaker::constraint::base { 'glance-registry-api-constr' :
       constraint_type => "order",
-      first_resource  => "openstack-glance-registry-clone",
-      second_resource => "openstack-glance-api-clone",
+      first_resource  => "glance-registry-clone",
+      second_resource => "glance-api-clone",
       first_action    => "start",
       second_action   => "start",
     }
     ->
     quickstack::pacemaker::constraint::colocation { 'glance-registry-api-colo' :
-      source => "openstack-glance-api-clone",
-      target => "openstack-glance-registry-clone",
+      source => "glance-api-clone",
+      target => "glance-registry-clone",
       score => "INFINITY",
     }
     if ($backend == 'rbd') {
@@ -208,7 +208,7 @@ class quickstack::pacemaker::glance (
       include ::quickstack::pacemaker::ceph_config
       include ::quickstack::firewall::ceph_mon
 
-      Class['quickstack::firewall::ceph_mon'] -> 
+      Class['quickstack::firewall::ceph_mon'] ->
       Exec['i-am-glance-vip-OR-glance-is-up-on-vip']
 
       Class['quickstack::pacemaker::ceph_config'] ->

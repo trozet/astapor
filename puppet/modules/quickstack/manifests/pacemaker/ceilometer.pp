@@ -125,24 +125,22 @@ class quickstack::pacemaker::ceilometer (
       monitor_params => {'start-delay'     => '10s'},
     }
     ->
-    quickstack::pacemaker::resource::service {
+    quickstack::pacemaker::resource::generic {
       ["openstack-ceilometer-collector",
       "openstack-ceilometer-api",
       "openstack-ceilometer-alarm-evaluator",
       "openstack-ceilometer-alarm-notifier",
       "openstack-ceilometer-notification"]:
-      clone => true,
-      options => 'start-delay=10s',
-      monitor_params => {'start-delay' => '10s'},
+      clone_opts      => "interleave=true",
+      resource_params => 'start-delay=10s',
+      #monitor_params  => {'start-delay'     => '10s'},
     }
     ->
-    pcmk_resource { "ceilometer-delay":
-      ensure          => 'present',
+    # Delay doesnt support --clone in our version of pcs, just like ocf
+    quickstack::pacemaker::resource::generic { "ceilometer-delay":
+      resource_name   => "",
+      resource_params => "startdelay=10 clone interleave=true",
       resource_type   => "Delay",
-      resource_params => 'startdelay=10',
-      group           => '',
-      clone           => true,
-      interval        => '30s',
     }
     ->
     quickstack::pacemaker::constraint::base { "central-collector-constr":

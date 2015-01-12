@@ -16,9 +16,8 @@ class quickstack::pacemaker::memcached {
     try_sleep => 10,
     command   => "/tmp/ha-all-in-one-util.bash all_members_include memcached",
   } ->
-  quickstack::pacemaker::resource::service { 'memcached':
-    clone   => true,
-    options => 'start-delay=10s',
+  quickstack::pacemaker::resource::generic { 'memcached':
+    clone_opts => "interleave=true",
   }
 
 }
