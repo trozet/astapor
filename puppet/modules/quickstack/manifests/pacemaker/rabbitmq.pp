@@ -85,11 +85,6 @@ class quickstack::pacemaker::rabbitmq (
     } ->
 
     Class['::rabbitmq'] ->
-    exec {"rabbit-mirrored-queues":
-      command => '/usr/sbin/rabbitmqctl set_policy HA \'^(?!amq\.).*\' \'{"ha-mode": "all"}\'',
-      unless  => '/usr/sbin/rabbitmqctl list_policies | grep -q HA',
-      require => Class['::rabbitmq::service'],
-    } ->
 
     exec {"pcs-rabbitmq-server-set-up":
       command => "/usr/sbin/pcs property set rabbitmq=running --force",
@@ -151,6 +146,14 @@ class quickstack::pacemaker::rabbitmq (
         require   => Quickstack::Pacemaker::Vips ["$amqp_group"],
         before    => Class['::rabbitmq'],
       }
+
+      exec {"rabbit-mirrored-queues":
+        command => '/usr/sbin/rabbitmqctl set_policy HA \'^(?!amq\.).*\' \'{"ha-mode": "all"}\'',
+        unless  => '/usr/sbin/rabbitmqctl list_policies | grep -q HA',
+        require => [Class['::rabbitmq'], Class['::rabbitmq::service']],
+        before  => Exec["pcs-rabbitmq-server-set-up"],
+      }
+
       if (str2bool_i(map_params('include_mysql'))) {
         # avoid race condition with galera setup
         Anchor['galera-online'] -> Exec['i-am-first-rabbitmq-node-OR-rabbitmq-is-up-on-first-node']
