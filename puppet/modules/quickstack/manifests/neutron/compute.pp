@@ -33,7 +33,7 @@ class quickstack::neutron::compute (
   $ovs_vlan_ranges              = $quickstack::params::ovs_vlan_ranges,
   $ovs_tunnel_iface             = 'eth1',
   $ovs_tunnel_network           = '',
-  $ovs_l2_population            = 'True',
+  $ovs_l2_population            = 'False',
   $amqp_provider                = $quickstack::params::amqp_provider,
   $amqp_host                    = $quickstack::params::amqp_host,
   $amqp_port                    = '5672',
