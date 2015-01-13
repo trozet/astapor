@@ -79,7 +79,7 @@ class quickstack::pacemaker::cinder(
 
     Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip'] -> Exec<| title =='cinder-manage db_sync'|> -> Exec['pcs-cinder-server-set-up']
     if (str2bool_i(map_params('include_mysql'))) {
-      Exec['galera-online'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
+      Anchor['galera-online'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
     if (str2bool_i(map_params('include_keystone'))) {
       Exec['all-keystone-nodes-are-up'] -> Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
@@ -188,7 +188,8 @@ class quickstack::pacemaker::cinder(
       source => "cinder-scheduler-clone",
       target => "cinder-api-clone",
       score => "INFINITY",
-    }
+    } ->
+    Anchor['pacemaker ordering constraints begin']
 
     if str2bool_i("$volume") {
       # FIXME(jistr): remove the host override
@@ -312,5 +313,6 @@ class quickstack::pacemaker::cinder(
       Class['quickstack::ceph::client_packages'] ->
       Exec['i-am-cinder-vip-OR-cinder-is-up-on-vip']
     }
+
   }
 }

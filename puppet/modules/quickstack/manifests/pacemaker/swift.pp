@@ -108,5 +108,7 @@ class quickstack::pacemaker::swift (
       first_action    => "start",
       second_action   => "start",
     }
+    ->
+    Anchor['pacemaker ordering constraints begin']
   }
 }

@@ -18,6 +18,6 @@ class quickstack::pacemaker::memcached {
   } ->
   quickstack::pacemaker::resource::generic { 'memcached':
     clone_opts => "interleave=true",
-  }
-
+  } ->
+  Anchor['pacemaker ordering constraints begin']
 }
