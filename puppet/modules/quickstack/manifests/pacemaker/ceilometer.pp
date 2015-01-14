@@ -102,6 +102,7 @@ class quickstack::pacemaker::ceilometer (
       qpid_protocol              => map_params(''),
       service_enable             => $_enabled,
       service_ensure             => $_ensure,
+      verbose                    => $verbose,
     }
     ->
     exec {"pcs-ceilometer-server-set-up":
