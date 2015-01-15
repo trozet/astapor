@@ -14,16 +14,12 @@ class quickstack::load_balancer::galera (
     addr                 => [ $frontend_pub_host ],
     port                 => "$public_port",
     mode                 => "$public_mode",
-    #listen_options       => { 'option' => [ "$log", 'httpchk' ],
-    # FIXME replace below line with above line when clustercheck is available
-    listen_options       => { 'option' => [ "tcpka" ],
+    listen_options       => { 'option' => [ "$log", 'httpchk', 'tcpka' ],
                               'timeout' => ["client $timeout",
                                             "server $timeout", ],
                               'stick-table' => 'type ip size 2',
                               'stick' => 'on dst', },
-    # member_options       => [ 'check inter 1s', 'port 9200' ],
-    # FIXME replace below line with above line when clustercheck is available
-    member_options       => [ 'check weight 1 on-marked-down shutdown-sessions' ],
+    member_options       => [ 'check inter 1s', 'port 9200', 'on-marked-down shutdown-sessions' ],
     backend_server_addrs => $backend_server_addrs,
     backend_server_names => $backend_server_names,
   }
