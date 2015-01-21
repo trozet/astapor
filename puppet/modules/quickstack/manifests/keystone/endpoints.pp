@@ -7,6 +7,8 @@
 #
 # [admin_email] Email address of system admin. Required.
 # [admin_password] Auth password for admin user. Required.
+# [extra_admin_roles] Additional keystone roles to be given to the admin user.
+# Optional.  Defaults to []
 # [glance_user_password] Auth password for glance user. Required.
 # [nova_user_password] Auth password for nova user. Required.
 # [public_address] Public address where keystone can be accessed. Required.
@@ -43,6 +45,7 @@ class quickstack::keystone::endpoints (
   $admin_password,
   $admin_tenant                = 'admin',
   $enabled                     = true,
+  $extra_admin_roles           = [],
   $internal_address            = false,
   $public_address,
   $public_protocol             = 'http',
@@ -97,7 +100,8 @@ class quickstack::keystone::endpoints (
   $swift_admin_address         = false,
 ) {
 
-  # I have to do all of this crazy munging b/c parameters are not
+  validate_array($extra_admin_roles)
+  # We have to do all of this crazy munging b/c parameters are not
   # set procedurally in Puppet
   if($internal_address) {
     $internal_real = $internal_address
@@ -232,9 +236,20 @@ class quickstack::keystone::endpoints (
 
   if $enabled {
     # Setup the admin user
+    $_base_admin_roles = ['admin']
+    if $heat {
+      if (size($extra_admin_roles) > 0) {
+        $_admin_roles = concat($_base_admin_roles,$extra_admin_roles)
+      } else {
+        $_admin_roles = $_base_admin_roles
+      }
+    } else {
+      $_admin_roles = $_base_admin_roles
+    }
     class { 'keystone::roles::admin':
       email        => $admin_email,
       password     => $admin_password,
+      admin_roles  => $_admin_roles,
       admin_tenant => $admin_tenant,
     }
     contain keystone::roles::admin

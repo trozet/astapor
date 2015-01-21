@@ -116,5 +116,4 @@ class quickstack::heat(
     manage_service                => str2bool_i("$manage_service"),
     configure_delegated_roles     => $engine_cfg_delegated,
   }
-  contain heat::engine
 }
