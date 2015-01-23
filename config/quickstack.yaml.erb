@@ -27,6 +27,8 @@ cinder_backend_nfs: false
 cinder_backend_nfs_name: nfs_backend
 cinder_backend_eqlx: false
 cinder_backend_eqlx_name: eqlx_backend
+cinder_backend_netapp: false
+cinder_backend_netapp_name: netapp_backend
 cinder_multiple_backends: false
 cinder_gluster_peers:
 - 192.168.0.4
@@ -48,6 +50,21 @@ cinder_eqlx_pool: default
 cinder_eqlx_use_chap: false
 cinder_eqlx_chap_login: chapadmin
 cinder_eqlx_chap_password: <%= passwd_auto %>
+netapp_hostname: netapp1.example.com
+netapp_login: admin
+netapp_password: <%= passwd_auto %>
+netapp_server_port: 80
+netapp_storage_family: ontap_cluster
+netapp_transport_type: http
+netapp_storage_protocol: nfs
+netapp_nfs_shares: 192.168.1.4:/cinder
+netapp_nfs_shares_config: /etc/cinder/shares.conf
+netapp_volume_list: cindervol1
+netapp_vfiler: cinder
+netapp_vserver: cinder
+netapp_controller_ips: 192.168.1.3
+netapp_sa_password: <%= passwd_auto %>
+netapp_storage_pools: pool1
 glance_db_password: <%= passwd_auto %>
 glance_user_password: <%= passwd_auto %>
 glance_gluster_peers: []
