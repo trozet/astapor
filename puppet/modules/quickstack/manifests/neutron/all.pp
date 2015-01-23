@@ -130,6 +130,14 @@ class quickstack::neutron::all (
   }
   File['/etc/neutron/plugin.ini'] -> Exec['neutron-db-manage upgrade']
 
+  # short-term workaround for BZ 1181592
+  package{'bind-utils': } ->
+  exec {'neutron-etc-hosts-workaround':
+    command => 'dig A $(hostname) | grep -A1 "ANSWER SEC" | tail -n 1 | awk \'{print $NF " " $1}\' | sed -e \'s/.$//g\' >>/etc/hosts',
+    unless => 'grep -P "\b$( hostname )\b" /etc/hosts',
+    path => ['/usr/bin','/bin'],
+  } -> Service['neutron-server']
+
   class { '::neutron::server':
     auth_host                => $auth_host,
     auth_password            => $neutron_user_password,
