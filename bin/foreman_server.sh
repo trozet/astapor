@@ -198,10 +198,12 @@ else
 fi
 sudo -u foreman scl enable ruby193 "cd $FOREMAN_DIR; rake db:seed RAILS_ENV=production FOREMAN_PROVISIONING=$FOREMAN_PROVISIONING"
 
-if [ "$FOREMAN_PROVISIONING" = "true" ]; then
+#if [ "$FOREMAN_PROVISIONING" = "true" ]; then
   # Write the TFTP default file
-  curl --user 'admin:changeme' -k 'https://127.0.0.1/api/config_templates/build_pxe_default'
-fi
+  # this will not work until we call foreman-rake permissions:reset and use the
+  # returned password
+  #curl --user 'admin:changeme' -k 'https://127.0.0.1/api/config_templates/build_pxe_default'
+#fi
 
 # write client-register-to-foreman script
 # TODO don't hit yum unless packages are not installed
@@ -232,8 +234,7 @@ EOF
 
 echo "Foreman is installed and almost ready for setting up your OpenStack"
 echo "You'll find Foreman at https://$(hostname)"
-echo "The user name is 'admin' and default password is 'changeme'."
-echo "Please change the password at https://$(hostname)/users/1-admin/edit"
+echo "Get an admin password by running foreman-rake permissions:reset"
 echo ""
 echo "Then you need to alter a few parameters in Foreman."
 echo "Visit: https://$(hostname)/hostgroups"
@@ -246,3 +247,8 @@ echo "Run that script and visit the HOSTS tab in foreman. Pick some"
 echo "host groups for your nodes based on the configuration you prefer"
 echo ""
 echo "Once puppet runs on the machines, OpenStack is ready!"
+if [ "$FOREMAN_PROVISIONING" = "true" ]; then
+    echo "To finish configuring your provisioning setup, you need a"
+    echo "TFTP default file, which can be set up by going to"
+    echo "https://$(hostname)/config_templates/build_pxe_default"
+fi
