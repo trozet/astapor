@@ -57,6 +57,15 @@ class quickstack::pacemaker::keystone (
     if (str2bool_i(map_params('include_mysql'))) {
       Anchor['galera-online'] -> Exec['i-am-keystone-vip-OR-keystone-is-up-on-vip']
     }
+    if (str2bool_i(map_params('include_heat'))) {
+      if (is_configured('heat')) {
+        $_extra_admin_roles = ['heat_stack_owner']
+      } else {
+        $_extra_admin_roles = []
+      }
+    } else {
+        $_extra_admin_roles = []
+    }
 
     class {"::quickstack::load_balancer::keystone":
       frontend_pub_host    => map_params("keystone_public_vip"),
@@ -112,6 +121,7 @@ class quickstack::pacemaker::keystone (
       admin_password              => "$admin_password",
       admin_tenant                => "$admin_tenant",
       enabled                     => $_enabled,
+      extra_admin_roles           => $_extra_admin_roles,
       internal_address            => map_params("keystone_private_vip"),
       public_address              => map_params("keystone_public_vip"),
       public_protocol             => "$public_protocol",

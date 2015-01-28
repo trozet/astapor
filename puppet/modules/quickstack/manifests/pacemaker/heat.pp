@@ -50,6 +50,8 @@ class quickstack::pacemaker::heat(
 
     Exec['i-am-heat-vip-OR-heat-is-up-on-vip'] -> Exec<| title == 'heat-dbsync' |>
     -> Exec['pcs-heat-server-set-up']
+    Exec['i-am-heat-vip-OR-heat-is-up-on-vip'] -> Service<| title =='heat-engine' |>
+
     if (str2bool_i(map_params('include_mysql'))) {
       Anchor['galera-online'] -> Exec['i-am-heat-vip-OR-heat-is-up-on-vip']
     }
