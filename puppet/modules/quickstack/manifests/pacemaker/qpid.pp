@@ -1,5 +1,5 @@
 class quickstack::pacemaker::qpid (
-  $config_file           = '/etc/qpidd.conf',
+  $config_file           = '/etc/qpid/qpidd.conf',
   $package_name          = 'qpid-cpp-server',
   $package_ensure        = present,
   $service_name          = 'qpidd',
@@ -7,9 +7,9 @@ class quickstack::pacemaker::qpid (
   $service_enable        = true,
   $manage_service        = false,
   $backend_port          = '15672',
-  $max_connections       = '65535',
+  $max_connections       = '65530',
   $worker_threads        = '17',
-  $connection_backlog    = '65535',
+  $connection_backlog    = '65530',
   $realm                 = 'QPID',
   $log_to_file           = 'UNSET',
   $haproxy_timeout       = '120s',
@@ -81,8 +81,8 @@ class quickstack::pacemaker::qpid (
       port                 => map_params("amqp_port"),
       backend_port         => $backend_port,
       timeout              => $haproxy_timeout,
-      extra_listen_options => {'stick-table' => 'type ip size 2',
-                               'stick' => 'on dst'},
+      extra_listen_options => { 'stick-table' => 'type ip size 2',
+                                'stick' => 'on dst'},
     }
 
     if (str2bool_i(map_params('include_mysql'))) {
