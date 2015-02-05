@@ -147,6 +147,8 @@ class quickstack::neutron::controller_networker (
   $ml2_vxlan_group               = '224.0.0.1',
   $ml2_vni_ranges                = ['10:100'],
   $ml2_security_group            = 'true',
+  $odl_controller_ip             = '',
+  $odl_controller_port           = '8080',
   $amqp_provider                 = $quickstack::params::amqp_provider,
   $amqp_host                     = $quickstack::params::amqp_host,
   $amqp_username                 = $quickstack::params::amqp_username,
@@ -379,6 +381,20 @@ class quickstack::neutron::controller_networker (
       veth_mtu         => $veth_mtu,
     }
   }
+    # check if opendaylight needs to be configured.
+    if ('opendaylight' in $ml2_mechanism_drivers) {
+      # OVS manager
+      exec { 'Set OVS Manager to OpenDaylight':
+        command => "/usr/bin/ovs-vsctl set-manager tcp:${odl_controller_ip}:6640",
+        unless  => "/usr/bin/ovs-vsctl show | /usr/bin/grep 'Manager \"tcp:${odl_controller_ip}:6640\"'",
+      }
+      # local ip
+      exec { 'Set local_ip Other Option':
+        command => "/usr/bin/ovs-vsctl set Open_vSwitch $(ovs-vsctl get Open_vSwitch . _uuid) other_config:local_ip=$::ipaddress",
+        unless  => "/usr/bin/ovs-vsctl list Open_vSwitch | /usr/bin/grep 'local_ip=\"$::ipaddress\"'",
+      }
+    }
+
 ###dhcp and l3agent
   class { '::neutron::agents::dhcp': }
 
@@ -429,6 +445,16 @@ class quickstack::neutron::controller_networker (
         nexus_config        => $nexus_config,
       }
     }
+    # check if opendaylight needs to be configured.
+    if ('opendaylight' in $ml2_mechanism_drivers) {
+      neutron_plugin_ml2 {
+        'ml2_odl/username':         value => 'admin';
+        'ml2_odl/password':         value => 'admin';
+        'ml2_odl/url':              value => "http://${odl_controller_ip}:${odl_controller_port}/controller/nb/v2/neutron";
+      }
+
+    }
+
   }
 
   class {'quickstack::neutron::plugins::neutron_config':
