@@ -134,16 +134,43 @@ class quickstack::neutron::compute (
 
  # check if opendaylight needs to be configured.
     if ('opendaylight' in $ml2_mechanism_drivers) {
+      $local_ip = find_ip("$ovs_tunnel_network","$ovs_tunnel_iface","")
+      package {'sshpass':
+        ensure => installed,
+      }
+      ->
+      wait_for { "sshpass -p karaf ssh -p 8101 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PreferredAuthentications=password karaf@${odl_controller_ip} 'bundle:list -s | grep openstack.net-virt-providers | grep Active;'":
+        exit_code         => 0,
+        polling_frequency => 75,
+        max_retries       => 5,
+      }
+      ->
+      package { 'openvswitch':
+        ensure  => $package_ensure,
+        name    => $::neutron::params::ovs_package,
+      }
+      ->
+      service {'openvswitch':
+        ensure  => 'running',
+      }
+      ->
+      # OVS Add br-ex
+      vs_bridge { 'br-ex':
+        ensure => present,
+      }
+      ->
+      # local ip
+      exec { 'Set local_ip Other Option':
+        command => "/usr/bin/ovs-vsctl set Open_vSwitch $(ovs-vsctl get Open_vSwitch . _uuid) other_config:local_ip=${local_ip}",
+        unless  => "/usr/bin/ovs-vsctl list Open_vSwitch | /usr/bin/grep 'local_ip=\"${local_ip}\"'",
+      }
+      ->
       # OVS manager
       exec { 'Set OVS Manager to OpenDaylight':
         command => "/usr/bin/ovs-vsctl set-manager tcp:${odl_controller_ip}:6640",
         unless  => "/usr/bin/ovs-vsctl show | /usr/bin/grep 'Manager \"tcp:${odl_controller_ip}:6640\"'",
       }
-      # local ip
-      exec { 'Set local_ip Other Option':
-        command => "/usr/bin/ovs-vsctl set Open_vSwitch $(ovs-vsctl get Open_vSwitch . _uuid) other_config:local_ip=$::ipaddress",
-        unless  => "/usr/bin/ovs-vsctl list Open_vSwitch | /usr/bin/grep 'local_ip=\"$::ipaddress\"'",
-      }
+
     }
 
 

@@ -392,7 +392,8 @@ class quickstack::neutron::controller_networker (
         ensure => installed,
       }
       ->
-      wait_for { 'sshpass -p karaf ssh -p 8101 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PreferredAuthentications=password karaf@localhost bundle:list -s | grep openstack.net-virt-providers | grep Active;':
+      # Checks to see if net-virt provider for ODL is active before we bring up OVS
+      wait_for { "sshpass -p karaf ssh -p 8101 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PreferredAuthentications=password karaf@localhost 'bundle:list -s | grep openstack.net-virt-providers | grep Active;'":
         exit_code         => 0,
         polling_frequency => 75,
         max_retries       => 5,
