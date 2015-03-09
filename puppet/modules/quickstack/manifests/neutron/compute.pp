@@ -154,11 +154,6 @@ class quickstack::neutron::compute (
         ensure  => 'running',
       }
       ->
-      # OVS Add br-ex
-      vs_bridge { 'br-ex':
-        ensure => present,
-      }
-      ->
       # local ip
       exec { 'Set local_ip Other Option':
         command => "/usr/bin/ovs-vsctl set Open_vSwitch $(ovs-vsctl get Open_vSwitch . _uuid) other_config:local_ip=${local_ip}",
