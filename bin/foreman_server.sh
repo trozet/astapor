@@ -39,6 +39,10 @@ if [ "x$SCL_RUBY_HOME" = "x" ]; then
   SCL_RUBY_HOME=/opt/rh/ruby193/root
 fi
 
+if [ "x$OPNFV_PUPPET_HOME" = "x" ]; then
+  OPNFV_PUPPET_HOME=/usr/share/opnfv/
+fi
+
 if [ "x$OPENSTACK_PUPPET_HOME" = "x" ]; then
   OPENSTACK_PUPPET_HOME=/usr/share/openstack-puppet
 fi
@@ -123,6 +127,7 @@ class { 'puppet':
   server_common_modules_path => [
     '$QUICKSTACK_HOME/puppet/modules',
     '$OPENSTACK_PUPPET_HOME/modules',
+    '$OPNFV_PUPPET_HOME/modules',
   ],
 }
 
@@ -150,6 +155,9 @@ cat >> installer.pp << EOM
   dns_reverse      => '${PROVISIONING_REVERSE}',
   dns_forwarders   => ['${FORWARDER}'],
   dns_interface    => '${FACTER_PROV_INTERFACE}',
+
+  bmc              => true,
+  bmc_default_provider => 'ipmitool',
 }
 EOM
 
@@ -190,7 +198,7 @@ FOREMAN_VERSION_MAJOR=$(rpm -q foreman | cut -d'-' -f2 | cut -d'.' -f1)
 FOREMAN_VERSION_MINOR=$(rpm -q foreman | cut -d'-' -f2 | cut -d'.' -f2)
 # Set params, and run the db:seed file to set class parameter defaults
 if [[ "$FOREMAN_VERSION_MAJOR" > 1 || "$FOREMAN_VERSION_MINOR" > 4 ]]; then
-  cp ./seeds.rb $FOREMAN_DIR/db/seeds.d/99-quickstack.rb
+  cp ./opnfv-seeds.rb $FOREMAN_DIR/db/seeds.d/99-quickstack.rb
   sed -i "s#PROVISIONING_INTERFACE#$PROVISIONING_INTERFACE#" $FOREMAN_DIR/db/seeds.d/99-quickstack.rb
 else
   cp ./seeds.rb $FOREMAN_DIR/db/.
