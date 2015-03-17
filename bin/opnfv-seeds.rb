@@ -472,6 +472,7 @@ hostgroups = [
      :class=>"quickstack::storage_backend::cinder"},
 ]
 
+##gets puppet class key type
 def get_key_type(value)
   key_list = LookupKey::KEY_TYPES
   value_type = value.class.to_s.downcase
@@ -483,32 +484,36 @@ def get_key_type(value)
   # If we need to handle actual number classes like Fixnum, add those here
 end
 
-def set_all_params_override
-  pclasses = Puppetclass.find :all
-  pclasses.each do |pclass|
-    pclass.class_params.each do |p|
-      p.override = true
-      p.save
-    end
-  end
-end
+#set all puppet class parameters to override
+#def set_all_params_override
+#  pclasses = Puppetclass.find :all
+#  pclasses.each do |pclass|
+#    pclass.class_params.each do |p|
+#      p.override = true
+#      p.save
+#    end
+#  end
+#end
 
-set_all_params_override
+#set_all_params_override
 
-hostgroups.each do |hg|
-  pclassnames = hg[:class].kind_of?(Array) ? hg[:class] : [ hg[:class] ]
-  pclassnames.each do |pclassname|
-    pclass = Puppetclass.find_by_name pclassname
-    pclass.class_params.each do |p|
-      if params.include?(p.key)
-        p.key_type = get_key_type(params[p.key])
-        p.default_value = params[p.key]
-      end
-      p.save
-    end
-  end
-end
+##associates default puppet classes for each hostgroup
+##with default values
+#hostgroups.each do |hg|
+#  pclassnames = hg[:class].kind_of?(Array) ? hg[:class] : [ hg[:class] ]
+#  pclassnames.each do |pclassname|
+#    pclass = Puppetclass.find_by_name pclassname
+#    pclass.class_params.each do |p|
+#      if params.include?(p.key)
+#        p.key_type = get_key_type(params[p.key])
+#        p.default_value = params[p.key]
+#      end
+#      p.save
+#    end
+#  end
+#end
 
+##finds each hostgroup and adds puppet classes
 # Hostgroups
 hostgroups.each do |hg|
   h=Hostgroup.find_or_create_by_name hg[:name]
