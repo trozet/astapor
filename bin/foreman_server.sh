@@ -80,9 +80,9 @@ if [ "$FOREMAN_PROVISIONING" = "true" ]; then
   PRIMARY_INT=$(route|grep default|awk ' { print ( $(NF) ) }')
   PRIMARY_PREFIX=$(facter network_${PRIMARY_INT} | cut -d. -f1-3)
  
-  # If no provisioning interface specified, guess it's "the next one" 
+  # If no provisioning interface specified, we want the first interface (mgmt) for OPNFV 
   if [ "x$PROVISIONING_INTERFACE" = "x" ]; then
-    PROVISIONING_INTERFACE=$(facter -p|grep ipaddress_|grep -Ev "_lo|$PRIMARY_INT"|awk -F"[_ ]" '{print $2;exit 0}')
+    PROVISIONING_INTERFACE=$(facter -p|grep ipaddress_|grep -Ev "_lo"|awk -F"[_ ]" '{print $2;exit 0}')
   fi
 
   # the string for this interface that facter expects

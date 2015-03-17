@@ -11,7 +11,7 @@ require 'facter'
 require 'securerandom'
 
 # for the sub-network foreman owns
-secondary_int = ENV["PROVISIONING_INTERFACE"]
+secondary_int = 'PROVISIONING_INTERFACE'
 
 ##START of template
 provision_text=%q[
