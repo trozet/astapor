@@ -11,28 +11,76 @@ require 'facter'
 require 'securerandom'
 
 # for the sub-network foreman owns
-secondary_int = 'PROVISIONING_INTERFACE'
+secondary_int = ENV["PROVISIONING_INTERFACE"]
 
-# Changes from upstream:
-#  - EPEL removed
-#  - SELinux enforcing
-#  - puppet removed from %packages
-# Template texts - the trailing newline is important!
-provision_text='install
-<%= @mediapath %>
-lang en_US.UTF-8
-selinux --enforcing
+##START of template
+provision_text=%q[
+<%#
+kind: provision
+name: Kickstart default
+oses:
+- CentOS 4
+- CentOS 5
+- CentOS 6
+- CentOS 7
+- Fedora 16
+- Fedora 17
+- Fedora 18
+- Fedora 19
+- Fedora 20
+%>
+<%
+  rhel_compatible = @host.operatingsystem.family == 'Redhat' && @host.operatingsystem.name != 'Fedora'
+  os_major = @host.operatingsystem.major.to_i
+  realm_compatible = (@host.operatingsystem.name == "Fedora" && os_major >= 20) || (rhel_compatible && os_major >= 7)
+  # safemode renderer does not support unary negation
+  pm_set = @host.puppetmaster.empty? ? false : true
+  proxy_string = @host.params['http-proxy'] ? " --proxy=http://#{@host.params['http-proxy']}:#{@host.params['http-proxy-port']}" : ''
+  puppet_enabled = pm_set || @host.params['force-puppet'] && @host.params['force-puppet'] == 'true'
+  salt_enabled = @host.params['salt_master'] ? true : false
+  section_end = (rhel_compatible && os_major <= 5) ? '' : '%end'
+%>
+install
+<%= @mediapath %><%= proxy_string %>
+lang <%= @host.params['lang'] || 'en_US.UTF-8' %>
+selinux --permissive
 keyboard us
 skipx
-network --bootproto <%= @static ? "static" : "dhcp" %> --hostname <%= @host %>
+network --bootproto <%= @static ? "static --ip=#{@host.ip} --netmask=#{@host.subnet.mask} --gateway=#{@host.subnet.gateway} --nameserver=#{[@host.subnet.dns_primary,@host.subnet.dns_secondary].reject{|n| n.blank?}.join(',')}" : 'dhcp' %> --hostname <%= @host %>
 rootpw --iscrypted <%= root_pass %>
-firewall --<%= @host.operatingsystem.major.to_i >= 6 ? "service=" : "" %>ssh
+firewall --<%= os_major >= 6 ? 'service=' : '' %>ssh
 authconfig --useshadow --passalgo=sha256 --kickstart
-timezone UTC
-services --disabled autofs,gpm,sendmail,cups,iptables,ip6tables,auditd,arptables_jf,xfs,pcmcia,isdn,rawdevices,hpoj,bluetooth,openibd,avahi-daemon,avahi-dnsconfd,hidd,hplip,pcscd,restorecond,mcstrans,rhnsd,yum-updatesd
+timezone --utc <%= @host.params['time-zone'] || 'UTC' %>
+<% if rhel_compatible && os_major > 4 -%>
+services --disabled NetworkManger,gpm,sendmail,cups,pcmcia,isdn,rawdevices,hpoj,bluetooth,openibd,avahi-daemon,avahi-dnsconfd,hidd,hplip,pcscd
+services --enabled network
+<% end -%>
 
+<% if realm_compatible && @host.info["parameters"]["realm"] && @host.otp && @host.realm && @host.realm.realm_type == "Active Directory" -%>
+realm join --one-time-password='<%= @host.otp %>' <%= @host.realm %>
+<% end -%>
+
+<% if @host.operatingsystem.name == 'Fedora' -%>
+repo --name=fedora-everything --mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=fedora-<%= @host.operatingsystem.major %>&arch=<%= @host.architecture %><%= proxy_string %>
+<% if puppet_enabled && @host.params['enable-puppetlabs-repo'] && @host.params['enable-puppetlabs-repo'] == 'true' -%>
+repo --name=puppetlabs-products --baseurl=http://yum.puppetlabs.com/fedora/f<%= @host.operatingsystem.major %>/products/<%= @host.architecture %><%= proxy_string %>
+repo --name=puppetlabs-deps --baseurl=http://yum.puppetlabs.com/fedora/f<%= @host.operatingsystem.major %>/dependencies/<%= @host.architecture %><%= proxy_string %>
+<% end -%>
+<% elsif rhel_compatible && os_major > 4 -%>
+repo --name="EPEL" --mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-<%= @host.operatingsystem.major %>&arch=<%= @host.architecture %><%= proxy_string %>
+<% if puppet_enabled && @host.params['enable-puppetlabs-repo'] && @host.params['enable-puppetlabs-repo'] == 'true' -%>
+repo --name=puppetlabs-products --baseurl=http://yum.puppetlabs.com/el/<%= @host.operatingsystem.major %>/products/<%= @host.architecture %><%= proxy_string %>
+repo --name=puppetlabs-deps --baseurl=http://yum.puppetlabs.com/el/<%= @host.operatingsystem.major %>/dependencies/<%= @host.architecture %><%= proxy_string %>
+<% end -%>
+<% end -%>
+
+<% if @host.operatingsystem.name == 'Fedora' and os_major <= 16 -%>
+# Bootloader exception for Fedora 16:
+bootloader --append="nofb quiet splash=quiet <%=ks_console%>" <%= grub_pass %>
+part biosboot --fstype=biosboot --size=1
+<% else -%>
 bootloader --location=mbr --append="nofb quiet splash=quiet" <%= grub_pass %>
-key --skip
+<% end -%>
 
 <% if @dynamic -%>
 %include /tmp/diskpart.cfg
@@ -43,20 +91,39 @@ key --skip
 text
 reboot
 
-%packages --ignoremissing
+%packages
 yum
 dhclient
 ntp
 wget
-redhat-lsb-core
+-NetworkManager
 @Core
+<% if rhel_compatible && os_major > 4 -%>
+epel-release
+<% end -%>
+<% if puppet_enabled %>
+puppet
+<% if @host.params['enable-puppetlabs-repo'] && @host.params['enable-puppetlabs-repo'] == 'true' -%>
+puppetlabs-release
+<% end -%>
+<% end -%>
+<% if salt_enabled %>
+salt-minion
+<% end -%>
+<%= section_end -%>
 
 <% if @dynamic -%>
 %pre
 <%= @host.diskLayout %>
+<%= section_end -%>
 <% end -%>
 
 %post --nochroot
+##trozet bring up managed interfaces
+echo "config other interfaces"
+<% @host.interfaces.managed.each do |interface| %>
+network --bootproto=dhcp --device=<%= interface.identifier %> --onboot=yes
+<% end %>
 exec < /dev/tty3 > /dev/tty3
 #changing to VT 3 so that we can see whats going on....
 /usr/bin/chvt 3
@@ -64,6 +131,7 @@ exec < /dev/tty3 > /dev/tty3
 cp -va /etc/resolv.conf /mnt/sysimage/etc/resolv.conf
 /usr/bin/chvt 1
 ) 2>&1 | tee /mnt/sysimage/root/install.postnochroot.log
+<%= section_end -%>
 
 %post
 logger "Starting anaconda <%= @host %> postinstall"
@@ -73,26 +141,46 @@ exec < /dev/tty3 > /dev/tty3
 (
 #update local time
 echo "updating system time"
-/usr/sbin/ntpdate -sub <%= @host.params["ntp-server"] || "0.fedora.pool.ntp.org" %>
+/usr/sbin/ntpdate -sub <%= @host.params['ntp-server'] || '0.fedora.pool.ntp.org' %>
 /usr/sbin/hwclock --systohc
 
-<%= snippets "redhat_register" %>
+#run script to set onboots
+a=1; for f in /etc/sysconfig/network-scripts/ifcfg-* ; do if (($a > 3)); then break; fi; let "a++"; head -n -1 "$f" > /etc/sysconfig/network-scripts/temp.txt; echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/temp.txt; mv -f /etc/sysconfig/network-scripts/temp.txt "$f" ;  done
+
+<% if @host.info["parameters"]["realm"] && @host.otp && @host.realm && @host.realm.realm_type == "FreeIPA" -%>
+<%= snippet "freeipa_register" %>
+<% end -%>
+
+#disable networkmanager
+#systemctl stop NetworkManager
+#systemctl disable NetworkManager
+#systemctl start network
+#systemctl enable network
 
 # update all the base packages from the updates repository
 yum -t -y -e 0 update
 
-# and add the puppet package
-yum -t -y -e 0 install puppet
-
+<% if puppet_enabled %>
 echo "Configuring puppet"
 cat > /etc/puppet/puppet.conf << EOF
-<%= snippets "puppet.conf" %>
+<%= snippet 'puppet.conf' %>
 EOF
 
 # Setup puppet to run on system reboot
 /sbin/chkconfig --level 345 puppet on
 
-puppet agent -o --tags no_such_tag --server <%= @host.puppetmaster %>  --no-daemonize
+/usr/bin/puppet agent --config /etc/puppet/puppet.conf -o --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
+<% end -%>
+
+<% if salt_enabled %>
+cat > /etc/salt/minion << EOF
+<%= snippet 'saltstack_minion' %>
+EOF
+# Setup salt-minion to run on system reboot
+/sbin/chkconfig --level 345 salt-minion on
+# Running salt-call to trigger key signing
+salt-call --no-color --grains >/dev/null
+<% end -%>
 
 sync
 
@@ -102,13 +190,21 @@ wget -q -O /dev/null --no-check-certificate <%= foreman_url %>
 # Sleeping an hour for debug
 ) 2>&1 | tee /root/install.post.log
 exit 0
-'
+
+<%= section_end -%>
+]
+##END KICKSTART TEMPLATE
+
+##PXE TEMPLATE
 pxe_text='default linux
 label linux
 IPAPPEND 2
 kernel <%= @kernel %>
 append initrd=<%= @initrd %> ks=<%= foreman_url("provision")%> ksdevice=bootif network kssendmac
 '
+##END PXE TEMPLATE
+
+###partition table info
 ptable_text='zerombr
 clearpart --all --initlabel
 autopart
@@ -121,49 +217,21 @@ Setting[:manage_puppetca] = false
 Setting[:foreman_url] = Facter.value(:fqdn)
 
 # Create an OS to assign things to. We'll come back later to finish it's config
-os = Operatingsystem.where(:name => "RedHat", :major => "6", :minor => "4").first
-os ||= Operatingsystem.create(:name => "RedHat", :major => "6", :minor => "4")
+os = Operatingsystem.where(:name => "CentOS", :major => "7", :minor => "").first
+os ||= Operatingsystem.create(:name => "CentOS", :major => "7", :minor => "")
 os.type = "Redhat"
-os.description = "RHEL Server 6.4" if os.respond_to? :description=
+os.description = "CentOS 7" if os.respond_to? :description=
 os.save!
 
 # Installation Media - comes as standard, just need to associate it
 # For RHEL this is the Binary DVD image from rhn.redhat.com downloads, loopback
 # mounted and made available over HTTP.
-m=Medium.find_or_create_by_name("OpenStack RHEL mirror")
-m.path="http://mirror.example.com/rhel/$major.$minor/os/$arch"
+m=Medium.find_or_create_by_name("CentOS 7 mirror")
+m.path="http://mirror.centos.org/centos/$major/os/$arch"
 m.os_family="Redhat"
 m.operatingsystems << os
 m.save!
 
-# OS parameters for RHN(S) registration, see redhat_register snippet
-{
-  # use Subscription Manager, not Satellite
-  "subscription_manager" => "true",
-
-  "subscription_manager_username" => "username",
-  "subscription_manager_password" => "password",
-  # for load balancer also enable "rhel-lb-for-rhel-6-server-rpms"
-  "subscription_manager_repos" => "rhel-6-server-rpms,rhel-6-server-openstack-4.0-rpms",
-
-  # if using SAM/Katello
-  # "subscription_manager_host" => "katello.example.com",
-  # "subscription_manager_org" => "organization",
-
-  # if using Satellite
-  # "site" for local Satellite, "hosted" for RHN
-  # "satellite_type" => "site",
-  # "satellite_host" => "satellite.example.com",
-
-  # if using Satellite or SAM/Katello
-  # Activation key must have OpenStack child channel
-  # "activation_key" => "1-example",
-}.each do |k,v|
-  p=OsParameter.find_or_create_by_name(k)
-  p.value = v
-  p.reference_id = os.id
-  p.save!
-end
 
 # Add Proxy
 # Figure out how to call this before the class import
@@ -234,13 +302,6 @@ if ENV["FOREMAN_PROVISIONING"] == "true" then
     end
   end
   os.save!
-
-  # Override all the puppet class params for quickstack
-  primary_int=`route|grep default|awk ' { print ( $(NF) ) }'`.chomp
-  primary_prefix=Facter.value("network_#{primary_int}").split('.')[0..2].join('.')
-  sec_int_hash=Facter.to_hash.reject { |k| k !~ /^ipaddress_/ }.reject { |k| k =~ /lo|#{primary_int}/ }.first
-  secondary_int=sec_int_hash[0].split('_').last
-  secondary_prefix=sec_int_hash[1].split('.')[0..2].join('.')
 end
 
 params = {
