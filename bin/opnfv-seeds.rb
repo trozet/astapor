@@ -119,11 +119,20 @@ salt-minion
 <% end -%>
 
 %post --nochroot
-##trozet bring up managed interfaces
+##trozet bring up first 3 real interfaces
 echo "config other interfaces"
-<% @host.interfaces.managed.each do |interface| %>
+<% i=0 %>
+<% @host.interfaces.each do |interface| %>
+<% if i >= 3 %>
+<% break %>
+<% end %>
+<% if interface.identifier != "" %>
 network --bootproto=dhcp --device=<%= interface.identifier %> --onboot=yes
 <% end %>
+<% i=i+1 %>
+<% end %>
+
+
 exec < /dev/tty3 > /dev/tty3
 #changing to VT 3 so that we can see whats going on....
 /usr/bin/chvt 3
