@@ -12,8 +12,8 @@ This returns the ip associated with the given network or nic.
     the_nic = arguments[1] ||= ''
     the_ip = arguments[2] ||= ''
 
-    if (the_network != '')
-      function_get_ip_from_network([the_network])
+    if (the_ip != '')
+      the_ip
     elsif (the_nic != '')
       my_ip = nil
       [the_nic].flatten.each do |this_nic|
@@ -24,7 +24,7 @@ This returns the ip associated with the given network or nic.
       end
       my_ip
     else
-      the_ip
+      function_get_ip_from_network([the_network])
     end
   end
 end
