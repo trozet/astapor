@@ -1,5 +1,6 @@
 class quickstack::neutron::all (
   $allow_overlapping_ips         = true,
+  $agent_type                    = 'ovs',
   $auth_host                     = 'localhost',
   $auth_tenant                   = 'services',
   $auth_user                     = 'neutron',
@@ -63,6 +64,8 @@ class quickstack::neutron::all (
                                     },
   $n1kv_vsm_ip                   = '0.0.0.0',
   $n1kv_vsm_password             = undef,
+  $odl_controller_ip             = '',
+  $odl_controller_port           = '8080',
   $ovs_bridge_mappings           = [],
   $ovs_bridge_uplinks            = [],
   $ovs_tunnel_iface              = '',
@@ -179,6 +182,14 @@ class quickstack::neutron::all (
         nexus_config        => $nexus_config,
       }
     }
+     # check if opendaylight needs to be configured.
+    if ('opendaylight' in $ml2_mechanism_drivers) {
+      neutron_plugin_ml2 {
+        'ml2_odl/username':         value => 'admin';
+        'ml2_odl/password':         value => 'admin';
+        'ml2_odl/url':              value => "http://${odl_controller_ip}:${odl_controller_port}/controller/nb/v2/neutron";
+      }
+    }
   }
 
   if $neutron_core_plugin == 'neutron.plugins.cisco.network_plugin.PluginV2' {
@@ -200,6 +211,44 @@ class quickstack::neutron::all (
       provider_vlan_auto_trunk     => $provider_vlan_auto_trunk,
       tenant_network_type          => $tenant_network_type,
     }
+  } elsif downcase("$agent_type") == 'opendaylight' {
+      $local_ip = find_ip("$ovs_tunnel_network",
+                        ["$ovs_tunnel_iface","$external_network_bridge"],
+                        "")
+      Service<| title == 'opendaylight' |>
+      ->
+      package {'sshpass':
+        ensure => installed,
+      }
+      ->
+      # Checks to see if net-virt provider is active before we bring OVS
+      wait_for { "sshpass -p karaf ssh -p 8101 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PreferredAuthentications=password karaf@${odl_controller_ip} 'bundle:list -s | grep openstack.net-virt-providers | grep Active;'":
+        exit_code         => 0,
+        polling_frequency => 75,
+        max_retries       => 5,
+      }
+      ->
+      package { 'openvswitch':
+        ensure  => installed,
+        name    => $::neutron::params::ovs_package,
+      }
+      ->
+      service {'openvswitch':
+        ensure  => 'running',
+      }
+      ->
+      # local ip
+      exec { 'Set local_ip Other Option':
+        command => "/usr/bin/ovs-vsctl set Open_vSwitch $(ovs-vsctl get Open_vSwitch . _uuid) other_config:local_ip=${local_ip}",
+        unless  => "/usr/bin/ovs-vsctl list Open_vSwitch | /usr/bin/grep 'local_ip=\"${local_ip}\"'",
+      }
+      ->
+      # OVS manager
+      exec { 'Set OVS Manager to OpenDaylight':
+        command => "/usr/bin/ovs-vsctl set-manager tcp:${odl_controller_ip}:6640",
+        unless  => "/usr/bin/ovs-vsctl show | /usr/bin/grep 'Manager \"tcp:${odl_controller_ip}:6640\"'",
+      }
+
   } else {
     $local_ip = find_ip("$ovs_tunnel_network",
                       ["$ovs_tunnel_iface","$external_network_bridge"],
