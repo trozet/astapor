@@ -141,7 +141,7 @@ class quickstack::cinder_volume(
         netapp_storage_pools     => $netapp_storage_pools[0],
       }
     } elsif str2bool_i("$backend_rbd") {
-      Class['quickstack::ceph::client_packages'] -> Cinder::Backend::Rbd<| |>
+      #Class['quickstack::ceph::client_packages'] -> Cinder::Backend::Rbd<| |>
       class { '::cinder::volume::rbd':
         rbd_pool            => $rbd_pool,
         rbd_ceph_conf       => $rbd_ceph_conf,

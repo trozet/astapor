@@ -375,24 +375,24 @@ class quickstack::controller_common (
   }
 
   if (str2bool_i("$cinder_backend_rbd") or ($glance_backend == 'rbd')) {
-    include ::quickstack::ceph::client_packages
+    #include ::quickstack::ceph::client_packages
     # hack around the glance package declaration if needed
     if ($glance_backend != 'rbd') {
-      package {'python-ceph': } -> Class['quickstack::ceph::client_packages']
+      #package {'python-ceph': } -> Class['quickstack::ceph::client_packages']
     }
-    if $ceph_fsid {
-      class { '::quickstack::ceph::config':
-        fsid                  => $ceph_fsid,
-        cluster_network       => $ceph_cluster_network,
-        public_network        => $ceph_public_network,
-        mon_initial_members   => $ceph_mon_initial_members,
-        mon_host              => $ceph_mon_host,
-        images_key            => $ceph_images_key,
-        volumes_key           => $ceph_volumes_key,
-        osd_pool_default_size => $ceph_osd_pool_default_size,
-        osd_journal_size      => $ceph_osd_journal_size,
-      } -> Class['quickstack::ceph::client_packages']
-    }
+#    if $ceph_fsid {
+#      class { '::quickstack::ceph::config':
+#        fsid                  => $ceph_fsid,
+#        cluster_network       => $ceph_cluster_network,
+#        public_network        => $ceph_public_network,
+#        mon_initial_members   => $ceph_mon_initial_members,
+#        mon_host              => $ceph_mon_host,
+#        images_key            => $ceph_images_key,
+#        volumes_key           => $ceph_volumes_key,
+#        osd_pool_default_size => $ceph_osd_pool_default_size,
+#        osd_journal_size      => $ceph_osd_journal_size,
+#      } -> Class['quickstack::ceph::client_packages']
+#    }
   }
 
   class { 'quickstack::cinder_volume':

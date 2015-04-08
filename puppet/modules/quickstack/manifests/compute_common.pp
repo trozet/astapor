@@ -102,7 +102,7 @@ class quickstack::compute_common (
         osd_journal_size      => $ceph_osd_journal_size,
       } -> Class['quickstack::ceph::client_packages']
     }
-    package {'python-ceph': } ->
+    #package {'python-ceph': } ->
     Class['quickstack::ceph::client_packages'] -> Package['nova-compute']
   }
 
