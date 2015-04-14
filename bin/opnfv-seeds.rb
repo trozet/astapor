@@ -13,6 +13,36 @@ require 'securerandom'
 # for the sub-network foreman owns
 secondary_int = 'PROVISIONING_INTERFACE'
 
+##START of puppet template
+puppet_text=%q[
+<%#
+kind: snippet
+name: puppet.conf
+%>
+[main]
+<% if @host.operatingsystem.name == 'FreeBSD' -%>
+vardir = /var/puppet
+logdir = \$vardir/log
+<% else -%>
+vardir = /var/lib/puppet
+logdir = /var/log/puppet
+<% end -%>
+rundir = /var/run/puppet
+ssldir = \$vardir/ssl
+
+[agent]
+pluginsync      = true
+report          = true
+ignoreschedules = true
+daemon          = false
+ca_server       = <%= @host.puppet_ca_server %>
+certname        = <%= @host.certname %>
+environment     = <%= @host.environment %>
+server          = <%= @host.puppetmaster %>
+runinterval     = 600
+]
+##END PUPPET TEMPLATE
+
 ##START of template
 provision_text=%q[
 <%#
@@ -220,6 +250,9 @@ clearpart --all --initlabel
 autopart
 '
 
+# Set puppet interval accordingly (10 min)
+Setting[:puppet_interval] = 10
+
 # Disable CA management as the proxy has issues using sudo with SCL
 Setting[:manage_puppetca] = false
 
@@ -277,6 +310,14 @@ if ENV["FOREMAN_PROVISIONING"] == "true" then
   }
   pt.update_attributes(data)
   pt.save!
+
+  pup = ConfigTemplate.find_or_initialize_by_name "puppet.conf"
+  data = {
+    :template         => puppet_text,
+    :snippet          => true,
+  }
+  pup.update_attributes(data)
+  pup.save!
 
   pxe = ConfigTemplate.find_or_initialize_by_name "OpenStack PXE Template"
   data = {
