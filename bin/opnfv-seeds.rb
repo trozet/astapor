@@ -106,10 +106,10 @@ repo --name=puppetlabs-deps --baseurl=http://yum.puppetlabs.com/el/<%= @host.ope
 
 <% if @host.operatingsystem.name == 'Fedora' and os_major <= 16 -%>
 # Bootloader exception for Fedora 16:
-bootloader --append="nofb quiet splash=quiet biosdevname=0 net.ifnames=0 <%=ks_console%>" <%= grub_pass %>
+bootloader --append="nofb quiet splash=quiet <%=ks_console%>" <%= grub_pass %>
 part biosboot --fstype=biosboot --size=1
 <% else -%>
-bootloader --location=mbr --append="nofb quiet biosdevname=0 net.ifnames=0 splash=quiet" <%= grub_pass %>
+bootloader --location=mbr --append="nofb quiet splash=quiet" <%= grub_pass %>
 <% end -%>
 
 <% if @dynamic -%>
@@ -240,7 +240,7 @@ pxe_text='default linux
 label linux
 IPAPPEND 2
 kernel <%= @kernel %>
-append initrd=<%= @initrd %> ks=<%= foreman_url("provision")%> ksdevice=bootif network kssendmac biosdevname=0 net.ifnames=0
+append initrd=<%= @initrd %> ks=<%= foreman_url("provision")%> ksdevice=bootif network kssendmac
 '
 ##END PXE TEMPLATE
 
