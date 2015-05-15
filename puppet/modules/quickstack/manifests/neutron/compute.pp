@@ -145,19 +145,11 @@ class quickstack::neutron::compute (
         max_retries       => 5,
       }
       ->
-      package { 'openvswitch':
-        ensure  => $package_ensure,
-        name    => $::neutron::params::ovs_package,
-      }
-      ->
-      service {'openvswitch':
-        ensure  => 'running',
-      }
-      ->
       # local ip
       exec { 'Set local_ip Other Option':
         command => "/usr/bin/ovs-vsctl set Open_vSwitch $(ovs-vsctl get Open_vSwitch . _uuid) other_config:local_ip=${local_ip}",
         unless  => "/usr/bin/ovs-vsctl list Open_vSwitch | /usr/bin/grep 'local_ip=\"${local_ip}\"'",
+        require => Service['openvswitch'],
       }
       ->
       # OVS manager
