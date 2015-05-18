@@ -145,6 +145,10 @@ class quickstack::neutron::compute (
         max_retries       => 5,
       }
       ->
+      wait_for { 'a_minute':
+        seconds => 60,
+      }
+      ->
       # local ip
       exec { 'Set local_ip Other Option':
         command => "/usr/bin/ovs-vsctl set Open_vSwitch $(ovs-vsctl get Open_vSwitch . _uuid) other_config:local_ip=${local_ip}",

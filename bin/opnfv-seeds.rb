@@ -250,11 +250,14 @@ clearpart --all --initlabel
 autopart
 '
 
+# Set ignore facts for provisioning
+Setting[:ignore_puppet_facts_for_provisioning] = true
+
 # Set puppet interval accordingly (10 min)
 Setting[:puppet_interval] = 10
 
 # Disable CA management as the proxy has issues using sudo with SCL
-Setting[:manage_puppetca] = false
+Setting[:manage_puppetca] = true
 
 # Set correct hostname
 Setting[:foreman_url] = Facter.value(:fqdn)
