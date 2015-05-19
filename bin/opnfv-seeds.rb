@@ -29,6 +29,7 @@ logdir = /var/log/puppet
 <% end -%>
 rundir = /var/run/puppet
 ssldir = \$vardir/ssl
+bindaddress = <%= @host.ip %>
 
 [agent]
 pluginsync      = true
@@ -185,7 +186,11 @@ echo "updating system time"
 /usr/sbin/hwclock --systohc
 
 #run script to set onboots
+<% if @host.params["deployment_type"] == "three_network" %>
+a=1; for f in /etc/sysconfig/network-scripts/ifcfg-* ; do if (($a > 3)); then break; fi; let "a++"; head -n -1 "$f" > /etc/sysconfig/network-scripts/temp.txt; echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/temp.txt; mv -f /etc/sysconfig/network-scripts/temp.txt "$f" ;  done
+<% else -%>
 a=1; for f in /etc/sysconfig/network-scripts/ifcfg-* ; do if (($a > 4)); then break; fi; let "a++"; head -n -1 "$f" > /etc/sysconfig/network-scripts/temp.txt; echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/temp.txt; mv -f /etc/sysconfig/network-scripts/temp.txt "$f" ;  done
+<% end -%>
 
 <% if @host.info["parameters"]["realm"] && @host.otp && @host.realm && @host.realm.realm_type == "FreeIPA" -%>
 <%= snippet "freeipa_register" %>
