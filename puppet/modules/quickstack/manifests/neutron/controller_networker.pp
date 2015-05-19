@@ -399,18 +399,14 @@ class quickstack::neutron::controller_networker (
         max_retries       => 5,
       }
       ->
-      package { 'openvswitch':
-        ensure  => installed,
-        name    => $::neutron::params::ovs_package,
-      }
-      ->
-      service {'openvswitch':
-        ensure  => 'running',
+      wait_for { 'a_minute':
+        seconds => 60,
       }
       ->
       # OVS Add br-ex
       vs_bridge { 'br-ex':
         ensure => present,
+        require => Service['openvswitch'],
       }
       ->
       # local ip
