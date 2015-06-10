@@ -334,16 +334,16 @@ class quickstack::controller_common (
     verbose                     => $verbose,
   }
 
-  class {'quickstack::swift::proxy':
-    swift_proxy_host           => $controller_pub_host,
-    keystone_host              => $controller_pub_host,
-    swift_admin_password       => $swift_admin_password,
-    swift_shared_secret        => $swift_shared_secret,
-    swift_storage_ips          => $swift_storage_ips,
-    swift_storage_device       => $swift_storage_device,
-    swift_ringserver_ip        => $swift_ringserver_ip,
-    swift_is_ringserver        => true,
-  }
+#  class {'quickstack::swift::proxy':
+#    swift_proxy_host           => $controller_pub_host,
+#    keystone_host              => $controller_pub_host,
+#    swift_admin_password       => $swift_admin_password,
+#    swift_shared_secret        => $swift_shared_secret,
+#    swift_storage_ips          => $swift_storage_ips,
+#    swift_storage_device       => $swift_storage_device,
+#    swift_ringserver_ip        => $swift_ringserver_ip,
+#    swift_is_ringserver        => true,
+#  }
 
   class { 'quickstack::cinder':
     user_password  => $cinder_user_password,
