@@ -586,7 +586,7 @@ hostgroups = [
               "opnfv::controller_networker"]},
     {:name=>"Controller_Network_ODL",
      :class=>["opnfv",
-              "opnfv::opendaylight_controller",
+              "opnfv::odl_service",
               "opnfv::controller_networker"]},
     {:name=>"Compute",
      :class=>["opnfv",
