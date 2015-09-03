@@ -42,10 +42,14 @@
 #  }
 
 class quickstack::keystone::common (
+  $admin_endpoint              = '127.0.0.1',
   $admin_token,
   $amqp_host                   = 'localhost',
   $amqp_port                   = '5672',
   $bind_host                   = '0.0.0.0',
+  $admin_bind_host             = '0.0.0.0',
+  $public_bind_host            = '0.0.0.0',
+  $public_endpoint             = '127.0.0.1',
   $db_host                     = '127.0.0.1',
   $db_name                     = 'keystone',
   $db_password,
@@ -76,8 +80,11 @@ class quickstack::keystone::common (
   }
 
   class { '::keystone':
+    admin_endpoint   => "http://${admin_endpoint}:35357/",
     admin_token      => $admin_token,
-    bind_host        => $bind_host,
+    public_bind_host => $public_bind_host,
+    public_endpoint  => "http://${public_endpoint}:5000/",
+    admin_bind_host  => $admin_bind_host,
     catalog_type     => 'sql',
     debug            => $debug,
     enabled          => $enabled,

@@ -95,10 +95,13 @@ class quickstack::pacemaker::keystone (
       unless   => "/tmp/ha-all-in-one-util.bash i_am_vip $keystone_private_vip || /tmp/ha-all-in-one-util.bash property_exists keystone",
     } ->
     class {"::quickstack::keystone::common":
+      admin_endpoint => map_params("keystone_admin_vip"),
       admin_token  => "$admin_token",
       amqp_host    => map_params("amqp_vip"),
       amqp_port    => map_params("amqp_port"),
-      bind_host    => map_params("local_bind_addr"),
+      public_bind_host => map_params("keystone_public_vip"),
+      public_endpoint  => map_params("keystone_public_vip"),
+      admin_bind_host  => map_params("keystone_admin_vip"),
       db_host      => map_params("db_vip"),
       db_name      => "$db_name",
       db_password  => map_params("keystone_db_password"),
