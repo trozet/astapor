@@ -188,6 +188,8 @@ echo "updating system time"
 #run script to set onboots
 <% if @host.params["deployment_type"] == "three_network" %>
 a=1; for f in /etc/sysconfig/network-scripts/ifcfg-* ; do if (($a > 3)); then break; fi; let "a++"; head -n -1 "$f" > /etc/sysconfig/network-scripts/temp.txt; echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/temp.txt; mv -f /etc/sysconfig/network-scripts/temp.txt "$f" ;  done
+<% elsif @host.params["deployment_type"] == "single_network" %>
+a=1; for f in /etc/sysconfig/network-scripts/ifcfg-* ; do if (($a > 1)); then break; fi; let "a++"; head -n -1 "$f" > /etc/sysconfig/network-scripts/temp.txt; echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/temp.txt; mv -f /etc/sysconfig/network-scripts/temp.txt "$f" ;  done
 <% else -%>
 a=1; for f in /etc/sysconfig/network-scripts/ifcfg-* ; do if (($a > 4)); then break; fi; let "a++"; head -n -1 "$f" > /etc/sysconfig/network-scripts/temp.txt; echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/temp.txt; mv -f /etc/sysconfig/network-scripts/temp.txt "$f" ;  done
 <% end -%>
